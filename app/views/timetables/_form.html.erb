@@ -1,0 +1,18 @@
+<% # フォーム用パーシャル %>
+<%= form_with model: timetable do |form| %>
+<div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+</div>
+<div>
+    <%= form.label :description, style: "display :block" %>
+    <%= form.rich_text_area :description %>
+</div>
+<div>
+    <%= form.label :image, style: "display: block" %>
+    <%= form.file_field :image, accept: "image/*" %>
+</div>
+<div>
+    <%= form.submit %>
+</div>
+<% end %>

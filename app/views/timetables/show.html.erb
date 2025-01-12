@@ -1,0 +1,17 @@
+<section class="timetable">
+    <section class="timetable-info">
+        <h1><%= @timetable.name %></h1>
+        <%= @timetable.description %>
+        <% if authenticated? %>
+        <div>
+            <%= link_to t(".edit"), edit_timetable_path(@timetable) %>
+        </div>
+        <%= button_to t(".delete"), @timetable, method: :delete, data: {
+    turbo_confirm: t(".confirm")
+} %>
+        <% end %>
+    </section>
+</section>
+<div>
+    <%= link_to t(".back"), timetables_path %>
+</div>
