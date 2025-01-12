@@ -1,7 +1,6 @@
 <section class="timetable">
     <section class="timetable-info">
         <h1><%= @timetable.name %></h1>
-        <%= @timetable.description %>
         <% if authenticated? %>
         <div>
             <%= link_to t(".edit"), edit_timetable_path(@timetable) %>
