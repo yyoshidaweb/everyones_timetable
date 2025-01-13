@@ -1,6 +1,33 @@
 <section class="timetable">
     <section class="timetable-info">
         <h1><%= @timetable.name %></h1>
+        <%= link_to t(".new"), new_timetable_artist_path(@timetable, @artist) if authenticated? %>
+
+
+        <% # タイムテーブル %>
+        <% @timetable.stages.each do |stage| %>
+        <h2><%= stage.name %></h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% stage.artists.order(:start_time).each do |artist| %>
+                <tr>
+                    <td><%= artist.name %></td>
+                    <td><%= artist.start_time.strftime('%H:%M') %> - <%= artist.end_time.strftime('%H:%M') %></td>
+                    <td><%= link_to 'Edit', edit_artist_path(artist) %></td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% end %>
+
+
         <% if authenticated? %>
         <div>
             <%= link_to t(".edit"), edit_timetable_path(@timetable) %>

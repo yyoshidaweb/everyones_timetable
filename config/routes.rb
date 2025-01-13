@@ -17,8 +17,12 @@ Rails.application.routes.draw do
   # CRUDを全て作成する。
   resources :timetables do
     resources :stages, shallow: true do
-      resources :artist, shallow: true
+      resources :artists, shallow: true
     end
+  end
+
+  resources :timetables, only: [ :show ] do
+    resources :artists
   end
 
   # rootパスを設定する
