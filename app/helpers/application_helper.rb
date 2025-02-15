@@ -25,7 +25,7 @@ module ApplicationHelper
     start_time = ceil_to_nearest_5_minutes(artist.start_time)
     end_time = ceil_to_nearest_5_minutes(artist.end_time)
     duration_minutes = ((end_time - start_time) / 60).to_i
-    
+
     {
       top: duration_to_rows((start_time.hour - 10) * 60 + start_time.min),
       height: duration_to_rows(duration_minutes)
