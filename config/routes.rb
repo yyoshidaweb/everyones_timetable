@@ -15,7 +15,15 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   # CRUDを全て作成する。
-  resources :timetables
+  resources :timetables do
+    resources :stages, shallow: true do
+      resources :artists, shallow: true
+    end
+  end
+
+  resources :timetables, only: [ :show ] do
+    resources :artists
+  end
 
   # rootパスを設定する
   root "timetables#index"
