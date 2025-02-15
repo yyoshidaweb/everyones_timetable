@@ -10,6 +10,10 @@ class TimetablesController < ApplicationController
 
   # タイムテーブルを一つビューに渡す
   def show
+    @timetable = Timetable.find(params[:id])
+    @stages = @timetable.stages
+    @artists = @timetable.artists.includes(:stage)
+                        .group_by(&:stage_id)
   end
 
   # 新規タイムテーブル作成のフォームを作成する

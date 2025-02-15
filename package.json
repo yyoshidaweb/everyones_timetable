@@ -1,0 +1,18 @@
+{
+  "name": "everyones_timetable",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.css -o ./app/assets/builds/application.css --minify --config ./config/tailwind.config.js"
+  },
+  "repository": "git@github.com:yyoshidaweb/everyones_timetable.git",
+  "author": "yyoshidaweb <yoshidayumajob@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.0.0"
+  }
+}

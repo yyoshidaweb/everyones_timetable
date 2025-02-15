@@ -18,23 +18,34 @@ class ArtistsController < ApplicationController
   end
 
   def create
-    # 既存ステージが存在しない場合、新しいステージを作成する
-    stage = if params[:new_stage_name].present?
-              Stage.create(
-                timetable_id: params[:timetable_id],
-                name: params[:new_stage_name]
-              )
-            else
-              Stage.find_by(params[:artist][:stage_id])
-            end
-    # アーティストを作成する
-    @artist = stage.artists.build(artist_params)
+    Rails.logger.debug "Artist params: #{params.inspect}"
+    Rails.logger.debug "Stage ID: #{params.dig(:artist, :stage_id)}"
+
+    @stage = Stage.find(params[:artist][:stage_id])
+    Rails.logger.debug "Found stage: #{@stage.inspect}"
+
+    @artist = @stage.artists.build(artist_params)
+
+    # 日付部分を今日の日付で補完
+    @artist.start_time = Time.zone.now.to_date.to_time + @artist.start_time.seconds_since_midnight
+    @artist.end_time = Time.zone.now.to_date.to_time + @artist.end_time.seconds_since_midnight
+
+    Rails.logger.debug "Built artist: #{@artist.inspect}"
+
     if @artist.save
-      redirect_to timetable_path(stage.timetable)
+      Rails.logger.debug "Artist saved successfully"
+      redirect_to timetable_path(@timetable), notice: "\u30A2\u30FC\u30C6\u30A3\u30B9\u30C8\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F"
     else
+      Rails.logger.debug "Artist save failed: #{@artist.errors.full_messages}"
       @stages = Stage.where(timetable_id: params[:timetable_id])
-      render :new
+      render :new, status: :unprocessable_entity
     end
+  rescue => e
+    Rails.logger.error "Error in create: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    @stages = Stage.where(timetable_id: params[:timetable_id])
+    flash.now[:alert] = "\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F"
+    render :new, status: :unprocessable_entity
   end
 
   def edit
@@ -44,15 +55,16 @@ class ArtistsController < ApplicationController
 
   def update
     if @artist.update(artist_params)
-      redirect_to stage_path(@artist.stage)
+      redirect_to timetable_path(@artist.stage.timetable), notice: "\u30A2\u30FC\u30C6\u30A3\u30B9\u30C8\u60C5\u5831\u3092\u66F4\u65B0\u3057\u307E\u3057\u305F"
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
+    timetable = @artist.stage.timetable
     @artist.destroy
-    redirect_to stage_path(@artist.stage)
+    redirect_to timetable_path(timetable), notice: "\u30A2\u30FC\u30C6\u30A3\u30B9\u30C8\u3092\u524A\u9664\u3057\u307E\u3057\u305F"
   end
 
   # タイムテーブルを一つ取得する
