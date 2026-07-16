@@ -10,6 +10,11 @@ updates:
     open-pull-requests-limit: 1  # PR上限を1に制限
     groups:
       bundler-updates:          # すべてのGem更新を1つにまとめる
+        applies-to: version-updates
+        patterns:
+          - "*"
+      bundler-security:         # セキュリティ更新を1つにまとめる
+        applies-to: security-updates
         patterns:
           - "*"
 
@@ -23,5 +28,10 @@ updates:
     open-pull-requests-limit: 1
     groups:
       actions-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      actions-security:
+        applies-to: security-updates
         patterns:
           - "*"
