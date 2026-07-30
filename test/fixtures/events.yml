@@ -39,3 +39,10 @@ no_ai_usage_event:
   event_key: "no_ai_usage_event"
   description: "AI利用回数0のユーザーのテスト用フェスイベント"
   is_published: true
+
+unpublished:
+  user: one
+  event_name_tag: unpublished
+  event_key: "unpublished"
+  description: "非公開のテスト用フェスイベント"
+  is_published: false

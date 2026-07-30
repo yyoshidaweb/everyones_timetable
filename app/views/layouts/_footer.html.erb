@@ -12,6 +12,10 @@
                     class: "text-gray-700 hover:text-gray-900 hover:underline",
                     target: "_blank",
                     rel: "noopener noreferrer" %>
+          <% if user_signed_in? && current_user.developer? %>
+            <%= link_to "管理画面（開発者向け）", admin_dashboard_path,
+                class: "text-gray-700 hover:text-gray-900 hover:underline" %>
+          <% end %>
           <div class="flex items-center text-gray-700">
             <span>運営：</span>
             <%= link_to "https://piku.page/@yyoshidaweb",

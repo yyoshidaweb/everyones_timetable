@@ -18,3 +18,6 @@ six:
 
 no_ai_usage_event:
   name: "AI利用回数0のイベント"
+
+unpublished:
+  name: "非公開イベント"
