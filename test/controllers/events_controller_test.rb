@@ -41,10 +41,23 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should show lock icon on unpublished event detail for owner" do
+    unpublished_event = events(:unpublished)
+    get event_url(unpublished_event.event_key)
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "lock"
+  end
+
   # 自分が作成したイベント一覧
   test "should index" do
     get events_path
     assert_response :success
+  end
+
+  test "should show lock icon for unpublished event in created list" do
+    get events_path(filter: "created")
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "lock"
   end
 
   # イベント作成ページを表示
