@@ -66,6 +66,22 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to show_timetable_path(created_event.event_key)
   end
 
+  test "should create unpublished event" do
+    event_name = "非公開イベント作成テスト"
+    assert_difference("Event.count", 1) do
+      post events_url, params: {
+        event: {
+          event_name_tag_attributes: { name: event_name },
+          description: "説明",
+          is_published: false
+        }
+      }
+    end
+
+    created_event = Event.last
+    assert_not created_event.is_published?
+  end
+
   # 1ユーザー内のイベント名が重複する場合は作成できない
   test "should not create overlapping event" do
     overlapping_event_name = "Event1"
@@ -138,6 +154,20 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
 
     # Event 本体の値も更新されていること
     assert_equal "説明更新", @event.description
+  end
+
+  test "should update event publication status" do
+    patch event_url(@event.event_key), params: {
+      event: {
+        description: @event.description,
+        is_published: false,
+        event_name_tag_attributes: { name: @event.event_name_tag.name }
+      }
+    }
+
+    assert_redirected_to event_path(@event.event_key)
+    @event.reload
+    assert_not @event.is_published?
   end
 
   # イベント名が空文字の場合は編集できない

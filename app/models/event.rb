@@ -29,7 +29,8 @@ class Event < ApplicationRecord
   # みんなが作ったタイムテーブルのうち、未来イベントを取得
   scope :future_all, -> {
     now = Time.current.to_date
-    left_joins(:event_favorites)
+    where(is_published: true)
+      .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
       .includes(:user, :days)
@@ -47,7 +48,8 @@ class Event < ApplicationRecord
   # みんなが作ったタイムテーブルのうち、過去イベントを取得
   scope :past_all, -> {
     now = Time.current.to_date
-    left_joins(:event_favorites)
+    where(is_published: true)
+      .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
       .includes(:user, :days)
