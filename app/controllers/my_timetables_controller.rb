@@ -3,6 +3,8 @@ class MyTimetablesController < ApplicationController
   before_action :set_user
   # イベントをセット
   before_action :set_event
+  # 非公開イベントの閲覧制御
+  before_action :authorize_published_event_access!
   # === 出演者、開催日、ステージをセット ===
   before_action :set_performers
   before_action :set_days
@@ -39,6 +41,11 @@ class MyTimetablesController < ApplicationController
     # イベントを取得
     def set_event
       @event = Event.includes(:event_name_tag).find_by!(event_key: params[:event_key])
+    end
+
+    # 非公開イベントは作成者のみ閲覧可能
+    def authorize_published_event_access!
+      authorize_published_event!(@event)
     end
 
     # 出演者を取得

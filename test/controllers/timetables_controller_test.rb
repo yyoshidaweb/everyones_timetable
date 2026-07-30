@@ -34,6 +34,19 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should not get unpublished timetable with logout" do
+    sign_out @user
+    get show_timetable_path(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
+  test "should not get unpublished timetable by other user" do
+    sign_out @user
+    sign_in @user_two
+    get show_timetable_path(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
   # デフォルト（最古日付）での表示テスト
   test "should show event timetable by event_key" do
     get show_timetable_path(@event.event_key)

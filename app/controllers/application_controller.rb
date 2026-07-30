@@ -33,4 +33,13 @@ class ApplicationController < ActionController::Base
   end
   # ビューでpreview_environment?メソッドを使用できるようにする
   helper_method :preview_environment?
+
+  private
+    # 非公開イベントは作成者本人のみ閲覧を許可する
+    def authorize_published_event!(event)
+      return if event.is_published?
+      return if user_signed_in? && event.user == current_user
+
+      raise ActiveRecord::RecordNotFound
+    end
 end

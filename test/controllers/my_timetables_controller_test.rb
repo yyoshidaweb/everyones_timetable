@@ -32,4 +32,19 @@ class MyTimetablesControllerTest < ActionDispatch::IntegrationTest
     get show_my_timetable_path(event_key: @event.event_key, username: @user.username)
     assert_response :success
   end
+
+  test "should not get unpublished my_timetable with logout" do
+    sign_out @user
+    unpublished_event = events(:unpublished)
+    get show_my_timetable_path(event_key: unpublished_event.event_key, username: @user.username)
+    assert_response :not_found
+  end
+
+  test "should not get unpublished my_timetable by other user" do
+    sign_out @user
+    sign_in @user_two
+    unpublished_event = events(:unpublished)
+    get show_my_timetable_path(event_key: unpublished_event.event_key, username: @user.username)
+    assert_response :not_found
+  end
 end

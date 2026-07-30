@@ -22,6 +22,19 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should not show unpublished event with logout" do
+    sign_out @user
+    get event_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
+  test "should not show unpublished event by other user" do
+    sign_out @user
+    sign_in users(:two)
+    get event_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
   # 他者が作成したイベント詳細も表示できる
   test "should show event by other user" do
     get event_url(@other_event.event_key)

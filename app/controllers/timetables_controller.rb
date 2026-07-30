@@ -3,6 +3,8 @@ class TimetablesController < ApplicationController
   before_action :set_event, only: %i[ show new create ]
   # イベントの所有者本人のみアクセス可能
   before_action :authorize_event!, only: %i[ new create ]
+  # 非公開イベントの閲覧制御
+  before_action :authorize_published_event_access!, only: %i[ show ]
   # === 出演者、開催日、ステージをセット ===
   before_action :set_performers, only: %i[ show ]
   before_action :set_days
@@ -100,6 +102,11 @@ class TimetablesController < ApplicationController
     # イベントの所有者かどうかチェック（異なる場合は404エラーを発生させる）
     def authorize_event!
       raise ActiveRecord::RecordNotFound unless @event.user == current_user
+    end
+
+    # 非公開イベントは作成者のみ閲覧可能
+    def authorize_published_event_access!
+      authorize_published_event!(@event)
     end
 
     # 出演者を取得
