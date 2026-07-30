@@ -18,6 +18,8 @@ class Admin::DashboardsControllerTest < ActionDispatch::IntegrationTest
     assert_match @free_user.name, response.body
     assert_match events(:unpublished).display_name, response.body
     assert_match "非公開", response.body
+    assert_select "a[href=?]", show_timetable_path(events(:unpublished).event_key),
+                  text: events(:unpublished).display_name
   end
 
   test "free user cannot access admin dashboard" do
