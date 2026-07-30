@@ -1,0 +1,58 @@
+---
+description: みんなのタイムテーブル プロジェクトの基本方針
+alwaysApply: true
+---
+
+# みんなのタイムテーブル
+
+音楽フェス向けタイムテーブル作成サービス。文字入力だけでWeb版タイムテーブルを作れる。
+
+- UI 表記: **みんなのタイムテーブル**
+- 英語・コード: **minnanotimetable**（リポジトリ名もこれに合わせる）
+- サービスURL: https://minnanotimetable.com
+
+## 技術スタック
+
+- Ruby on Rails（Hotwire: Turbo / Stimulus）+ Tailwind CSS
+- 認証: Devise + Google OAuth
+- DB: SQLite（開発・ステージング）/ PostgreSQL（本番）
+- テスト: Minitest
+- ホスティング: Render（PRプレビュー / ステージング / 本番）
+- パッケージ管理: Bundler + Yarn、ランタイムは mise
+
+## Git ワークフロー
+
+**ブランチ戦略: [GitHub Flow](https://docs.github.com/ja/get-started/using-github/github-flow)**
+
+- `main` は常にデプロイ可能な状態を保つ
+- 作業は `main` から作業用ブランチを切り、PR 経由で `main` にマージする
+- **`main` ブランチへの直接プッシュは禁止**
+- 作業完了後は、**PR 作成前に人間によるレビューを求め、許可を得てから PR を作成する**
+- **マージは必ず人間が行う**（エージェントがマージしない）
+- PR マージで本番・ステージングへ自動デプロイされる。PR プレビューは Render の Pull Request Previews を利用する
+
+**コミットメッセージ: [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/)**
+
+```
+<型>[任意 スコープ]: <タイトル>
+
+[任意 本文]
+```
+
+- 主な型: `feat`（新機能）、`fix`（バグ修正）、`docs`、`chore`、`refactor`、`test`、`build`、`ci`
+- タイトルは命令形・簡潔に（例: `feat: タイムテーブル一覧に公開フラグを追加`）
+- **実装作業中は、修正のたびにコミットする**（作業完了時に一括コミットにまとめない）
+
+## コーディング方針
+
+- 依頼された範囲だけ変更する（過剰な抽象化・未要求機能は追加しない）
+- 既存コードの命名・構成に合わせる（Rails / Hotwire 中心。未依頼で React 等を導入しない）
+- UI 文言は日本語
+- コントローラー変更時は Minitest を追加・更新する
+- PR プレビューでは `preview_environment?`（`ENV["IS_PULL_REQUEST"]`）を使い、メール送信・外部API・Webhook・決済などの外部通信を止める
+
+## 文章・GitHub
+
+- 日本語と英語の間にスペースを入れない（例: `本Issue`、不可: `本 Issue`）
+- GitHub上でIssue、コメントなどを書く際は、必ず末尾に `Made with Cursor` という署名を付ける
+- PR作成時は署名を付けない（Cursorが自動付与するため）
