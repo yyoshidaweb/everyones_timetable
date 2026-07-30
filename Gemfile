@@ -43,6 +43,8 @@ gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 2.0"
+# Rails 8.1.3.1+ の Active Storage が起動時に要求する（libvips >= 8.13 も必要）
+gem "ruby-vips", ">= 2.2.1", require: false
 
 # 追記
 gem "rexml", ">= 3.4"
