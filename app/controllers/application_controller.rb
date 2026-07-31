@@ -38,8 +38,10 @@ class ApplicationController < ActionController::Base
     # 非公開イベントは作成者本人のみ閲覧を許可する
     def authorize_published_event!(event)
       return if event.is_published?
-      return if user_signed_in? && event.user == current_user
+      return if user_signed_in? && event.user_id == current_user.id
 
-      raise ActiveRecord::RecordNotFound
+      # raise だと開発環境で Exception 画面になるため、公開用404を返す
+      response.set_header("X-Robots-Tag", "noindex, nofollow")
+      render file: Rails.public_path.join("404.html"), status: :not_found, layout: false
     end
 end

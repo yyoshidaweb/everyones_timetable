@@ -38,6 +38,7 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     sign_out @user
     get show_timetable_path(events(:unpublished).event_key)
     assert_response :not_found
+    assert_includes response.body, "ページが見つかりません"
   end
 
   test "should not get unpublished timetable by other user" do
@@ -45,6 +46,7 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user_two
     get show_timetable_path(events(:unpublished).event_key)
     assert_response :not_found
+    assert_includes response.body, "ページが見つかりません"
   end
 
   # デフォルト（最古日付）での表示テスト

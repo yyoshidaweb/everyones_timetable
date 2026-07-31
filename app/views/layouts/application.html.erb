@@ -9,8 +9,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%# ステージング環境では検索エンジンにインデックスさせないための設定 %>
-    <% if Rails.env.staging? %>
+    <%# ステージング環境、または非公開タイムテーブルでは検索エンジンにインデックスさせない %>
+    <% if Rails.env.staging? || (@event.present? && !@event.is_published?) %>
       <meta name="robots" content="noindex, nofollow">
     <% end %>
     <%# OGP画像 %>
