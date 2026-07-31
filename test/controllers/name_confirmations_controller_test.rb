@@ -14,9 +14,8 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
   test "should get new as modal" do
     get new_name_confirmation_url, headers: { "Turbo-Frame" => "modal" } # モーダルとして表示
     assert_response :success
-    # 選択肢が2つとも表示されていることを確認
+    assert_includes response.body, "名前を変更しますか？"
     assert_includes response.body, "この名前で続ける"
-    assert_includes response.body, "名前を変更する"
   end
 
   # モーダル以外での表示は想定していないため直接アクセスはリダイレクトされる
@@ -40,30 +39,30 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_url
   end
 
-  # 「この名前で続ける」を押した場合は名前が変更されない
-  test "should not change name when keeping current name" do
+  # フォームに入力されている名前で更新される
+  test "should update name with submitted value" do
     patch name_confirmation_url,
-      params: { commit_type: "keep", user: { name: "変更後の名前" } },
-      headers: { "Accept" => "text/vnd.turbo-stream.html" }
-    @user.reload
-    assert_equal "Name Unconfirmed", @user.name # 名前は変更されない
-    assert @user.name_confirmed? # 名前は確認済みになる
-  end
-
-  # 「名前を変更する」を押した場合は入力された名前で更新される
-  test "should change name when changing name" do
-    patch name_confirmation_url,
-      params: { commit_type: "change", user: { name: "変更後の名前" } },
+      params: { user: { name: "変更後の名前" } },
       headers: { "Accept" => "text/vnd.turbo-stream.html" }
     @user.reload
     assert_equal "変更後の名前", @user.name
     assert @user.name_confirmed? # 名前は確認済みになる
   end
 
+  # 名前を変更しなかった場合も確認済みになる
+  test "should confirm name when name is not modified" do
+    patch name_confirmation_url,
+      params: { user: { name: @user.name } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    @user.reload
+    assert_equal "Name Unconfirmed", @user.name
+    assert @user.name_confirmed?
+  end
+
   # 確認後にモーダルが閉じる
   test "turbo_stream: modal is closed after confirmation" do
     patch name_confirmation_url,
-      params: { commit_type: "keep", user: { name: "Name Unconfirmed" } },
+      params: { user: { name: "変更後の名前" } },
       headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
     assert_response :success
@@ -75,7 +74,7 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
   # 名前が空の場合は確認済みにならない
   test "should not confirm when name is blank" do
     patch name_confirmation_url,
-      params: { commit_type: "change", user: { name: "" } },
+      params: { user: { name: "" } },
       headers: { "Turbo-Frame" => "modal" }
     @user.reload
     assert_equal "Name Unconfirmed", @user.name # 名前は変更されない
@@ -87,7 +86,7 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
   # ログアウト時の更新アクションのテスト
   test "should redirect update when not logged in" do
     sign_out @user # ログアウト状態を再現
-    patch name_confirmation_url, params: { commit_type: "change", user: { name: "Hacker" } }
+    patch name_confirmation_url, params: { user: { name: "Hacker" } }
     assert_redirected_to root_url
     assert_not @user.reload.name_confirmed? # 未ログインは更新不可
   end

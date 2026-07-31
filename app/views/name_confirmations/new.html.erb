@@ -3,7 +3,7 @@
   <div class="fixed inset-0 z-300 flex items-center justify-center bg-black/40">
     <div class="relative max-h-[80svh] overflow-y-auto bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
       <div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
-        <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center">お名前の確認</h1>
+        <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center">名前を変更しますか？</h1>
         <p class="text-gray-500 text-sm mb-8">
           マイタイムテーブルなどに表示される名前です。あとからプロフィール編集画面でも変更できます。
         </p>
@@ -17,12 +17,10 @@
               class: "w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800
                       focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800" %>
           </div>
-          <%# 名前を変更するボタン・この名前で続けるボタン %>
-          <div class="space-y-3">
-            <%= f.button "名前を変更する", name: "commit_type", value: "change",
+          <%# 入力されている名前で確定するボタン %>
+          <div>
+            <%= f.submit "この名前で続ける",
               class: "w-full py-2 rounded-md bg-gray-800 text-white hover:bg-gray-900 transition cursor-pointer" %>
-            <%= f.button "この名前で続ける", name: "commit_type", value: "keep",
-              class: "w-full py-2 rounded-md border border-gray-300 text-gray-800 hover:bg-gray-50 transition cursor-pointer" %>
           </div>
         <% end %>
       </div>

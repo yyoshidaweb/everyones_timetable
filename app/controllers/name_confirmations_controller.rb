@@ -14,9 +14,8 @@ class NameConfirmationsController < ApplicationController
 
   def update
     @user = current_user
-    # 「名前を変更する」を押した場合のみ入力された名前で更新する
-    @user.name = user_params[:name] if params[:commit_type] == "change"
-    # ボタンを押した時点で名前を確認済みにする
+    # フォームに入力されている名前を設定し、確認済みにする
+    @user.name = user_params[:name]
     @user.name_confirmed_at = Time.current
 
     if @user.save
