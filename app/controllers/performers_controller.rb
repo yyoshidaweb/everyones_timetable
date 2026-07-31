@@ -3,6 +3,8 @@ class PerformersController < ApplicationController
   before_action :set_event
   # indexとshow以外のアクションは所有者本人のみアクセス可能
   before_action :authorize_event!, except: %i[index show]
+  # 非公開イベントの閲覧制御（公開ページ）
+  before_action :authorize_published_event_access!, only: %i[ index show ]
   before_action :set_performer, only: %i[ show edit update destroy ]
   before_action :set_performances, only: %i[ show ]
   before_action :set_page_title, except: %i[ destroy ]
@@ -127,6 +129,11 @@ class PerformersController < ApplicationController
     # イベントの所有者かどうかチェック（異なる場合は404エラーを発生させる）
     def authorize_event!
       raise ActiveRecord::RecordNotFound unless @event.user == current_user
+    end
+
+    # 非公開イベントは作成者のみ閲覧可能
+    def authorize_published_event_access!
+      authorize_published_event!(@event)
     end
 
     # 出演者を取得

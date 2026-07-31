@@ -30,6 +30,19 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should not get unpublished event stages with logout" do
+    sign_out @user
+    get event_stages_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
+  test "should not get unpublished event stages by other user" do
+    sign_out @user
+    sign_in users(:two)
+    get event_stages_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
   # ステージ詳細
   test "should get show stage" do
     stage = @event.stages.first

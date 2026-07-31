@@ -30,6 +30,19 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should not get unpublished event performers with logout" do
+    sign_out @user
+    get event_performers_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
+  test "should not get unpublished event performers by other user" do
+    sign_out @user
+    sign_in users(:two)
+    get event_performers_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
   # 出演者詳細
   test "should get show" do
     performer = @event.performers.first
