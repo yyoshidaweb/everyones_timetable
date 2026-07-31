@@ -5,9 +5,10 @@
         class="fixed inset-0 z-300 flex items-center justify-center bg-black/40">
     <div class="relative max-h-[80svh] overflow-y-auto bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
       <div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
-        <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center">名前を変更しますか？</h1>
+        <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center">表示名を確認してください</h1>
         <p class="text-gray-500 text-sm mb-8">
-          マイタイムテーブルなどに表示される名前です。あとからプロフィール編集画面でも変更できます。
+          他のユーザーに表示される名前をご確認ください。<br>
+          変更しない場合は、そのまま「この名前で続ける」を押してください。
         </p>
         <%= form_with model: @user, url: name_confirmation_path, method: :patch, class: "space-y-6" do |f| %>
           <%# エラーメッセージ %>

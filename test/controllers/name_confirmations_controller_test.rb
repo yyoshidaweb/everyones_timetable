@@ -14,7 +14,7 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
   test "should get new as modal" do
     get new_name_confirmation_url, headers: { "Turbo-Frame" => "modal" } # モーダルとして表示
     assert_response :success
-    assert_includes response.body, "名前を変更しますか？"
+    assert_includes response.body, "表示名を確認してください"
     assert_includes response.body, "この名前で続ける"
   end
 
