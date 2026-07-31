@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   resources :sessions, only: [ :new ]
   # ユーザープロフィール用のルーティング
   resource :profile, only: [ :show, :edit, :update, :destroy ]
-  # 新規登録直後の名前確認用のルーティング
+  # 名前変更モーダル用のルーティング
   resource :name_confirmation, only: [ :new, :update ]
 
   # Deviseのルーティング設定でOmniauthコールバック用コントローラーを指定

@@ -6,7 +6,7 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
 
   # 各テストの前に実行されるセットアップメソッド
   setup do
-    @user = users(:name_unconfirmed) # 名前が未確認のユーザー（新規登録直後）を利用
+    @user = users(:name_unconfirmed) # 名前が未確認のユーザーを利用
     sign_in @user # テスト用のログイン状態を再現
   end
 
@@ -68,7 +68,9 @@ class NameConfirmationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "text/vnd.turbo-stream.html", response.media_type
     # モーダルを閉じる Turbo Stream が返っているか
-    assert_includes response.body, 'turbo-stream action="update" target="modal"'
+    assert_includes response.body, 'turbo-stream action="replace" target="modal"'
+    # 再度読み込まれないよう src が取り除かれているか
+    assert_not_includes response.body, new_name_confirmation_path
   end
 
   # 名前が空の場合は確認済みにならない

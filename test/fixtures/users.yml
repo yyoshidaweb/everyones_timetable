@@ -46,7 +46,7 @@ developer:
   role: developer
   name_confirmed_at: <%= Time.current %> # 名前を確認済みであることを再現
 
-# 名前が未確認のユーザー（新規登録直後を再現）
+# 名前が未確認のユーザー（名前変更モーダルが表示される状態を再現）
 name_unconfirmed:
   name: Name Unconfirmed
   email: name.unconfirmed@example.com

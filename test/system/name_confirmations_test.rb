@@ -28,4 +28,20 @@ class NameConfirmationsTest < ApplicationSystemTestCase
     visit root_path
     assert_no_text "名前を変更しますか？"
   end
+
+  test "確定後にブラウザバックしても再表示されない" do
+    visit root_path
+    assert_text "名前を変更しますか？"
+
+    click_on "この名前で続ける"
+    assert_no_text "名前を変更しますか？"
+
+    # 別ページへ遷移してから戻る
+    click_on "利用規約"
+    assert_current_path terms_path
+    page.go_back
+
+    assert_current_path root_path
+    assert_no_text "名前を変更しますか？"
+  end
 end
