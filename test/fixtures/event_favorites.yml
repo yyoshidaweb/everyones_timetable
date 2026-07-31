@@ -1,3 +1,11 @@
 user_one_to_event_one:
   user: one
   event: one
+
+user_two_to_unpublished:
+  user: two
+  event: unpublished
+
+user_one_to_unpublished:
+  user: one
+  event: unpublished

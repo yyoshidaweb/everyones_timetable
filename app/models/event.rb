@@ -82,9 +82,11 @@ class Event < ApplicationRecord
   }
 
   # お気に入りタイムテーブル（最後にお気に入りした順）
+  # 非公開イベントは作成者本人のお気に入り一覧にのみ表示する
   scope :recent_favorite_by, ->(user) {
     joins(:event_favorites)
       .where(event_favorites: { user_id: user.id })
+      .where("events.is_published = ? OR events.user_id = ?", true, user.id)
       .includes(:user, :days)
       .order("event_favorites.created_at DESC")
   }
