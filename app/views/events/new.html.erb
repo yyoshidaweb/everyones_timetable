@@ -34,9 +34,7 @@
     <%# 非公開設定トグル（オンで非公開） %>
     <div>
       <label class="inline-flex items-center gap-2 cursor-pointer">
-        <%= f.check_box :is_published,
-              { class: "w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800 cursor-pointer" },
-              "0", "1" %>
+        <%= f.check_box :is_private, class: "w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800 cursor-pointer" %>
         <span class="text-sm text-gray-800">非公開にする</span>
       </label>
       <p class="mt-1 text-xs text-gray-500">非公開にすると自分以外は閲覧できません。</p>

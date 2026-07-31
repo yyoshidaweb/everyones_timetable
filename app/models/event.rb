@@ -98,4 +98,14 @@ class Event < ApplicationRecord
   def display_name
     event_name_tag.name
   end
+
+  # フォーム用: 非公開チェックボックス（オン=非公開）
+  # boolean列 is_published を反転した値として扱う
+  def is_private
+    !is_published?
+  end
+
+  def is_private=(value)
+    self.is_published = !ActiveModel::Type::Boolean.new.cast(value)
+  end
 end

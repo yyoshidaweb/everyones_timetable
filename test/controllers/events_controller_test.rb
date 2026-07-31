@@ -154,6 +154,19 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should check private checkbox when event is unpublished" do
+    unpublished_event = events(:unpublished)
+    get edit_event_url(unpublished_event.event_key)
+    assert_response :success
+    assert_select "input[name='event[is_private]'][type=checkbox][checked]"
+  end
+
+  test "should not check private checkbox when event is published" do
+    get edit_event_url(@event.event_key)
+    assert_response :success
+    assert_select "input[name='event[is_private]'][type=checkbox][checked]", count: 0
+  end
+
   # 他者が作成した編集フォームは表示できない
   test "should not get edit form of other user's event" do
     get edit_event_url(@other_event.event_key)
