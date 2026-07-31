@@ -51,11 +51,19 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
-  # N+1クエリを検出してRailsログに警告を出力する
-  # 既存のN+1を解消するまでは raise させず、ログ出力のみに留める
+  # N+1クエリを検出してRailsログに警告を出力し、検出時はテストを失敗させる
   config.after_initialize do
     Bullet.enable = true
     Bullet.rails_logger = true
-    Bullet.raise = false
+    Bullet.raise = true
+
+    # `dependent: :destroy` のカスケード削除はActive Recordが関連を1件ずつ読み込むため
+    # N+1として検出されるが、削除時のコールバックを動かす以上避けられないので除外する
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :days
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :stages
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :performers
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :event_favorites
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Performer", association: :performances
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Performance", association: :performance_favorites
   end
 end

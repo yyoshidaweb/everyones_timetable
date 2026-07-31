@@ -20,7 +20,7 @@
           <%# 名前 %>
           <p class="mb-2 text-lg font-semibold text-gray-800 line-clamp-2"><%= performer.display_name %></p>
           <%# 出演情報 %>
-          <% if performer.performances.exists? %>
+          <% if performer.performances.any? %>
             <div class="gap-1 flex flex-col text-gray-500">
               <div class="gap-1 flex items-baseline">
                 <% performance = performer.performances.first %>

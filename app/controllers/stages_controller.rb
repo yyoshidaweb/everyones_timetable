@@ -11,7 +11,7 @@ class StagesController < ApplicationController
 
   # ステージ一覧
   def index
-    @stages = @event.stages.order(:position)
+    @stages = @event.stages.order(:position).includes(:stage_name_tag)
   end
 
   # ステージ
@@ -26,7 +26,7 @@ class StagesController < ApplicationController
 
   # ステージ作成処理
   def create
-    @stages = @event.stages.order(:position)
+    @stages = @event.stages.order(:position).includes(:stage_name_tag)
     @stage = @event.stages.build(stage_params)
 
     # フォームで受け取るタグ名（fields_for で post される形）
@@ -119,7 +119,7 @@ class StagesController < ApplicationController
 
   # ステージ並び替えページ
   def sort
-    @stages = @event.stages.order(:position)
+    @stages = @event.stages.order(:position).includes(:stage_name_tag)
   end
 
   # ステージ並び替え処理

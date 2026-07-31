@@ -33,7 +33,7 @@ class Event < ApplicationRecord
       .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
-      .includes(:user, :days)
+      .includes(:user, :days, :event_name_tag, :event_favorites)
       .group(:id)
       .having("MAX(days.date) >= ?", now)
       .order(
@@ -52,7 +52,7 @@ class Event < ApplicationRecord
       .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
-      .includes(:user, :days)
+      .includes(:user, :days, :event_name_tag, :event_favorites)
       .group(:id)
       .having("MAX(days.date) < ?", now)
       .order(
@@ -72,7 +72,7 @@ class Event < ApplicationRecord
   # 作成したタイムテーブル
   scope :recent_created_by, ->(user) {
     where(user: user)
-      .includes(:user, :days)
+      .includes(:user, :days, :event_name_tag, :event_favorites)
       .order(created_at: :desc)
   }
 
@@ -87,7 +87,7 @@ class Event < ApplicationRecord
     joins(:event_favorites)
       .where(event_favorites: { user_id: user.id })
       .where("events.is_published = ? OR events.user_id = ?", true, user.id)
-      .includes(:user, :days)
+      .includes(:user, :days, :event_name_tag, :event_favorites)
       .order("event_favorites.created_at DESC")
   }
 

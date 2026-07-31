@@ -94,7 +94,7 @@ class PerformancesController < ApplicationController
 
     # 出演者を取得
     def set_performers
-      @performers = @event.performers.order_by_name
+      @performers = @event.performers.order_by_name.includes(:performer_name_tag)
     end
 
     # 開催日を取得
@@ -104,7 +104,7 @@ class PerformancesController < ApplicationController
 
     # ステージを取得
     def set_stages
-      @stages = @event.stages
+      @stages = @event.stages.includes(:stage_name_tag)
     end
 
     # ページタイトルを設定

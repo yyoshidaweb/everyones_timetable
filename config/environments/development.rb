@@ -80,5 +80,14 @@ Rails.application.configure do
   config.after_initialize do
     Bullet.enable = true
     Bullet.rails_logger = true
+
+    # `dependent: :destroy` のカスケード削除はActive Recordが関連を1件ずつ読み込むため
+    # N+1として検出されるが、削除時のコールバックを動かす以上避けられないので除外する
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :days
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :stages
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :performers
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Event", association: :event_favorites
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Performer", association: :performances
+    Bullet.add_safelist type: :n_plus_one_query, class_name: "Performance", association: :performance_favorites
   end
 end
