@@ -8,7 +8,8 @@
         <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center">表示名を確認してください</h1>
         <p class="text-gray-500 text-sm mb-8">
           他のユーザーに表示される名前をご確認ください。<br>
-          変更しない場合は、そのまま「この名前で続ける」を押してください。
+          変更しない場合は、そのまま「この名前で続ける」を押してください。<br>
+          あとからプロフィール編集画面でも変更できます。
         </p>
         <%= form_with model: @user, url: name_confirmation_path, method: :patch, class: "space-y-6" do |f| %>
           <%# エラーメッセージ %>
