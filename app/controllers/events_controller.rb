@@ -7,6 +7,8 @@ class EventsController < ApplicationController
   before_action :set_event, only: [ :show, :edit, :update, :destroy ]
   # 所有者本人かどうかチェック
   before_action :authorize_event!, only: [ :edit, :update, :destroy ]
+  # 非公開イベントの閲覧制御
+  before_action :authorize_published_event_access!, only: [ :show ]
   # 開催日を昇順で取得
   before_action :set_days, only: [ :show, :edit ]
   before_action :set_page_title, except: %i[ destroy ]
@@ -144,6 +146,11 @@ class EventsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @event.user == current_user
   end
 
+  # 非公開イベントは作成者のみ閲覧可能
+  def authorize_published_event_access!
+    authorize_published_event!(@event)
+  end
+
   # 開催日を昇順にセットする
   def set_days
     @days = @event.days.order(:date)
@@ -172,6 +179,8 @@ class EventsController < ApplicationController
   def event_params
     params.require(:event).permit(
       :description,
+      :is_published,
+      :is_private,
       event_name_tag_attributes: [ :name ] # event_name_tagに対するエラーの伝播を許可
     )
   end

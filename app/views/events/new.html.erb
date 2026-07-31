@@ -31,6 +31,14 @@
         class: "w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800
                 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800 min-h-32 resize-y overflow-y-auto"%>
     </div>
+    <%# 非公開設定トグル（オンで非公開） %>
+    <div>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <%= f.check_box :is_private, class: "w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800 cursor-pointer" %>
+        <span class="text-sm text-gray-800">非公開にする</span>
+      </label>
+      <p class="mt-1 text-xs text-gray-500">オンにすると自分だけに表示されます。</p>
+    </div>
     <%# 作成ボタン %>
     <div>
       <%= f.submit "作成",

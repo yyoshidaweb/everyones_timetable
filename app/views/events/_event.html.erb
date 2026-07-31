@@ -3,7 +3,7 @@
                           class: "block bg-white shadow-md rounded-lg p-4 border hover:shadow-xl hover:bg-gray-50 transition" do %>
   <%# タイトル %>
   <p class="text-lg font-semibold text-gray-800 line-clamp-1">
-    <%= event.display_name %>
+    <%= event_name_with_lock(event) %>
   </p>
   <%# 開催日 %>
   <p class="text-sm text-gray-500">

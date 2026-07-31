@@ -29,7 +29,8 @@ class Event < ApplicationRecord
   # みんなが作ったタイムテーブルのうち、未来イベントを取得
   scope :future_all, -> {
     now = Time.current.to_date
-    left_joins(:event_favorites)
+    where(is_published: true)
+      .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
       .includes(:user, :days)
@@ -47,7 +48,8 @@ class Event < ApplicationRecord
   # みんなが作ったタイムテーブルのうち、過去イベントを取得
   scope :past_all, -> {
     now = Time.current.to_date
-    left_joins(:event_favorites)
+    where(is_published: true)
+      .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
       .includes(:user, :days)
@@ -80,9 +82,11 @@ class Event < ApplicationRecord
   }
 
   # お気に入りタイムテーブル（最後にお気に入りした順）
+  # 非公開イベントは作成者本人のお気に入り一覧にのみ表示する
   scope :recent_favorite_by, ->(user) {
     joins(:event_favorites)
       .where(event_favorites: { user_id: user.id })
+      .where("events.is_published = ? OR events.user_id = ?", true, user.id)
       .includes(:user, :days)
       .order("event_favorites.created_at DESC")
   }
@@ -95,5 +99,15 @@ class Event < ApplicationRecord
   # フォームや一覧表示用の名前
   def display_name
     event_name_tag.name
+  end
+
+  # フォーム用: 非公開チェックボックス（オン=非公開）
+  # boolean列 is_published を反転した値として扱う
+  def is_private
+    !is_published?
+  end
+
+  def is_private=(value)
+    self.is_published = !ActiveModel::Type::Boolean.new.cast(value)
   end
 end

@@ -22,16 +22,42 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should not show unpublished event with logout" do
+    sign_out @user
+    get event_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
+  test "should not show unpublished event by other user" do
+    sign_out @user
+    sign_in users(:two)
+    get event_url(events(:unpublished).event_key)
+    assert_response :not_found
+  end
+
   # 他者が作成したイベント詳細も表示できる
   test "should show event by other user" do
     get event_url(@other_event.event_key)
     assert_response :success
   end
 
+  test "should show lock icon on unpublished event detail for owner" do
+    unpublished_event = events(:unpublished)
+    get event_url(unpublished_event.event_key)
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "lock"
+  end
+
   # 自分が作成したイベント一覧
   test "should index" do
     get events_path
     assert_response :success
+  end
+
+  test "should show lock icon for unpublished event in created list" do
+    get events_path(filter: "created")
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "lock"
   end
 
   # イベント作成ページを表示
@@ -64,6 +90,22 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_equal tag.id, created_event.event_name_tag_id
     # 正しいリダイレクト先
     assert_redirected_to show_timetable_path(created_event.event_key)
+  end
+
+  test "should create unpublished event" do
+    event_name = "非公開イベント作成テスト"
+    assert_difference("Event.count", 1) do
+      post events_url, params: {
+        event: {
+          event_name_tag_attributes: { name: event_name },
+          description: "説明",
+          is_published: false
+        }
+      }
+    end
+
+    created_event = Event.last
+    assert_not created_event.is_published?
   end
 
   # 1ユーザー内のイベント名が重複する場合は作成できない
@@ -112,6 +154,19 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should check private checkbox when event is unpublished" do
+    unpublished_event = events(:unpublished)
+    get edit_event_url(unpublished_event.event_key)
+    assert_response :success
+    assert_select "input[name='event[is_private]'][type=checkbox][checked]"
+  end
+
+  test "should not check private checkbox when event is published" do
+    get edit_event_url(@event.event_key)
+    assert_response :success
+    assert_select "input[name='event[is_private]'][type=checkbox][checked]", count: 0
+  end
+
   # 他者が作成した編集フォームは表示できない
   test "should not get edit form of other user's event" do
     get edit_event_url(@other_event.event_key)
@@ -138,6 +193,20 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
 
     # Event 本体の値も更新されていること
     assert_equal "説明更新", @event.description
+  end
+
+  test "should update event publication status" do
+    patch event_url(@event.event_key), params: {
+      event: {
+        description: @event.description,
+        is_published: false,
+        event_name_tag_attributes: { name: @event.event_name_tag.name }
+      }
+    }
+
+    assert_redirected_to event_path(@event.event_key)
+    @event.reload
+    assert_not @event.is_published?
   end
 
   # イベント名が空文字の場合は編集できない
