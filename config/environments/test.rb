@@ -50,4 +50,12 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # N+1クエリを検出してRailsログに警告を出力する
+  # 既存のN+1を解消するまでは raise させず、ログ出力のみに留める
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.rails_logger = true
+    Bullet.raise = false
+  end
 end
