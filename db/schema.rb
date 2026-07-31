@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_021648) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_31_084711) do
   create_table "days", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "date", null: false
@@ -122,6 +122,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_021648) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "name", limit: 50, default: "", null: false
+    t.datetime "name_confirmed_at"
     t.string "provider", limit: 50, default: "", null: false
     t.datetime "remember_created_at"
     t.string "remember_token"
