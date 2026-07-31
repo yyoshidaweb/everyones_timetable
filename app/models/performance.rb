@@ -31,7 +31,7 @@ class Performance < ApplicationRecord
   # 開催日と開始時刻順で並べ、必要な関連も事前ロードするスコープ
   scope :ordered_for_performer_detail, -> {
     left_joins(:day)
-      .includes(:day, :stage)
+      .includes(:day, stage: :stage_name_tag)
       .order(
         Arel.sql("days.date IS NULL ASC"), # dayあり → dayなし の順
         "days.date ASC",
@@ -49,10 +49,7 @@ class Performance < ApplicationRecord
     )
     .where(performers: { event_id: event.id })
     .where(days: { date: date })
-    .includes(
-      performer: :performer_name_tag,
-      stage: :stage_name_tag
-    )
+    .includes(performer: :performer_name_tag)
     .order(:start_time)
   }
 

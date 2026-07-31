@@ -40,7 +40,7 @@ class MyTimetablesController < ApplicationController
 
     # イベントを取得
     def set_event
-      @event = Event.includes(:event_name_tag).find_by!(event_key: params[:event_key])
+      @event = Event.find_by!(event_key: params[:event_key])
     end
 
     # 非公開イベントは作成者のみ閲覧可能

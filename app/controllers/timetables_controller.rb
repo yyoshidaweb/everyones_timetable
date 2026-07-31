@@ -96,7 +96,7 @@ class TimetablesController < ApplicationController
         else
           params[:event_event_key]
         end
-      @event = Event.includes(:event_name_tag).find_by!(event_key: event_key_param)
+      @event = Event.find_by!(event_key: event_key_param)
     end
 
     # イベントの所有者かどうかチェック（異なる場合は404エラーを発生させる）
