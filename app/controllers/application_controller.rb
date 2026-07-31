@@ -34,6 +34,12 @@ class ApplicationController < ActionController::Base
   # ビューでpreview_environment?メソッドを使用できるようにする
   helper_method :preview_environment?
 
+  # 名前変更モーダルを表示するかどうかを判定するヘルパーメソッド
+  def show_name_confirmation_modal?
+    user_signed_in? && !current_user.name_confirmed?
+  end
+  helper_method :show_name_confirmation_modal?
+
   private
     # 非公開イベントは作成者本人のみ閲覧を許可する
     def authorize_published_event!(event)

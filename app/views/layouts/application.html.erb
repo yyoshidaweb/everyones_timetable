@@ -67,8 +67,12 @@
     <%# メイン要素（ヘルパーでクラスを生成） %>
     <main class="<%= main_element_class %>">
       <%= yield %>
-      <%# モーダル用 %>
-      <%= turbo_frame_tag "modal" %>
+      <%# モーダル用（新規登録直後は名前変更モーダルを自動で読み込む） %>
+      <% if show_name_confirmation_modal? %>
+        <%= turbo_frame_tag "modal", src: new_name_confirmation_path %>
+      <% else %>
+        <%= turbo_frame_tag "modal" %>
+      <% end %>
     </main>
     <%# フッター %>
     <%= render "layouts/footer" %>
