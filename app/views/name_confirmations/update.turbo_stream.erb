@@ -1,0 +1,4 @@
+<%# モーダルを閉じる（src を取り除いて再度読み込まれないようにする） %>
+<%= turbo_stream.replace "modal" do %>
+  <%= turbo_frame_tag "modal" %>
+<% end %>

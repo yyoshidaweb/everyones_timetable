@@ -63,6 +63,11 @@ class User < ApplicationRecord
     provider.blank? && super
   end
 
+  # 名前変更モーダルで名前を確認済みかどうか
+  def name_confirmed?
+    name_confirmed_at.present?
+  end
+
   # お気に入りタイムテーブル（event）idを取得する
   def favorite_event_id(event)
     event_favorites.find_by(event_id: event.id)&.id

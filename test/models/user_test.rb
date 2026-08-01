@@ -17,6 +17,24 @@ class UserTest < ActiveSupport::TestCase
     assert user.username.bytesize >= 8
   end
 
+  # 名前の確認状況が name_confirmed_at で判定される
+  test "name_confirmed? depends on name_confirmed_at" do
+    assert users(:one).name_confirmed?
+    assert_not users(:name_unconfirmed).name_confirmed?
+  end
+
+  # Googleログインで新規作成されたユーザーは名前が未確認になる
+  test "user created by from_omniauth is not name confirmed" do
+    auth = OmniAuth::AuthHash.new(
+      provider: "google_oauth2",
+      uid: "test-google-uid-403",
+      info: { email: "user4@example.com", name: "Test User" }
+    )
+    user = User.from_omniauth(auth)
+    assert user.persisted?
+    assert_not user.name_confirmed?
+  end
+
   # 月を跨いだ時にAI利用回数がリセットされる
   test "should reset ai_timetable_count when month has changed" do
     user = @no_ai_usage_user
