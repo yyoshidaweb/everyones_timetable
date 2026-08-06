@@ -22,12 +22,12 @@ module EventsHelper
     @my_timetable_view ? "bg-orange-600" : "bg-gray-800"
   end
 
-  # event-headerのタイトルを返す
+  # event-headerのタイトルを返す（鍵アイコンはビュー側で先頭に付ける）
   def event_header_title
     if @my_timetable_view
-      safe_join([ "#{@user.name}の", event_name_with_lock(@event), " マイタイムテーブル" ])
+      "#{@user.name}の#{@event.display_name} マイタイムテーブル"
     else
-      event_name_with_lock(@event)
+      @event.display_name
     end
   end
 
