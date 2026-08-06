@@ -1,15 +1,15 @@
 <%# イベント用ヘッダー (@show_event_headerがtrueの場合のみ表示) %>
 <% if @show_event_header %>
-  <header class="fixed top-8 z-160 left-0 w-full p-2 h-8 flex justify-center items-center
+  <header class="fixed top-8 z-160 left-0 w-full p-2 h-8 flex justify-center items-center gap-2
                 <%= event_header_color %>">
-    <div class="flex-1">
+    <div class="w-6 shrink-0 flex items-center">
       <%= render "events/favorite_button", event: @event %>
     </div>
-    <h1 class="text-sm text-white truncate text-center flex-none max-w-[95%] flex items-center justify-center leading-none">
+    <h1 class="text-sm text-white truncate text-center flex-1 min-w-0 leading-none">
       <%= event_header_title %>
     </h1>
     <%# 共有ボタン（data-urlで読み込ませたいURLを指定する） %>
-    <div class="flex-1 flex justify-end">
+    <div class="w-6 shrink-0 flex items-center justify-end">
       <button
           data-controller="modal"
           data-action="click->modal#open"
