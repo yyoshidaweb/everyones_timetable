@@ -43,3 +43,6 @@
 # macOSシステムファイル
 .DS_Store
 public/.DS_Store
+
+# 並行作業用のgit worktree（bin/worktree が作成する）
+/.worktrees/
