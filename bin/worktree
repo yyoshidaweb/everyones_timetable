@@ -58,9 +58,9 @@ def add(branch)
   end
 
   FileUtils.chdir path do
-    puts "\n== 依存関係をインストール =="
+    # node_modules はgit管理下にあるため、worktree作成時点で展開済み
+    puts "\n== gemをインストール =="
     system("bundle check") || system!("bundle install")
-    system! "yarn install"
 
     puts "\n== データベースを準備 =="
     system! "bin/rails db:prepare"
@@ -83,7 +83,15 @@ def remove(branch, force:)
   path = worktree_path(branch)
   abort "#{path} が見つかりません。" unless File.exist?(path)
 
-  system! "git worktree remove #{force ? "--force " : ""}#{path}"
+  unless force
+    changes = `git -C #{path} status --porcelain --untracked-files=no`
+    unless changes.empty?
+      abort "#{path} に未コミットの変更があります。コミットするか、--force を付けて実行してください。"
+    end
+  end
+
+  # 鍵ファイルやDBなどgitignore対象のファイルが必ず残っているため --force が必要
+  system! "git worktree remove --force #{path}"
   puts "#{path} を削除しました。ブランチ #{branch} は残っています。"
 end
 
