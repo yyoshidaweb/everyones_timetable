@@ -7,7 +7,7 @@
     </div>
     <%# 非公開の場合はタイトル全体の先頭に鍵アイコンを付ける %>
     <h1 class="text-sm text-white flex-1 min-w-0 flex items-center justify-center gap-1 leading-none">
-      <%= lock_icon unless @event.is_published? %>
+      <%= lock_icon_for(@event) %>
       <span class="truncate"><%= event_header_title %></span>
     </h1>
     <%# 共有ボタン（data-urlで読み込ませたいURLを指定する） %>
