@@ -17,8 +17,8 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Enable auto-merge for bundler-updates
-        if: steps.metadata.outputs.dependency-group == 'bundler-updates'
+      - name: Enable auto-merge
+        if: contains(fromJSON('["bundler-updates", "bundler-security", "actions-updates", "actions-security"]'), steps.metadata.outputs.dependency-group)
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
