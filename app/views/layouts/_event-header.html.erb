@@ -2,13 +2,17 @@
 <% if @show_event_header %>
   <header class="fixed top-8 z-160 left-0 w-full p-2 h-8 flex justify-center items-center gap-2
                 <%= event_header_color %>">
+    <%# マイタイムテーブルではお気に入りボタンを出さないが、
+        右の共有ボタンと幅を揃えてタイトルを中央に保つため枠だけ残す %>
     <div class="w-6 shrink-0 flex items-center">
       <%= render "events/favorite_button", event: @event %>
     </div>
+    <% header_title = event_header_title %>
     <%# 非公開の場合はタイトル全体の先頭に鍵アイコンを付ける %>
     <h1 class="text-sm text-white flex-1 min-w-0 flex items-center justify-center gap-1 leading-none">
       <%= lock_icon_for(@event) %>
-      <span class="truncate"><%= event_header_title %></span>
+      <%# 省略された場合でも全文を確認できるようにtitle属性を付ける %>
+      <span class="truncate" title="<%= header_title %>"><%= header_title %></span>
     </h1>
     <%# 共有ボタン（data-urlで読み込ませたいURLを指定する） %>
     <div class="w-6 shrink-0 flex items-center justify-end">
