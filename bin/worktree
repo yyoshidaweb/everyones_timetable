@@ -1,0 +1,120 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+APP_ROOT = File.expand_path("..", __dir__)
+WORKTREES_DIR = ".worktrees".freeze
+
+def system!(*args)
+  system(*args, exception: true)
+end
+
+def usage
+  puts <<~USAGE
+    並行作業用のgit worktreeを管理します。
+
+    使い方:
+      bin/worktree add <ブランチ名>     worktreeを作成してセットアップする
+      bin/worktree remove <ブランチ名>  worktreeを削除する（--force で未コミットの変更ごと削除）
+      bin/worktree list                worktreeの一覧を表示する
+
+    例:
+      bin/worktree add feat/460-example
+  USAGE
+end
+
+def main_worktree?
+  git_dir = `git rev-parse --absolute-git-dir`.strip
+  common_dir = File.expand_path(`git rev-parse --git-common-dir`.strip)
+  git_dir == common_dir
+end
+
+def branch_exists?(ref)
+  system("git show-ref --verify --quiet refs/#{ref}")
+end
+
+def worktree_path(branch)
+  File.join(WORKTREES_DIR, branch.tr("/", "-"))
+end
+
+def add(branch)
+  path = worktree_path(branch)
+  abort "#{path} は既に存在します。" if File.exist?(path)
+
+  puts "== worktreeを作成 =="
+  system! "git fetch origin"
+
+  if branch_exists?("heads/#{branch}")
+    system! "git worktree add #{path} #{branch}"
+  elsif branch_exists?("remotes/origin/#{branch}")
+    system! "git worktree add #{path} --track -b #{branch} origin/#{branch}"
+  else
+    system! "git worktree add #{path} -b #{branch} origin/main"
+  end
+
+  puts "\n== gitignoreされている鍵ファイルをコピー =="
+  FileUtils.cp "config/master.key", "#{path}/config/master.key"
+  Dir.glob("config/credentials/*.key").each do |key|
+    FileUtils.cp key, "#{path}/#{key}"
+  end
+
+  FileUtils.chdir path do
+    puts "\n== 依存関係をインストール =="
+    system("bundle check") || system!("bundle install")
+    system! "yarn install"
+
+    puts "\n== データベースを準備 =="
+    system! "bin/rails db:prepare"
+  end
+
+  puts <<~DONE
+
+    == 完了 ==
+    cd #{path}
+
+    開発サーバーを既存のものと同時に起動する場合は、ポートを変えて起動してください。
+      PORT=3001 bin/dev
+
+    作業が終わったら、メインの作業ディレクトリで次のコマンドを実行して削除できます。
+      bin/worktree remove #{branch}
+  DONE
+end
+
+def remove(branch, force:)
+  path = worktree_path(branch)
+  abort "#{path} が見つかりません。" unless File.exist?(path)
+
+  system! "git worktree remove #{force ? "--force " : ""}#{path}"
+  puts "#{path} を削除しました。ブランチ #{branch} は残っています。"
+end
+
+FileUtils.chdir APP_ROOT do
+  command, *args = ARGV
+
+  unless %w[add remove list].include?(command)
+    usage
+    exit 1
+  end
+
+  unless main_worktree?
+    abort "メインの作業ディレクトリで実行してください（worktreeの中では実行できません）。"
+  end
+
+  case command
+  when "add"
+    branch = args.first
+    if branch.nil?
+      usage
+      exit 1
+    end
+    add(branch)
+  when "remove"
+    branch = args.find { |arg| !arg.start_with?("--") }
+    if branch.nil?
+      usage
+      exit 1
+    end
+    remove(branch, force: args.include?("--force"))
+  when "list"
+    system! "git worktree list"
+  end
+end
