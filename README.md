@@ -125,6 +125,37 @@ bin/dev
 
 [Google認証機能作成手順 · yyoshidaweb/minnanotimetable Wiki](https://github.com/yyoshidaweb/minnanotimetable/wiki/Google%E8%AA%8D%E8%A8%BC%E6%A9%9F%E8%83%BD%E4%BD%9C%E6%88%90%E6%89%8B%E9%A0%86) を参考にして、Googleログインに必要なクライアントIDとクライアントシークレットを正しく設定すると、Googleログインが利用可能になります。
 
+### 複数の作業を並行して進める場合
+
+複数の作業を同時に進めたい場合は、`git worktree` で作業ディレクトリを分けます。同じディレクトリでブランチを切り替えると、進行中の作業や起動中の開発サーバーに影響してしまうためです。
+
+`bin/worktree` がworktreeの作成とセットアップをまとめて行います。
+
+```bash
+# origin/mainを基点にブランチを作り、worktreeを作成してセットアップする
+bin/worktree add feat/460-example
+
+# 作成したworktreeに移動
+cd .worktrees/feat-460-example
+
+# ポートを変えれば、既存の開発サーバーと同時に起動できる
+PORT=3001 bin/dev
+```
+
+worktreeは `.worktrees/` 配下に作成されます。gitignoreされている `config/master.key` と `config/credentials/*.key` は自動でコピーされ、データベースはworktreeごとに別ファイルになるため、テストを並行実行しても衝突しません。
+
+作業が終わったら、メインの作業ディレクトリで削除します。
+
+```bash
+# worktreeの一覧を確認
+bin/worktree list
+
+# worktreeを削除（未コミットの変更がある場合は中断される）
+bin/worktree remove feat/460-example
+```
+
+ブランチ自体は残るため、不要であれば `git branch -d feat/460-example` で別途削除してください。
+
 
 
 
