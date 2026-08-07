@@ -1,11 +1,19 @@
 #!/usr/bin/env ruby
 require "fileutils"
+require "open3"
 
 APP_ROOT = File.expand_path("..", __dir__)
 WORKTREES_DIR = ".worktrees".freeze
 
+# ブランチ名にシェルのメタ文字を含められるため、外部コマンドは必ず配列形式で呼び出す
 def system!(*args)
   system(*args, exception: true)
+end
+
+def capture!(*args)
+  stdout, status = Open3.capture2(*args)
+  abort "コマンドの実行に失敗しました: #{args.join(" ")}" unless status.success?
+  stdout
 end
 
 def usage
@@ -23,13 +31,13 @@ def usage
 end
 
 def main_worktree?
-  git_dir = `git rev-parse --absolute-git-dir`.strip
-  common_dir = File.expand_path(`git rev-parse --git-common-dir`.strip)
+  git_dir = capture!("git", "rev-parse", "--absolute-git-dir").strip
+  common_dir = File.expand_path(capture!("git", "rev-parse", "--git-common-dir").strip)
   git_dir == common_dir
 end
 
 def branch_exists?(ref)
-  system("git show-ref --verify --quiet refs/#{ref}")
+  system("git", "show-ref", "--verify", "--quiet", "refs/#{ref}")
 end
 
 def worktree_path(branch)
@@ -41,14 +49,14 @@ def add(branch)
   abort "#{path} は既に存在します。" if File.exist?(path)
 
   puts "== worktreeを作成 =="
-  system! "git fetch origin"
+  system! "git", "fetch", "origin"
 
   if branch_exists?("heads/#{branch}")
-    system! "git worktree add #{path} #{branch}"
+    system! "git", "worktree", "add", path, branch
   elsif branch_exists?("remotes/origin/#{branch}")
-    system! "git worktree add #{path} --track -b #{branch} origin/#{branch}"
+    system! "git", "worktree", "add", path, "--track", "-b", branch, "origin/#{branch}"
   else
-    system! "git worktree add #{path} -b #{branch} origin/main"
+    system! "git", "worktree", "add", path, "-b", branch, "origin/main"
   end
 
   puts "\n== gitignoreされている鍵ファイルをコピー =="
@@ -60,10 +68,10 @@ def add(branch)
   FileUtils.chdir path do
     # node_modules はgit管理下にあるため、worktree作成時点で展開済み
     puts "\n== gemをインストール =="
-    system("bundle check") || system!("bundle install")
+    system("bundle", "check") || system!("bundle", "install")
 
     puts "\n== データベースを準備 =="
-    system! "bin/rails db:prepare"
+    system! "bin/rails", "db:prepare"
   end
 
   puts <<~DONE
@@ -84,14 +92,14 @@ def remove(branch, force:)
   abort "#{path} が見つかりません。" unless File.exist?(path)
 
   unless force
-    changes = `git -C #{path} status --porcelain --untracked-files=no`
+    changes = capture!("git", "-C", path, "status", "--porcelain", "--untracked-files=no")
     unless changes.empty?
       abort "#{path} に未コミットの変更があります。コミットするか、--force を付けて実行してください。"
     end
   end
 
   # 鍵ファイルやDBなどgitignore対象のファイルが必ず残っているため --force が必要
-  system! "git worktree remove --force #{path}"
+  system! "git", "worktree", "remove", "--force", path
   puts "#{path} を削除しました。ブランチ #{branch} は残っています。"
 end
 
@@ -123,6 +131,6 @@ FileUtils.chdir APP_ROOT do
     end
     remove(branch, force: args.include?("--force"))
   when "list"
-    system! "git worktree list"
+    system! "git", "worktree", "list"
   end
 end
