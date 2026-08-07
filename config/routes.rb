@@ -81,6 +81,9 @@ Rails.application.routes.draw do
   get "/terms", to: "static_pages#terms"
   get "/privacy", to: "static_pages#privacy"
 
+  # サイトマップ（リクエストごとに動的に生成する）
+  get "/sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: "xml" }
+
   # イベント詳細ページ（/:event_key）
   get "/t/:event_key", to: "timetables#show", as: :show_timetable
 
