@@ -5,14 +5,27 @@ require "open3"
 APP_ROOT = File.expand_path("..", __dir__)
 WORKTREES_DIR = ".worktrees".freeze
 
+class CommandFailed < StandardError
+  attr_reader :exit_status
+
+  def initialize(args, exit_status)
+    @exit_status = exit_status
+    command = args.map { |arg| arg.match?(/\s/) ? arg.inspect : arg }.join(" ")
+    super("コマンドの実行に失敗しました: #{command}")
+  end
+end
+
 # ブランチ名にシェルのメタ文字を含められるため、外部コマンドは必ず配列形式で呼び出す
 def system!(*args)
-  system(*args, exception: true)
+  return if system(*args)
+
+  raise CommandFailed.new(args, $?&.exitstatus || 1)
 end
 
 def capture!(*args)
   stdout, status = Open3.capture2(*args)
-  abort "コマンドの実行に失敗しました: #{args.join(" ")}" unless status.success?
+  raise CommandFailed.new(args, status.exitstatus) unless status.success?
+
   stdout
 end
 
@@ -59,19 +72,24 @@ def add(branch)
     system! "git", "worktree", "add", path, "-b", branch, "origin/main"
   end
 
-  puts "\n== gitignoreされている鍵ファイルをコピー =="
-  FileUtils.cp "config/master.key", "#{path}/config/master.key"
-  Dir.glob("config/credentials/*.key").each do |key|
-    FileUtils.cp key, "#{path}/#{key}"
-  end
+  begin
+    puts "\n== gitignoreされている鍵ファイルをコピー =="
+    FileUtils.cp "config/master.key", "#{path}/config/master.key"
+    Dir.glob("config/credentials/*.key").each do |key|
+      FileUtils.cp key, "#{path}/#{key}"
+    end
 
-  FileUtils.chdir path do
-    # node_modules はgit管理下にあるため、worktree作成時点で展開済み
-    puts "\n== gemをインストール =="
-    system("bundle", "check") || system!("bundle", "install")
+    FileUtils.chdir path do
+      # node_modules はgit管理下にあるため、worktree作成時点で展開済み
+      puts "\n== gemをインストール =="
+      system("bundle", "check") || system!("bundle", "install")
 
-    puts "\n== データベースを準備 =="
-    system! "bin/rails", "db:prepare"
+      puts "\n== データベースを準備 =="
+      system! "bin/rails", "db:prepare"
+    end
+  rescue CommandFailed, SystemCallError => e
+    warn e.message
+    abort "セットアップに失敗しました。`bin/worktree remove #{branch} --force` で削除してからやり直してください。"
   end
 
   puts <<~DONE
@@ -103,34 +121,40 @@ def remove(branch, force:)
   puts "#{path} を削除しました。ブランチ #{branch} は残っています。"
 end
 
-FileUtils.chdir APP_ROOT do
-  command, *args = ARGV
+begin
+  FileUtils.chdir APP_ROOT do
+    command, *args = ARGV
 
-  unless %w[add remove list].include?(command)
-    usage
-    exit 1
-  end
-
-  unless main_worktree?
-    abort "メインの作業ディレクトリで実行してください（worktreeの中では実行できません）。"
-  end
-
-  case command
-  when "add"
-    branch = args.first
-    if branch.nil?
+    unless %w[add remove list].include?(command)
       usage
       exit 1
     end
-    add(branch)
-  when "remove"
-    branch = args.find { |arg| !arg.start_with?("--") }
-    if branch.nil?
-      usage
-      exit 1
+
+    unless main_worktree?
+      abort "メインの作業ディレクトリで実行してください（worktreeの中では実行できません）。"
     end
-    remove(branch, force: args.include?("--force"))
-  when "list"
-    system! "git", "worktree", "list"
+
+    case command
+    when "add"
+      branch = args.first
+      if branch.nil?
+        usage
+        exit 1
+      end
+      add(branch)
+    when "remove"
+      branch = args.find { |arg| !arg.start_with?("--") }
+      if branch.nil?
+        usage
+        exit 1
+      end
+      remove(branch, force: args.include?("--force"))
+    when "list"
+      system! "git", "worktree", "list"
+    end
   end
+rescue CommandFailed => e
+  # 失敗したコマンド自身がエラーを出力済みのため、バックトレースは出さない
+  warn e.message
+  exit e.exit_status
 end
