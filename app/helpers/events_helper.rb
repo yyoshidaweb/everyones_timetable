@@ -1,21 +1,22 @@
 module EventsHelper
-  # 非公開タイムテーブル用の鍵アイコン
-  def lock_icon
+  # 非公開タイムテーブル用の鍵アイコン（公開時はnilを返す）
+  # align-middleはインライン文脈（一覧カード・概要ページ）用、
+  # shrink-0はflex文脈（event-header）でアイコンが潰れないようにするためのもの
+  def lock_icon_for(event)
+    return if event.is_published?
+
     content_tag(
       :span,
       "lock",
-      class: "material-symbols-outlined leading-none",
+      class: "material-symbols-outlined leading-none align-middle shrink-0",
       style: "font-size: 1rem;"
     )
   end
 
   # 非公開時は左端に鍵アイコンを付けたタイムテーブル名を返す
+  # インライン要素のみで組み立て、囲み側の`truncate`/`line-clamp`を効かせる
   def event_name_with_lock(event)
-    return event.display_name if event.is_published?
-
-    content_tag(:span, class: "inline-flex items-center gap-1 align-middle leading-none") do
-      safe_join([ lock_icon, event.display_name ], " ")
-    end
+    safe_join([ lock_icon_for(event), event.display_name ].compact, " ")
   end
 
   # event-headerの色のクラスを返す
@@ -23,12 +24,12 @@ module EventsHelper
     @my_timetable_view ? "bg-orange-600" : "bg-gray-800"
   end
 
-  # event-headerのタイトルを返す
+  # event-headerのタイトルを返す（鍵アイコンはビュー側で先頭に付ける）
   def event_header_title
     if @my_timetable_view
-      safe_join([ "#{@user.name}の", event_name_with_lock(@event), " マイタイムテーブル" ])
+      "#{@user.name}の#{@event.display_name} マイタイムテーブル"
     else
-      event_name_with_lock(@event)
+      @event.display_name
     end
   end
 
