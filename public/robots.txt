@@ -1,6 +1,6 @@
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
 User-agent: *
-# マイタイムテーブル（/t/:event_key/:username）は本体と重複しやすいためクロールを抑制する
+# Disallow my timetables (/t/:event_key/:username) to reduce duplicate content crawl
 Disallow: /t/*/*
 
 Sitemap: https://minnanotimetable.com/sitemap.xml
