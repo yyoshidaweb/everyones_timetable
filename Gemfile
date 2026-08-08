@@ -78,6 +78,10 @@ gem "openai"
 # サイトマップ生成
 gem "sitemap_generator"
 
+# エラー監視（本番のみ有効）
+gem "sentry-ruby", "~> 6.7"
+gem "sentry-rails", "~> 6.7"
+
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

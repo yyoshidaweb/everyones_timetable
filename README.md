@@ -75,6 +75,10 @@ https://minnanotimetable.com
     * ステージング環境：無料のFree instance
     * 本番環境：有料のStarter instance
 
+### 運用監視
+* Sentry（エラー監視・パフォーマンストレース）
+* UptimeRobot（死活監視）
+
 ### 単体テスト
 * Minitest（ほとんど全てのコントローラーに対して作成）
 
@@ -175,6 +179,35 @@ bin/rails test
 
 2. プルリクエストを`main`ブランチにマージするとRenderが自動デプロイ
     - 同時にステージング環境にも同じ内容が自動デプロイされます
+
+
+
+## 運用監視
+
+いずれも無料枠の範囲で、本番環境のみを対象にしています。PRプレビューやステージングには送信・監視しません。
+
+### Sentry（エラー監視）
+
+例外と低サンプル率のパフォーマンストレースを収集します。
+
+1. [Sentry](https://sentry.io/) で Ruby / Rails プロジェクトを作成し、DSNを発行する
+2. Renderの本番サービスに環境変数 `SENTRY_DSN` を設定する（ステージング・プレビューには設定しない）
+3. デプロイ後、本番で意図的な例外や `Sentry.capture_message("test")` でイベントが届くことを確認する
+4. Sentry側でアラート通知（メール等）を設定する
+
+アプリ側は `config/initializers/sentry.rb` で初期化しています。`RAILS_ENV=production` かつ `SENTRY_DSN` があり、`IS_PULL_REQUEST` が `true` でない場合のみ有効です。トレーシングのサンプル率は無料枠を意識して `0.05` です。
+
+### UptimeRobot（死活監視）
+
+Rails標準のヘルスチェック `GET /up` を監視します。
+
+1. [UptimeRobot](https://uptimerobot.com/) でアカウントを作成する
+2. HTTP(s)モニターを追加する
+   - URL: `https://minnanotimetable.com/up`
+   - 監視間隔: 5分（無料枠）
+   - 期待するステータス: HTTP 200
+3. アラート連絡先（メール等）を設定する
+4. モニターがUpになることを確認する
 
 
 
