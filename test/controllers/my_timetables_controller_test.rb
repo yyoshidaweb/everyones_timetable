@@ -33,6 +33,13 @@ class MyTimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # マイタイムテーブルは検索エンジンにインデックスさせない
+  test "my timetable includes noindex robots meta" do
+    get show_my_timetable_path(event_key: @event.event_key, username: @user.username)
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']"
+  end
+
   test "should not get unpublished my_timetable with logout" do
     sign_out @user
     unpublished_event = events(:unpublished)
