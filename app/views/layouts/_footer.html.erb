@@ -12,6 +12,10 @@
                     class: "text-gray-700 hover:text-gray-900 hover:underline",
                     target: "_blank",
                     rel: "noopener noreferrer" %>
+          <%= link_to "稼働状況", "https://stats.uptimerobot.com/ZRof25OUD7",
+                    class: "text-gray-700 hover:text-gray-900 hover:underline",
+                    target: "_blank",
+                    rel: "noopener noreferrer" %>
           <% if user_signed_in? && current_user.developer? %>
             <%= link_to "管理画面（開発者向け）", admin_dashboard_path,
                 class: "text-gray-700 hover:text-gray-900 hover:underline" %>
