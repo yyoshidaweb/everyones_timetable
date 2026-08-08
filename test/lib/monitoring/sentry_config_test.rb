@@ -3,52 +3,56 @@
 require "test_helper"
 
 class Monitoring::SentryConfigTest < ActiveSupport::TestCase
+  EXAMPLE_DSN = "https://examplePublicKey@o0.ingest.sentry.io/0"
+
   setup do
-    @original_dsn = ENV["SENTRY_DSN"]
     @original_rails_env = ENV["RAILS_ENV"]
     @original_is_pull_request = ENV["IS_PULL_REQUEST"]
   end
 
   teardown do
-    restore_env("SENTRY_DSN", @original_dsn)
     restore_env("RAILS_ENV", @original_rails_env)
     restore_env("IS_PULL_REQUEST", @original_is_pull_request)
   end
 
   test "本番かつDSNがある場合のみ有効になる" do
     ENV["RAILS_ENV"] = "production"
-    ENV["SENTRY_DSN"] = "https://examplePublicKey@o0.ingest.sentry.io/0"
     ENV.delete("IS_PULL_REQUEST")
 
-    assert Monitoring::SentryConfig.enabled?
-    assert_equal ENV["SENTRY_DSN"], Monitoring::SentryConfig.dsn
+    with_sentry_dsn(EXAMPLE_DSN) do
+      assert Monitoring::SentryConfig.enabled?
+      assert_equal EXAMPLE_DSN, Monitoring::SentryConfig.dsn
+    end
   end
 
   test "ステージングでは無効になる" do
     ENV["RAILS_ENV"] = "staging"
-    ENV["SENTRY_DSN"] = "https://examplePublicKey@o0.ingest.sentry.io/0"
     ENV.delete("IS_PULL_REQUEST")
 
-    assert_not Monitoring::SentryConfig.enabled?
-    assert_nil Monitoring::SentryConfig.dsn
+    with_sentry_dsn(EXAMPLE_DSN) do
+      assert_not Monitoring::SentryConfig.enabled?
+      assert_nil Monitoring::SentryConfig.dsn
+    end
   end
 
   test "PRプレビューでは無効になる" do
     ENV["RAILS_ENV"] = "production"
-    ENV["SENTRY_DSN"] = "https://examplePublicKey@o0.ingest.sentry.io/0"
     ENV["IS_PULL_REQUEST"] = "true"
 
-    assert_not Monitoring::SentryConfig.enabled?
-    assert_nil Monitoring::SentryConfig.dsn
+    with_sentry_dsn(EXAMPLE_DSN) do
+      assert_not Monitoring::SentryConfig.enabled?
+      assert_nil Monitoring::SentryConfig.dsn
+    end
   end
 
   test "DSN未設定では無効になる" do
     ENV["RAILS_ENV"] = "production"
-    ENV.delete("SENTRY_DSN")
     ENV.delete("IS_PULL_REQUEST")
 
-    assert_not Monitoring::SentryConfig.enabled?
-    assert_nil Monitoring::SentryConfig.dsn
+    with_sentry_dsn(nil) do
+      assert_not Monitoring::SentryConfig.enabled?
+      assert_nil Monitoring::SentryConfig.dsn
+    end
   end
 
   test "トレーシングのサンプル率は無料枠向けに低い" do
@@ -57,6 +61,15 @@ class Monitoring::SentryConfigTest < ActiveSupport::TestCase
   end
 
   private
+    def with_sentry_dsn(dsn)
+      credentials = Object.new
+      credentials.define_singleton_method(:dig) do |*keys|
+        keys == [ :sentry, :dsn ] ? dsn : nil
+      end
+
+      Rails.application.stub(:credentials, credentials) { yield }
+    end
+
     def restore_env(key, value)
       if value.nil?
         ENV.delete(key)

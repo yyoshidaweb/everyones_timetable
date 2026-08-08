@@ -13,7 +13,7 @@ module Monitoring
       return if preview_environment?
       return unless production_environment?
 
-      ENV["SENTRY_DSN"].presence
+      Rails.application.credentials.dig(:sentry, :dsn).presence
     end
 
     def enabled?
