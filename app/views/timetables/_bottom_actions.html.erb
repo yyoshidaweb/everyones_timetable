@@ -1,16 +1,15 @@
-<%# タイムテーブル下余白内のアクションボタン（オーナー向け。余白高さは --timetable-bottom-spacer） %>
-<div class="fixed left-0 right-0 z-160 px-2
-            bottom-[calc(5.25rem+env(safe-area-inset-bottom))]
-            h-[var(--timetable-bottom-spacer)]
+<%# タイムテーブル右下に固定表示するアクションボタン（オーナー向け） %>
+<div class="fixed right-2 z-160
+            bottom-[calc(0.5rem+5.25rem+env(safe-area-inset-bottom))]
             flex items-center gap-2">
   <%= link_to new_event_timetable_path(@event.event_key),
-        class: "flex-1 flex items-center justify-center gap-1 p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900" do %>
-    <span class="material-symbols-outlined text-base">wand_stars</span>
-    <small class="text-xs">画像から作成</small>
+        aria: { label: "画像から作成" },
+        class: "flex items-center justify-center p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900" do %>
+    <span class="material-symbols-outlined">wand_stars</span>
   <% end %>
   <%= link_to new_event_performance_path(@event.event_key),
-        class: "flex-1 flex items-center justify-center gap-1 p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900" do %>
-    <span class="material-symbols-outlined text-base">calendar_add_on</span>
-    <small class="text-xs">出演情報を追加</small>
+        aria: { label: "出演情報を追加" },
+        class: "flex items-center justify-center p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900" do %>
+    <span class="material-symbols-outlined">calendar_add_on</span>
   <% end %>
 </div>

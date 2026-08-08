@@ -1,9 +1,4 @@
 module TimetablesHelper
-  # 下部タブ + タイムテーブル下余白 + safe-area を考慮したpaddingクラス
-  def timetable_with_bottom_spacer_padding_class
-    "pb-[calc(5.25rem+var(--timetable-bottom-spacer)+env(safe-area-inset-bottom))]"
-  end
-
   # タイムテーブル全体の高さを rem で返す（1時間単位）
   def timetable_height_rem(performances)
     start_hour = performances.min_by(&:start_time).start_time.hour

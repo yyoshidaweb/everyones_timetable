@@ -62,8 +62,8 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
   test "owner sees bottom action buttons on timetable" do
     get show_timetable_path(@event.event_key)
     assert_response :success
-    assert_select "a[href=?]", new_event_timetable_path(@event.event_key), text: /画像から作成/
-    assert_select "a[href=?]", new_event_performance_path(@event.event_key), text: /出演情報を追加/
+    assert_select "a[href=?][aria-label=?]", new_event_timetable_path(@event.event_key), "画像から作成"
+    assert_select "a[href=?][aria-label=?]", new_event_performance_path(@event.event_key), "出演情報を追加"
   end
 
   # 他ユーザーには下部アクションボタンが表示されない
