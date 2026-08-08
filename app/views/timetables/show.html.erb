@@ -18,19 +18,8 @@
   </nav>
 <% end %>
 <% if @performances.present? %>
-  <% if user_signed_in? && current_user == @event.user %>
-    <%# FAB %>
-    <button
-          data-controller="fab"
-          data-action="click->fab#open"
-      data-url="<%= fab_path(event_key: @event.event_key) %>"
-      class="fixed right-2 bottom-[calc(0.5rem+5.25rem+env(safe-area-inset-bottom))] z-160
-      flex items-center justify-center p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900 cursor-pointer">
-      <span class="material-symbols-outlined">add</span>
-    </button>
-  <% end %>
-  <%# タイムテーブル表示画面のメインコンテナ（画面全体の高さに設定する） %>
-  <div class="h-svh flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+  <%# タイムテーブル表示画面のメインコンテナ（下部タブ + 可変余白分のpaddingを確保する） %>
+  <div class="h-svh flex flex-col overflow-hidden <%= timetable_with_bottom_spacer_padding_class %>">
     <%# スクロールコンテナ（ヘッダーと日付選択タブの高さ分下げた位置に配置する） %>
     <div class="flex-1 pt-24 overflow-auto relative">
       <%# 横幅確保 %>
@@ -98,6 +87,9 @@
       <%= render "layouts/bottom_tab" %>
     </div>
   </div>
+  <% if user_signed_in? && current_user == @event.user %>
+    <%= render "timetables/bottom_actions" %>
+  <% end %>
 <% else %>
   <%# ===== 情報が揃った出演情報が0件の場合 ===== %>
   <div class="h-svh p-12 flex flex-col items-center justify-center pb-[calc(5.25rem+env(safe-area-inset-bottom))]">

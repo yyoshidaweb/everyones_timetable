@@ -1,3 +1,8 @@
+/* タイムテーブル領域下の余白（広告枠の準備。高さはこの変数で変更する） */
+:root {
+  --timetable-bottom-spacer: 3.5rem;
+}
+
 /* ===== ステージヘッダー ===== */
 /* ステージヘッダーの背景（奇数） */
 .stage-header-col:nth-child(odd) {

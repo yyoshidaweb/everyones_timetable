@@ -58,6 +58,33 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", show_timetable_path(@event.event_key, d: @day2.date)
   end
 
+  # オーナーには下部アクションボタンが常時表示される
+  test "owner sees bottom action buttons on timetable" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?]", new_event_timetable_path(@event.event_key), text: /画像から作成/
+    assert_select "a[href=?]", new_event_performance_path(@event.event_key), text: /出演情報を追加/
+  end
+
+  # 他ユーザーには下部アクションボタンが表示されない
+  test "other user does not see bottom action buttons on timetable" do
+    sign_out @user
+    sign_in @user_two
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?]", new_event_timetable_path(@event.event_key), count: 0
+    assert_select "a[href=?]", new_event_performance_path(@event.event_key), count: 0
+  end
+
+  # 未ログインユーザーには下部アクションボタンが表示されない
+  test "guest does not see bottom action buttons on timetable" do
+    sign_out @user
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?]", new_event_timetable_path(@event.event_key), count: 0
+    assert_select "a[href=?]", new_event_performance_path(@event.event_key), count: 0
+  end
+
   # 存在しないイベントキーによるタイムテーブル表示失敗のテスト
   test "should 404 if event_key not found" do
     get "/nonexistent-event-key"
