@@ -85,6 +85,13 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:url'][content=?]", canonical
   end
 
+  # 本体の公開タイムテーブルはインデックス対象（noindexしない）
+  test "published timetable does not include noindex robots meta" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
+  end
+
   # 出演情報が0件の場合もタイムテーブルを表示できる
   test "should show event timetable by event_key when no performances" do
     get show_timetable_path(@no_performance_event.event_key)
