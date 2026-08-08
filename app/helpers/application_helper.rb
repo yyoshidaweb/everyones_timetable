@@ -4,6 +4,15 @@ module ApplicationHelper
     time&.strftime("%H:%M")
   end
 
+  # 正規URLを返す（クエリパラメータは除く）。content_for :canonical で上書き可能
+  # タイムテーブルの ?d= など日付違いURLの重複インデックスを防ぐ
+  def canonical_url
+    if content_for?(:canonical)
+      content_for(:canonical)
+    else
+      "#{request.base_url}#{request.path}"
+    end
+  end
 
   # main要素のクラスを返す
   def main_element_class

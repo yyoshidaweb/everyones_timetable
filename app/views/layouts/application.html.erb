@@ -13,11 +13,13 @@
     <% if Rails.env.staging? || (@event.present? && !@event.is_published?) %>
       <meta name="robots" content="noindex, nofollow">
     <% end %>
+    <%# canonical（クエリパラメータを除いた正規URL。?d= などによる重複インデックスを防ぐ） %>
+    <link rel="canonical" href="<%= canonical_url %>">
     <%# OGP画像 %>
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="みんなのタイムテーブル">
     <meta property="og:locale" content="ja_JP">
-    <meta property="og:url" content="<%= request.original_url %>">
+    <meta property="og:url" content="<%= canonical_url %>">
     <meta property="og:image" content="<%= image_url('ogp.png') %>">
     <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : "みんなのタイムテーブル" %>">
     <meta property="og:description" content="<%= content_for?(:description) ? yield(:description) : "" %>">
