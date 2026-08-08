@@ -46,11 +46,13 @@
                 <%= hour %>
               </p>
             <% end %>
+            <%# タイムテーブル領域下の余白分（時刻列側） %>
+            <div class="h-[var(--timetable-bottom-spacer)]" aria-hidden="true"></div>
           </div>
-          <%# ステージを展開 %>
+          <%# ステージを展開（下余白分も列高さに含め、配色・区切り線を継続する） %>
           <% @stages.each do |stage| %>
             <div class="timetable-body-col flex-1 w-0 min-w-16 relative"
-                style="height: <%= timetable_height_rem(@performances) %>rem;">
+                style="height: calc(<%= timetable_height_rem(@performances) %>rem + var(--timetable-bottom-spacer));">
               <%# 各ステージの出演情報を検索 %>
               <% if @performances_by_stage[stage.id].present? %>
                 <% @performances_by_stage[stage.id].each do |performance| %>
@@ -83,8 +85,6 @@
           <% end %>
         </div>
       </div>
-      <%# タイムテーブル領域下の余白（広告枠の準備。タイムテーブルと一緒にスクロールする） %>
-      <div class="h-[var(--timetable-bottom-spacer)]" aria-hidden="true"></div>
       <%# 下部タブメニュー %>
       <%= render "layouts/bottom_tab" %>
     </div>
