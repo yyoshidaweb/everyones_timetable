@@ -10,6 +10,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # トップページにcanonicalタグが付与される
+  test "index includes canonical url" do
+    get "/"
+    assert_select "link[rel=canonical][href=?]", "http://www.example.com/"
+  end
+
   # 名前が未確認のユーザーには名前変更モーダルが自動で読み込まれる
   test "should load name confirmation modal when name is not confirmed" do
     sign_in users(:name_unconfirmed)

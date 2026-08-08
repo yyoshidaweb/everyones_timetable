@@ -76,6 +76,15 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "p", text: @performance2.performer.performer_name_tag.name, count: 0
   end
 
+  # canonicalはクエリパラメータを含まない正規URLを指す
+  test "canonical url excludes date query parameter" do
+    get show_timetable_path(@event.event_key, d: @day2.date)
+    assert_response :success
+    canonical = "http://www.example.com/t/#{@event.event_key}"
+    assert_select "link[rel=canonical][href=?]", canonical
+    assert_select "meta[property='og:url'][content=?]", canonical
+  end
+
   # 出演情報が0件の場合もタイムテーブルを表示できる
   test "should show event timetable by event_key when no performances" do
     get show_timetable_path(@no_performance_event.event_key)
