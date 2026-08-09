@@ -58,6 +58,69 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", show_timetable_path(@event.event_key, d: @day2.date)
   end
 
+  # オーナーには下部アクションボタンが常時表示される
+  test "owner sees bottom action buttons on timetable" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?][aria-label=?]", new_event_timetable_path(@event.event_key), "画像から作成"
+    assert_select "a[href=?][aria-label=?]", new_event_performance_path(@event.event_key), "出演情報を追加"
+  end
+
+  # 時刻軸に下余白分の正時（末尾の次の1つ）が表示される
+  test "time axis includes bottom spacer hour" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    # day one の最終終了は16:30のため、余白開始の正時は17
+    assert_select "p", text: "17"
+  end
+
+  # 下余白のCSS変数はRuby定数から:rootへ定義される
+  test "bottom spacer css variable is defined from helper constant" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "style", text: /--timetable-bottom-spacer:\s*#{TimetablesHelper::TIMETABLE_BOTTOM_SPACER_REM}rem/
+  end
+
+  # 他ユーザーには下余白が表示されない
+  test "other user does not see bottom spacer on timetable" do
+    sign_out @user
+    sign_in @user_two
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "p", text: "17", count: 0
+    assert_select ".timetable-bottom-spacer-cover", count: 0
+    assert_select "style", text: /--timetable-bottom-spacer/, count: 0
+  end
+
+  # 未ログインユーザーには下余白が表示されない
+  test "guest does not see bottom spacer on timetable" do
+    sign_out @user
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "p", text: "17", count: 0
+    assert_select ".timetable-bottom-spacer-cover", count: 0
+    assert_select "style", text: /--timetable-bottom-spacer/, count: 0
+  end
+
+  # 他ユーザーには下部アクションボタンが表示されない
+  test "other user does not see bottom action buttons on timetable" do
+    sign_out @user
+    sign_in @user_two
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?]", new_event_timetable_path(@event.event_key), count: 0
+    assert_select "a[href=?]", new_event_performance_path(@event.event_key), count: 0
+  end
+
+  # 未ログインユーザーには下部アクションボタンが表示されない
+  test "guest does not see bottom action buttons on timetable" do
+    sign_out @user
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?]", new_event_timetable_path(@event.event_key), count: 0
+    assert_select "a[href=?]", new_event_performance_path(@event.event_key), count: 0
+  end
+
   # 存在しないイベントキーによるタイムテーブル表示失敗のテスト
   test "should 404 if event_key not found" do
     get "/nonexistent-event-key"

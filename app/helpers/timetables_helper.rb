@@ -1,4 +1,10 @@
 module TimetablesHelper
+  # 1時間あたりの高さ（rem）。時刻スロットの h-24（6rem）と一致させる
+  TIMETABLE_REM_PER_HOUR = 6.0
+  # タイムテーブル領域下の余白（rem）。この定数が唯一の定義（CSS変数もここから生成する）
+  # 縦並びアクションボタン2つ分（各2.5rem + gap 0.5rem）に合わせて、+0.5remの余白を追加
+  TIMETABLE_BOTTOM_SPACER_REM = 6.5
+
   # タイムテーブル全体の高さを rem で返す（1時間単位）
   def timetable_height_rem(performances)
     start_hour = performances.min_by(&:start_time).start_time.hour
@@ -6,8 +12,7 @@ module TimetablesHelper
     # 終了時刻は「次の時間」に切り上げ
     end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
     total_hours = end_hour - start_hour
-    rem_per_hour = 6.0
-    total_hours * rem_per_hour
+    total_hours * TIMETABLE_REM_PER_HOUR
   end
 
   # タイムテーブル全体の開始時刻（正時のみ取得し、分は切り捨てる）
@@ -22,13 +27,12 @@ module TimetablesHelper
 
   # performance の開始位置の top を rem で返す
   def performance_top_rem(performance)
-  timetable_start_min = timetable_start_minute
-  start_min = performance.start_time.hour * 60 + performance.start_time.min
-  diff_min  = start_min - timetable_start_min
-  rem_per_hour = 6.0
-  rem_per_min  = rem_per_hour / 60.0
-  instead_of_margin = 0.05 # マージンの代わり
-  diff_min * rem_per_min + instead_of_margin
+    timetable_start_min = timetable_start_minute
+    start_min = performance.start_time.hour * 60 + performance.start_time.min
+    diff_min  = start_min - timetable_start_min
+    rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
+    instead_of_margin = 0.05 # マージンの代わり
+    diff_min * rem_per_min + instead_of_margin
   end
 
   # タイムテーブル用の時刻スロット配列を生成
@@ -46,10 +50,33 @@ module TimetablesHelper
     (start_hour..last_hour).to_a
   end
 
+  # 下余白のCSS変数を:rootへ定義するstyleタグ
+  def timetable_bottom_spacer_root_style_tag
+    content_tag(:style, ":root { --timetable-bottom-spacer: #{TIMETABLE_BOTTOM_SPACER_REM}rem; }")
+  end
+
+  # 表示中のイベントのオーナーかどうか
+  def timetable_event_owner?
+    user_signed_in? && current_user == @event.user
+  end
+
+  # ステージ列の高さスタイル（オーナーのみ下余白を含める）
+  def timetable_body_col_height_style(performances)
+    height = "#{timetable_height_rem(performances)}rem"
+    height = "calc(#{height} + var(--timetable-bottom-spacer))" if timetable_event_owner?
+    "height: #{height}"
+  end
+
+  # 下余白の開始位置に表示する正時（タイムテーブル末尾の次の時刻）
+  def timetable_bottom_spacer_hour(performances)
+    end_time = performances.max_by(&:end_time).end_time
+    end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
+    end_hour % 24
+  end
+
   # performance の高さを rem で返す
   def performance_height_rem(performance)
-    rem_per_hour = 6.0
-    rem_per_min  = rem_per_hour / 60.0
+    rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
     duration_min = performance.duration
     instead_of_margin = 0.05 # マージンの代わり
     duration_min * rem_per_min - instead_of_margin

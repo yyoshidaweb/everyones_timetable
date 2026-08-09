@@ -1,6 +1,11 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@event.display_name} タイムテーブル | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}のタイムテーブル。#{@event.description if @event.description.present?}" %>
+<% if timetable_event_owner? %>
+  <% content_for :head do %>
+    <%= timetable_bottom_spacer_root_style_tag %>
+  <% end %>
+<% end %>
 <%# 日付選択タブ（イベントヘッダーの高さ分下げて配置する） %>
 <% if @days.any?%>
   <nav class="flex h-8 fixed top-16 z-160 w-full justify-around overflow-x-auto bg-white border-t border-gray-200">
@@ -18,17 +23,6 @@
   </nav>
 <% end %>
 <% if @performances.present? %>
-  <% if user_signed_in? && current_user == @event.user %>
-    <%# FAB %>
-    <button
-          data-controller="fab"
-          data-action="click->fab#open"
-      data-url="<%= fab_path(event_key: @event.event_key) %>"
-      class="fixed right-2 bottom-[calc(0.5rem+5.25rem+env(safe-area-inset-bottom))] z-160
-      flex items-center justify-center p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900 cursor-pointer">
-      <span class="material-symbols-outlined">add</span>
-    </button>
-  <% end %>
   <%# タイムテーブル表示画面のメインコンテナ（画面全体の高さに設定する） %>
   <div class="h-svh flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
     <%# スクロールコンテナ（ヘッダーと日付選択タブの高さ分下げた位置に配置する） %>
@@ -57,11 +51,17 @@
                 <%= hour %>
               </p>
             <% end %>
+            <% if timetable_event_owner? %>
+              <%# タイムテーブル領域下の余白分の時刻（末尾の次の正時のみ） %>
+              <p class="h-[var(--timetable-bottom-spacer)] text-xs text-center pt-1 tabular-nums -translate-y-2.75">
+                <%= timetable_bottom_spacer_hour(@performances) %>
+              </p>
+            <% end %>
           </div>
-          <%# ステージを展開 %>
+          <%# ステージを展開（オーナーのみ下余白を含める） %>
           <% @stages.each do |stage| %>
             <div class="timetable-body-col flex-1 w-0 min-w-16 relative"
-                style="height: <%= timetable_height_rem(@performances) %>rem;">
+                style="<%= timetable_body_col_height_style(@performances) %>">
               <%# 各ステージの出演情報を検索 %>
               <% if @performances_by_stage[stage.id].present? %>
                 <% @performances_by_stage[stage.id].each do |performance| %>
@@ -90,6 +90,10 @@
                   <% end %>
                 <% end %>
               <% end %>
+              <% if timetable_event_owner? %>
+                <%# 下余白の先頭1時間より下の区切り線を隠す %>
+                <div class="timetable-bottom-spacer-cover" aria-hidden="true"></div>
+              <% end %>
             </div>
           <% end %>
         </div>
@@ -98,6 +102,9 @@
       <%= render "layouts/bottom_tab" %>
     </div>
   </div>
+  <% if timetable_event_owner? %>
+    <%= render "timetables/bottom_actions" %>
+  <% end %>
 <% else %>
   <%# ===== 情報が揃った出演情報が0件の場合 ===== %>
   <div class="h-svh p-12 flex flex-col items-center justify-center pb-[calc(5.25rem+env(safe-area-inset-bottom))]">

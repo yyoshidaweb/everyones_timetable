@@ -52,6 +52,26 @@
     background-position: top left;
 }
 
+/* 下余白のうち、先頭1時間より下の区切り線を覆い隠す（先頭1時間は時刻表示あり） */
+.timetable-body-col > .timetable-bottom-spacer-cover {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: max(0rem, calc(var(--timetable-bottom-spacer) - 1rem));
+    pointer-events: none;
+}
+
+.timetable-body-col:nth-child(odd) > .timetable-bottom-spacer-cover {
+    /* gray-100 */
+    background-color: #f3f4f6;
+}
+
+.timetable-body-col:nth-child(even) > .timetable-bottom-spacer-cover {
+    /* gray-200 */
+    background-color: #e5e7eb;
+}
+
 /* お気に入りマーカー */
 .favorite-marker {
     background-image: linear-gradient(transparent 50%,
