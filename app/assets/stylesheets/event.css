@@ -52,13 +52,13 @@
     background-position: top left;
 }
 
-/* 下余白は配色のみ残し、区切り線を覆い隠す */
+/* 下余白のうち、先頭1時間より下の区切り線を覆い隠す（先頭1時間は時刻表示あり） */
 .timetable-body-col > .timetable-bottom-spacer-cover {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: var(--timetable-bottom-spacer);
+    height: max(0rem, calc(var(--timetable-bottom-spacer) - 6rem));
     pointer-events: none;
 }
 
