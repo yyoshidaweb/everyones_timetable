@@ -75,6 +75,13 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "18"
   end
 
+  # 下余白のCSS変数はRuby定数から:rootへ定義される
+  test "bottom spacer css variable is defined from helper constant" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "style", text: /--timetable-bottom-spacer:\s*#{TimetablesHelper::TIMETABLE_BOTTOM_SPACER_REM}rem/
+  end
+
   # 他ユーザーには下部アクションボタンが表示されない
   test "other user does not see bottom action buttons on timetable" do
     sign_out @user

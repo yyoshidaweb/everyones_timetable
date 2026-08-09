@@ -1,6 +1,9 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@event.display_name} タイムテーブル | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}のタイムテーブル。#{@event.description if @event.description.present?}" %>
+<% content_for :head do %>
+  <%= timetable_bottom_spacer_root_style_tag %>
+<% end %>
 <%# 日付選択タブ（イベントヘッダーの高さ分下げて配置する） %>
 <% if @days.any?%>
   <nav class="flex h-8 fixed top-16 z-160 w-full justify-around overflow-x-auto bg-white border-t border-gray-200">

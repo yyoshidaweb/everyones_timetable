@@ -1,7 +1,7 @@
 module TimetablesHelper
   # 1時間あたりの高さ（rem）。時刻スロットの h-24（6rem）と一致させる
   TIMETABLE_REM_PER_HOUR = 6.0
-  # タイムテーブル領域下の余白（rem）。event.css の --timetable-bottom-spacer と揃える
+  # タイムテーブル領域下の余白（rem）。この定数が唯一の定義（CSS変数もここから生成する）
   # 縦並びアクションボタン2つ分（各2.5rem + gap 0.5rem）に合わせて、+0.5remの余白を追加
   TIMETABLE_BOTTOM_SPACER_REM = 6.5
 
@@ -48,6 +48,11 @@ module TimetablesHelper
         end_time.hour
       end
     (start_hour..last_hour).to_a
+  end
+
+  # 下余白のCSS変数を:rootへ定義するstyleタグ
+  def timetable_bottom_spacer_root_style_tag
+    content_tag(:style, ":root { --timetable-bottom-spacer: #{TIMETABLE_BOTTOM_SPACER_REM}rem; }")
   end
 
   # 下余白内に表示する正時スロット（hour と高さrem）の配列
