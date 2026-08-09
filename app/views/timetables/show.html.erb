@@ -49,13 +49,10 @@
                 <%= hour %>
               </p>
             <% end %>
-            <%# タイムテーブル領域下の余白分の時刻（余白内の全ての正時） %>
-            <% timetable_bottom_spacer_hour_slots(@performances).each do |slot| %>
-              <p class="text-xs text-center pt-1 tabular-nums -translate-y-2.75"
-                 style="height: <%= slot[:height_rem] %>rem;">
-                <%= slot[:hour] %>
-              </p>
-            <% end %>
+            <%# タイムテーブル領域下の余白分の時刻（末尾の次の正時のみ） %>
+            <p class="h-[var(--timetable-bottom-spacer)] text-xs text-center pt-1 tabular-nums -translate-y-2.75">
+              <%= timetable_bottom_spacer_hour(@performances) %>
+            </p>
           </div>
           <%# ステージを展開（下余白分も列高さに含め、配色・区切り線を継続する） %>
           <% @stages.each do |stage| %>

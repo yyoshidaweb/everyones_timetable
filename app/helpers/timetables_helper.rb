@@ -55,21 +55,11 @@ module TimetablesHelper
     content_tag(:style, ":root { --timetable-bottom-spacer: #{TIMETABLE_BOTTOM_SPACER_REM}rem; }")
   end
 
-  # 下余白内に表示する正時スロット（hour と高さrem）の配列
-  def timetable_bottom_spacer_hour_slots(performances)
+  # 下余白の開始位置に表示する正時（タイムテーブル末尾の次の時刻）
+  def timetable_bottom_spacer_hour(performances)
     end_time = performances.max_by(&:end_time).end_time
-    start_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
-
-    remaining = TIMETABLE_BOTTOM_SPACER_REM
-    slots = []
-    index = 0
-    while remaining.positive?
-      height = [ TIMETABLE_REM_PER_HOUR, remaining ].min
-      slots << { hour: (start_hour + index) % 24, height_rem: height }
-      remaining = (remaining - height).round(10)
-      index += 1
-    end
-    slots
+    end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
+    end_hour % 24
   end
 
   # performance の高さを rem で返す

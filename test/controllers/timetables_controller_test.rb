@@ -66,13 +66,12 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?][aria-label=?]", new_event_performance_path(@event.event_key), "出演情報を追加"
   end
 
-  # 時刻軸に下余白分の正時がすべて表示される
-  test "time axis includes all bottom spacer hours" do
+  # 時刻軸に下余白分の正時（末尾の次の1つ）が表示される
+  test "time axis includes bottom spacer hour" do
     get show_timetable_path(@event.event_key)
     assert_response :success
-    # day one の最終終了は16:30、余白6.5remのため17と18を表示する
+    # day one の最終終了は16:30のため、余白開始の正時は17
     assert_select "p", text: "17"
-    assert_select "p", text: "18"
   end
 
   # 下余白のCSS変数はRuby定数から:rootへ定義される
