@@ -66,6 +66,15 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?][aria-label=?]", new_event_performance_path(@event.event_key), "出演情報を追加"
   end
 
+  # タイムテーブル画面はページ全体ではなく内側コンテナのみスクロールする
+  test "timetable page locks body scroll and scrolls inner container only" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "body.h-svh.overflow-hidden"
+    assert_select "main.min-h-0.overflow-hidden"
+    assert_select "div.flex-1.min-h-0.overflow-auto.overscroll-none"
+  end
+
   # 時刻軸に下余白分の正時（末尾の次の1つ）が表示される
   test "time axis includes bottom spacer hour" do
     get show_timetable_path(@event.event_key)

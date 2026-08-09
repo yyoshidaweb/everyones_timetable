@@ -24,9 +24,9 @@
 <% end %>
 <% if @performances.present? %>
   <%# タイムテーブル表示画面のメインコンテナ（画面全体の高さに設定する） %>
-  <div class="h-svh flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
-    <%# スクロールコンテナ（ヘッダーと日付選択タブの高さ分下げた位置に配置する） %>
-    <div class="flex-1 pt-24 overflow-auto relative">
+  <div class="h-full flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+    <%# スクロールコンテナ（ヘッダーと日付選択タブの高さ分下げた位置に配置する。min-h-0で内側だけスクロール） %>
+    <div class="flex-1 min-h-0 pt-24 overflow-auto overscroll-none relative">
       <%# 横幅確保 %>
       <div class="min-w-max">
         <%# ヘッダー行 %>
@@ -107,7 +107,7 @@
   <% end %>
 <% else %>
   <%# ===== 情報が揃った出演情報が0件の場合 ===== %>
-  <div class="h-svh p-12 flex flex-col items-center justify-center pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+  <div class="h-full p-12 flex flex-col items-center justify-center pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
     <% if user_signed_in? && current_user == @event.user %>
       <div class="max-w-md flex flex-col justify-center items-center">
         <p class="text-gray-500 mb-4">タイムテーブルを完成させましょう！</p>
