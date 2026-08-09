@@ -58,22 +58,16 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "minnanotimetable.com", protocol: "https" }
+  config.action_mailer.default_url_options = { host: "example.com" }
 
-  # SMTP設定（本番credentialsの smtp:* がある場合のみ有効化）
-  # bin/rails credentials:edit --environment production
-  if (smtp = Rails.application.credentials.dig(:smtp)).present?
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {
-      user_name: smtp[:user_name],
-      password: smtp[:password],
-      address: smtp[:address],
-      port: smtp[:port] || 587,
-      authentication: smtp[:authentication] || :plain,
-      enable_starttls_auto: true,
-      domain: smtp[:domain]
-    }.compact
-  end
+  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
+  # config.action_mailer.smtp_settings = {
+  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
+  #   password: Rails.application.credentials.dig(:smtp, :password),
+  #   address: "smtp.example.com",
+  #   port: 587,
+  #   authentication: :plain
+  # }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

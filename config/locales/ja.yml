@@ -12,7 +12,6 @@ ja:
       performer_name_tag: "出演者名タグ"
       performance: "出演情報"
       performer_favorite: "お気に入り出演者"
-      feedback: "ご意見"
 
     attributes:
       user:
@@ -72,7 +71,3 @@ ja:
       performer_favorite:
         user_id: "ユーザー"
         performer_id: "出演者"
-
-      feedback:
-        body: "ご意見・ご要望"
-        user_id: "ユーザー"

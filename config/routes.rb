@@ -17,13 +17,9 @@ Rails.application.routes.draw do
   # トップページ
   root to: "home#index"
 
-  # ご意見箱
-  resources :feedbacks, only: [ :create ]
-
   # 開発者向け管理画面
   namespace :admin do
     resource :dashboard, only: [ :show ]
-    resources :feedbacks, only: [ :index ]
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
