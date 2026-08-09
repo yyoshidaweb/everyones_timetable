@@ -27,12 +27,12 @@ module TimetablesHelper
 
   # performance の開始位置の top を rem で返す
   def performance_top_rem(performance)
-  timetable_start_min = timetable_start_minute
-  start_min = performance.start_time.hour * 60 + performance.start_time.min
-  diff_min  = start_min - timetable_start_min
-  rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
-  instead_of_margin = 0.05 # マージンの代わり
-  diff_min * rem_per_min + instead_of_margin
+    timetable_start_min = timetable_start_minute
+    start_min = performance.start_time.hour * 60 + performance.start_time.min
+    diff_min  = start_min - timetable_start_min
+    rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
+    instead_of_margin = 0.05 # マージンの代わり
+    diff_min * rem_per_min + instead_of_margin
   end
 
   # タイムテーブル用の時刻スロット配列を生成
