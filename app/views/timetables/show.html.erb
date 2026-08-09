@@ -19,7 +19,8 @@
 <% end %>
 <% if @performances.present? %>
   <%# タイムテーブル表示画面のメインコンテナ（画面全体の高さに設定する） %>
-  <div class="h-svh flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+  <div class="h-svh flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]"
+       style="<%= timetable_bottom_spacer_css_var %>">
     <%# スクロールコンテナ（ヘッダーと日付選択タブの高さ分下げた位置に配置する） %>
     <div class="flex-1 pt-24 overflow-auto relative">
       <%# 横幅確保 %>
@@ -46,10 +47,13 @@
                 <%= hour %>
               </p>
             <% end %>
-            <%# タイムテーブル領域下の余白分の時刻 %>
-            <p class="h-[var(--timetable-bottom-spacer)] text-xs text-center pt-1 tabular-nums -translate-y-2.75">
-              <%= timetable_bottom_spacer_hour(@performances) %>
-            </p>
+            <%# タイムテーブル領域下の余白分の時刻（余白内の全ての正時） %>
+            <% timetable_bottom_spacer_hour_slots(@performances).each do |slot| %>
+              <p class="text-xs text-center pt-1 tabular-nums -translate-y-2.75"
+                 style="height: <%= slot[:height_rem] %>rem;">
+                <%= slot[:hour] %>
+              </p>
+            <% end %>
           </div>
           <%# ステージを展開（下余白分も列高さに含め、配色・区切り線を継続する） %>
           <% @stages.each do |stage| %>

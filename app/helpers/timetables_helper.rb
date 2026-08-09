@@ -1,4 +1,10 @@
 module TimetablesHelper
+  # 1時間あたりの高さ（rem）。時刻スロットの h-24（6rem）と一致させる
+  TIMETABLE_REM_PER_HOUR = 6.0
+  # タイムテーブル領域下の余白（rem）。CSS変数 --timetable-bottom-spacer と同期する
+  # 縦並びアクションボタン2つ分（各2.5rem + gap 0.5rem）に合わせて、+0.5remの余白を追加
+  TIMETABLE_BOTTOM_SPACER_REM = 6.5
+
   # タイムテーブル全体の高さを rem で返す（1時間単位）
   def timetable_height_rem(performances)
     start_hour = performances.min_by(&:start_time).start_time.hour
@@ -6,8 +12,7 @@ module TimetablesHelper
     # 終了時刻は「次の時間」に切り上げ
     end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
     total_hours = end_hour - start_hour
-    rem_per_hour = 6.0
-    total_hours * rem_per_hour
+    total_hours * TIMETABLE_REM_PER_HOUR
   end
 
   # タイムテーブル全体の開始時刻（正時のみ取得し、分は切り捨てる）
@@ -25,8 +30,7 @@ module TimetablesHelper
   timetable_start_min = timetable_start_minute
   start_min = performance.start_time.hour * 60 + performance.start_time.min
   diff_min  = start_min - timetable_start_min
-  rem_per_hour = 6.0
-  rem_per_min  = rem_per_hour / 60.0
+  rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
   instead_of_margin = 0.05 # マージンの代わり
   diff_min * rem_per_min + instead_of_margin
   end
@@ -46,17 +50,31 @@ module TimetablesHelper
     (start_hour..last_hour).to_a
   end
 
-  # 下余白の開始位置に表示する正時（タイムテーブル末尾の次の時刻）
-  def timetable_bottom_spacer_hour(performances)
+  # 下余白用のCSS変数宣言（--timetable-bottom-spacer）
+  def timetable_bottom_spacer_css_var
+    "--timetable-bottom-spacer: #{TIMETABLE_BOTTOM_SPACER_REM}rem"
+  end
+
+  # 下余白内に表示する正時スロット（hour と高さrem）の配列
+  def timetable_bottom_spacer_hour_slots(performances)
     end_time = performances.max_by(&:end_time).end_time
-    end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
-    end_hour % 24
+    start_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
+
+    remaining = TIMETABLE_BOTTOM_SPACER_REM
+    slots = []
+    index = 0
+    while remaining.positive?
+      height = [ TIMETABLE_REM_PER_HOUR, remaining ].min
+      slots << { hour: (start_hour + index) % 24, height_rem: height }
+      remaining = (remaining - height).round(10)
+      index += 1
+    end
+    slots
   end
 
   # performance の高さを rem で返す
   def performance_height_rem(performance)
-    rem_per_hour = 6.0
-    rem_per_min  = rem_per_hour / 60.0
+    rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
     duration_min = performance.duration
     instead_of_margin = 0.05 # マージンの代わり
     duration_min * rem_per_min - instead_of_margin
