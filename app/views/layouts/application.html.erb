@@ -57,7 +57,7 @@
       </script>
     <% end %>
   </head>
-  <body class="min-h-svh flex flex-col">
+  <body class="<%= body_element_class %>">
     <%# メインヘッダー(@hidden_headerがtrueの場合は非表示) %>
     <%= render "layouts/header" %>
     <%# セカンドヘッダー（@page_title が設定されている場合のみ表示する） %>

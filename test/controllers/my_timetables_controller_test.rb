@@ -40,6 +40,15 @@ class MyTimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "meta[name=robots][content='noindex, nofollow']"
   end
 
+  # マイタイムテーブルもページ全体ではなく内側コンテナのみスクロールする
+  test "my timetable page locks body scroll and scrolls inner container only" do
+    get show_my_timetable_path(event_key: @event.event_key, username: @user.username)
+    assert_response :success
+    assert_select "body.h-svh.overflow-hidden"
+    assert_select "main.min-h-0.overflow-hidden"
+    assert_select "div.flex-1.min-h-0.overflow-auto.overscroll-none"
+  end
+
   test "should not get unpublished my_timetable with logout" do
     sign_out @user
     unpublished_event = events(:unpublished)

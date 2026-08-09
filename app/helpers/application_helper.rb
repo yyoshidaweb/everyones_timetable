@@ -14,10 +14,20 @@ module ApplicationHelper
     end
   end
 
+  # body要素のクラスを返す
+  # タイムテーブル画面はページ全体スクロールを止め、内側コンテナのみスクロールさせる
+  def body_element_class
+    if defined?(@timetable_view) && @timetable_view
+      "h-svh flex flex-col overflow-hidden"
+    else
+      "min-h-svh flex flex-col"
+    end
+  end
+
   # main要素のクラスを返す
   def main_element_class
     if defined?(@timetable_view) && @timetable_view
-      ""
+      "min-h-0 flex-1 overflow-hidden"
     elsif defined?(@show_event_header) && @show_event_header
       "m-2 pt-24"
     elsif defined?(@page_title) && @page_title.present?
