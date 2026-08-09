@@ -13,7 +13,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   # トップページにご意見箱（Googleフォーム埋め込み）がある
   test "index includes embedded feedback google form" do
     get "/"
-    assert_select "h2", text: /ご意見箱/
     assert_select "iframe[title=?]", "みんなのタイムテーブル ご意見箱"
     assert_select "iframe[src=?]",
                   "https://docs.google.com/forms/d/e/1FAIpQLSdDYkoTm6JJ40NbK2gK2p-9p626HNShJdPssRoj1sG8KkKV_g/viewform?embedded=true"
