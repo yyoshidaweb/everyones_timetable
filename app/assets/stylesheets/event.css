@@ -1,3 +1,10 @@
+/* タイムテーブル領域下の余白（高さはこの変数で変更する） */
+/* TimetablesHelper::TIMETABLE_BOTTOM_SPACER_REM と値を揃えること */
+/* 縦並びアクションボタン2つ分（各2.5rem + gap 0.5rem）に合わせて、+0.5remの余白を追加 */
+:root {
+  --timetable-bottom-spacer: 6.5rem;
+}
+
 /* ===== ステージヘッダー ===== */
 /* ステージヘッダーの背景（奇数） */
 .stage-header-col:nth-child(odd) {
