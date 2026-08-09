@@ -14,7 +14,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "index includes embedded feedback google form when signed in" do
     sign_in users(:one)
     get "/"
-    assert_select "iframe[title=?]", "みんなのタイムテーブル ご意見箱"
+    assert_select "iframe[title=?]", "ご意見箱"
     assert_select "iframe[src=?]",
                   "https://docs.google.com/forms/d/e/1FAIpQLSdDYkoTm6JJ40NbK2gK2p-9p626HNShJdPssRoj1sG8KkKV_g/viewform?embedded=true"
   end
@@ -22,7 +22,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   # 未ログイン時はご意見箱を表示しない
   test "index does not include feedback google form when guest" do
     get "/"
-    assert_select "iframe[title=?]", "みんなのタイムテーブル ご意見箱", count: 0
+    assert_select "iframe[title=?]", "ご意見箱", count: 0
   end
 
   # トップページにcanonicalタグが付与される
