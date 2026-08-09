@@ -54,7 +54,7 @@
               <%= timetable_bottom_spacer_hour(@performances) %>
             </p>
           </div>
-          <%# ステージを展開（下余白分も列高さに含め、配色・区切り線を継続する） %>
+          <%# ステージを展開（下余白分も列高さに含め、配色は継続・区切り線はカバーで非表示） %>
           <% @stages.each do |stage| %>
             <div class="timetable-body-col flex-1 w-0 min-w-16 relative"
                 style="height: calc(<%= timetable_height_rem(@performances) %>rem + var(--timetable-bottom-spacer));">
@@ -86,6 +86,8 @@
                   <% end %>
                 <% end %>
               <% end %>
+              <%# 下余白の区切り線を隠す（配色のみ残す） %>
+              <div class="timetable-bottom-spacer-cover" aria-hidden="true"></div>
             </div>
           <% end %>
         </div>
