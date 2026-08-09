@@ -46,8 +46,10 @@
                 <%= hour %>
               </p>
             <% end %>
-            <%# タイムテーブル領域下の余白分（時刻列側） %>
-            <div class="h-[var(--timetable-bottom-spacer)]" aria-hidden="true"></div>
+            <%# タイムテーブル領域下の余白分の時刻 %>
+            <p class="h-[var(--timetable-bottom-spacer)] text-xs text-center pt-1 tabular-nums -translate-y-2.75">
+              <%= timetable_bottom_spacer_hour(@performances) %>
+            </p>
           </div>
           <%# ステージを展開（下余白分も列高さに含め、配色・区切り線を継続する） %>
           <% @stages.each do |stage| %>

@@ -46,6 +46,13 @@ module TimetablesHelper
     (start_hour..last_hour).to_a
   end
 
+  # 下余白の開始位置に表示する正時（タイムテーブル末尾の次の時刻）
+  def timetable_bottom_spacer_hour(performances)
+    end_time = performances.max_by(&:end_time).end_time
+    end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
+    end_hour % 24
+  end
+
   # performance の高さを rem で返す
   def performance_height_rem(performance)
     rem_per_hour = 6.0

@@ -66,6 +66,14 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?][aria-label=?]", new_event_performance_path(@event.event_key), "出演情報を追加"
   end
 
+  # 時刻軸に下余白分の正時が表示される
+  test "time axis includes bottom spacer hour" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    # day one の最終終了は16:30のため、余白開始の正時は17
+    assert_select "p", text: "17"
+  end
+
   # 他ユーザーには下部アクションボタンが表示されない
   test "other user does not see bottom action buttons on timetable" do
     sign_out @user
