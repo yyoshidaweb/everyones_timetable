@@ -55,6 +55,18 @@ module TimetablesHelper
     content_tag(:style, ":root { --timetable-bottom-spacer: #{TIMETABLE_BOTTOM_SPACER_REM}rem; }")
   end
 
+  # 表示中のイベントのオーナーかどうか
+  def timetable_event_owner?
+    user_signed_in? && current_user == @event.user
+  end
+
+  # ステージ列の高さスタイル（オーナーのみ下余白を含める）
+  def timetable_body_col_height_style(performances)
+    height = "#{timetable_height_rem(performances)}rem"
+    height = "calc(#{height} + var(--timetable-bottom-spacer))" if timetable_event_owner?
+    "height: #{height}"
+  end
+
   # 下余白の開始位置に表示する正時（タイムテーブル末尾の次の時刻）
   def timetable_bottom_spacer_hour(performances)
     end_time = performances.max_by(&:end_time).end_time

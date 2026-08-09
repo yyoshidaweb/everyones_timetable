@@ -81,6 +81,27 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "style", text: /--timetable-bottom-spacer:\s*#{TimetablesHelper::TIMETABLE_BOTTOM_SPACER_REM}rem/
   end
 
+  # 他ユーザーには下余白が表示されない
+  test "other user does not see bottom spacer on timetable" do
+    sign_out @user
+    sign_in @user_two
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "p", text: "17", count: 0
+    assert_select ".timetable-bottom-spacer-cover", count: 0
+    assert_select "style", text: /--timetable-bottom-spacer/, count: 0
+  end
+
+  # 未ログインユーザーには下余白が表示されない
+  test "guest does not see bottom spacer on timetable" do
+    sign_out @user
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "p", text: "17", count: 0
+    assert_select ".timetable-bottom-spacer-cover", count: 0
+    assert_select "style", text: /--timetable-bottom-spacer/, count: 0
+  end
+
   # 他ユーザーには下部アクションボタンが表示されない
   test "other user does not see bottom action buttons on timetable" do
     sign_out @user
