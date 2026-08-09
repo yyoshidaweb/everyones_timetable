@@ -58,7 +58,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: max(0rem, calc(var(--timetable-bottom-spacer) - 6rem));
+    height: max(0rem, calc(var(--timetable-bottom-spacer) - 1rem));
     pointer-events: none;
 }
 
