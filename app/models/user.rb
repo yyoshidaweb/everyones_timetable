@@ -2,6 +2,9 @@ class User < ApplicationRecord
   # ユーザーが作成したイベント
   has_many :events, dependent: :destroy
 
+  # ご意見箱への投稿（ユーザー削除後も意見は残す）
+  has_many :feedbacks, dependent: :nullify
+
   # お気に入りのイベント
   has_many :event_favorites, dependent: :destroy
   has_many :favorite_events, through: :event_favorites, source: :event

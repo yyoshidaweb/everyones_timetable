@@ -10,6 +10,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # トップページにご意見箱フォームがある
+  test "index includes feedback form" do
+    get "/"
+    assert_select "h2", text: /ご意見箱/
+    assert_select "form[action=?]", feedbacks_path
+  end
   # トップページにcanonicalタグが付与される
   test "index includes canonical url" do
     get "/"

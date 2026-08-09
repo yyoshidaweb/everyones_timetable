@@ -1,0 +1,13 @@
+ご意見箱に新しい投稿がありました。
+
+投稿日時: <%= l(@feedback.created_at, format: :long) %>
+<% if @feedback.user.present? -%>
+ユーザー: <%= @feedback.user.name %>（<%= @feedback.user.email %>）
+<% else -%>
+ユーザー: 未ログイン
+<% end -%>
+
+内容:
+<%= @feedback.body %>
+
+管理画面: <%= admin_feedbacks_url %>
