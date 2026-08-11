@@ -8,7 +8,8 @@
 <% end %>
 <%# 日付選択タブ（イベントヘッダーの高さ分下げて配置する） %>
 <% if @days.any?%>
-  <nav class="flex h-8 fixed top-16 z-160 w-full justify-around overflow-x-auto bg-white border-t border-gray-200">
+  <nav class="flex h-8 fixed top-16 z-160 w-full justify-around overflow-x-auto bg-white border-t border-gray-200"
+       data-timetable-image-part="days">
     <% @days.each do |day| %>
       <%# 日付を MM/DD 形式でラベルに整形 %>
       <% label = day.date.strftime("%-m/%-d") %>
@@ -27,8 +28,8 @@
   <div class="h-full flex flex-col overflow-hidden pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
     <%# スクロールコンテナ（ヘッダーと日付選択タブの高さ分下げた位置に配置する。min-h-0で内側だけスクロール） %>
     <div class="flex-1 min-h-0 pt-24 overflow-auto overscroll-none relative">
-      <%# 横幅確保 %>
-      <div class="min-w-max">
+      <%# 横幅確保（画像化対象） %>
+      <div class="min-w-max" data-timetable-image-part="grid">
         <%# ヘッダー行 %>
         <div class="flex sticky top-0 z-110 bg-white">
           <%# 左上空白 %>
@@ -53,7 +54,8 @@
             <% end %>
             <% if timetable_event_owner? %>
               <%# タイムテーブル領域下の余白分の時刻（末尾の次の正時のみ） %>
-              <p class="h-[var(--timetable-bottom-spacer)] text-xs text-center pt-1 tabular-nums -translate-y-2.75">
+              <p class="h-[var(--timetable-bottom-spacer)] text-xs text-center pt-1 tabular-nums -translate-y-2.75"
+                 data-timetable-image-hide>
                 <%= timetable_bottom_spacer_hour(@performances) %>
               </p>
             <% end %>
@@ -61,7 +63,8 @@
           <%# ステージを展開（オーナーのみ下余白を含める） %>
           <% @stages.each do |stage| %>
             <div class="timetable-body-col flex-1 w-0 min-w-16 relative"
-                style="<%= timetable_body_col_height_style(@performances) %>">
+                style="<%= timetable_body_col_height_style(@performances) %>"
+                data-timetable-image-height-rem="<%= timetable_height_rem(@performances) %>">
               <%# 各ステージの出演情報を検索 %>
               <% if @performances_by_stage[stage.id].present? %>
                 <% @performances_by_stage[stage.id].each do |performance| %>
@@ -92,7 +95,7 @@
               <% end %>
               <% if timetable_event_owner? %>
                 <%# 下余白の先頭1時間より下の区切り線を隠す %>
-                <div class="timetable-bottom-spacer-cover" aria-hidden="true"></div>
+                <div class="timetable-bottom-spacer-cover" aria-hidden="true" data-timetable-image-hide></div>
               <% end %>
             </div>
           <% end %>

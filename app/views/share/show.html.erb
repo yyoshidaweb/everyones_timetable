@@ -1,11 +1,12 @@
 <%# モーダル %>
 <%= turbo_frame_tag "modal" do %>
-  <div class="fixed inset-0 z-300 flex items-center justify-center bg-black/40",
-        data-controller="modal clipboard"
+  <div class="fixed inset-0 z-300 flex items-center justify-center bg-black/40"
+        data-controller="modal clipboard timetable-image"
         data-action="click->modal#close"
-    data-clipboard-text-value="<%= share_url_for %>">
+        data-clipboard-text-value="<%= share_url_for %>"
+        data-timetable-image-filename-value="<%= timetable_image_filename %>">
     <div class="flex flex-col justify-center items-center relative max-h-[80svh] overflow-y-auto bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6
-                <%= share_modal_border %>",
+                <%= share_modal_border %>"
           data-action="click->modal#stop">
       <%# × ボタン %>
       <button type="button"
@@ -13,46 +14,100 @@
               data-action="click->modal#close">
         <span class="material-symbols-outlined">close</span>
       </button>
-      <%# ページタイトル %>
-      <div>
-        <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center line-clamp-6
-                  <%= share_page_title_marker %>">
-          <%= share_page_title_for %>
-        </h1>
-      </div>
-      <%# タイトル %>
-      <div>
-        <h1 class="text-gray-800 mb-6 text-xl font-bold text-center line-clamp-6">
-          <%= share_title_for %>
-        </h1>
-      </div>
-      <%# QRコード %>
-      <% require 'rqrcode' %>
-      <% qrcode = RQRCode::QRCode.new(share_url_for) %>
-      <div class="flex justify-center mb-2">
-        <%= raw qrcode.as_svg(module_size: 6, standalone: true) %>
-      </div>
-      <%# URLとコピーボタン %>
-      <div class="text-gray-500 flex items-center mb-6">
-        <span class="text-xs mr-1.5 break-all"><%= share_url_for %></span>
-        <button data-action="click->clipboard#copy"
-          data-action="click->clipboard#copy"
-          class="flex items-center cursor-pointer hover:text-gray-700">
-          <span data-clipboard-target="icon"
-                class="material-symbols-outlined"
-                style="font-size: 1.25rem;">
-            content_copy
-          </span>
+
+      <%# ===== 共有内容 ===== %>
+      <div data-timetable-image-target="shareContent" class="w-full flex flex-col items-center">
+        <%# ページタイトル %>
+        <div>
+          <h1 class="text-gray-800 mb-4 text-2xl font-bold text-center line-clamp-6
+                    <%= share_page_title_marker %>">
+            <%= share_page_title_for %>
+          </h1>
+        </div>
+        <%# タイトル %>
+        <div>
+          <h1 class="text-gray-800 mb-6 text-xl font-bold text-center line-clamp-6">
+            <%= share_title_for %>
+          </h1>
+        </div>
+        <%# QRコード %>
+        <% require 'rqrcode' %>
+        <% qrcode = RQRCode::QRCode.new(share_url_for) %>
+        <div class="flex justify-center mb-2">
+          <%= raw qrcode.as_svg(module_size: 6, standalone: true) %>
+        </div>
+        <%# URLとコピーボタン %>
+        <div class="text-gray-500 flex items-center mb-6">
+          <span class="text-xs mr-1.5 break-all"><%= share_url_for %></span>
+          <button type="button"
+            data-action="click->clipboard#copy"
+            class="flex items-center cursor-pointer hover:text-gray-700">
+            <span data-clipboard-target="icon"
+                  class="material-symbols-outlined"
+                  style="font-size: 1.25rem;">
+              content_copy
+            </span>
+          </button>
+        </div>
+        <%# X共有 %>
+        <%= link_to "https://x.com/intent/post?text=#{CGI.escape(share_text_for)}",
+                          target: "_blank",
+                          rel: "noopener noreferrer",
+                          class: "flex items-center justify-center w-full text-center bg-black text-white py-2 rounded-full mb-2" do %>
+          <%= image_tag "x_logo.svg", class: "w-5 mr-2" %>
+          <span class="font-semibold">Xでシェアする</span>
+        <% end %>
+        <%# 画像を保存 %>
+        <button type="button"
+                data-action="click->timetable-image#generate"
+                class="flex items-center justify-center w-full text-center bg-gray-800 text-white py-2 rounded-full cursor-pointer hover:bg-gray-900">
+          <span class="material-symbols-outlined mr-2" style="font-size: 1.25rem;">download</span>
+          <span class="font-semibold">画像を保存</span>
         </button>
       </div>
-      <%# X共有 %>
-      <%= link_to "https://x.com/intent/post?text=#{CGI.escape(share_text_for)}",
-                        target: "_blank",
-                        rel: "noopener noreferrer",
-                        class: "flex items-center justify-center w-full text-center bg-black text-white py-2 rounded-full mb-2" do %>
-        <%= image_tag "x_logo.svg", class: "w-5 mr-2" %>
-        <span class="font-semibold">Xでシェアする</span>
-      <% end %>
+
+      <%# ===== ローディング ===== %>
+      <div data-timetable-image-target="loadingContent" class="hidden w-full">
+        <div class="flex flex-col items-center py-10">
+          <p class="text-gray-800 text-lg font-bold mb-4">画像を生成中…</p>
+          <div class="h-8 w-8 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <%# ===== プレビュー ===== %>
+      <div data-timetable-image-target="previewContent" class="hidden w-full">
+        <div class="flex flex-col items-center">
+          <h1 class="text-gray-800 mb-4 text-xl font-bold text-center">画像プレビュー</h1>
+          <div class="w-full max-h-[50svh] overflow-auto mb-4 border border-gray-200 rounded bg-gray-50">
+            <img data-timetable-image-target="previewImage"
+                 alt="タイムテーブル画像プレビュー"
+                 class="w-full h-auto block">
+          </div>
+          <button type="button"
+                  data-action="click->timetable-image#download"
+                  class="flex items-center justify-center w-full text-center bg-gray-800 text-white py-2 rounded-full mb-2 cursor-pointer hover:bg-gray-900">
+            <span class="material-symbols-outlined mr-2" style="font-size: 1.25rem;">download</span>
+            <span class="font-semibold">画像を保存</span>
+          </button>
+          <button type="button"
+                  data-action="click->timetable-image#backToShare"
+                  class="text-sm text-gray-500 hover:text-gray-700 cursor-pointer underline">
+            共有に戻る
+          </button>
+        </div>
+      </div>
+
+      <%# ===== エラー ===== %>
+      <div data-timetable-image-target="errorContent" class="hidden w-full">
+        <div class="flex flex-col items-center py-6">
+          <p class="text-gray-800 text-center mb-4">画像の生成に失敗しました。<br>時間をおいて再度お試しください。</p>
+          <button type="button"
+                  data-action="click->timetable-image#backToShare"
+                  class="text-sm text-gray-500 hover:text-gray-700 cursor-pointer underline">
+            共有に戻る
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 <% end %>

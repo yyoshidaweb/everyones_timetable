@@ -53,4 +53,28 @@ module ShareHelper
       "ring-6 ring-orange-400"
     end
   end
+
+  # タイムテーブル画像のダウンロードファイル名を返す
+  def timetable_image_filename
+    date_str = timetable_image_date_str
+    case params[:type]
+    when "event"
+      "#{safe_filename_component(@event.display_name)}_#{date_str}.png"
+    when "my-timetable"
+      "#{safe_filename_component(@user.name)}の#{safe_filename_component(@event.display_name)}マイタイムテーブル_#{date_str}.png"
+    end
+  end
+
+  # 画像ファイル名用の日付（MMDD）
+  def timetable_image_date_str
+    date = params[:d].present? ? Date.parse(params[:d].to_s) : Date.current
+    date.strftime("%m%d")
+  rescue Date::Error, ArgumentError
+    Date.current.strftime("%m%d")
+  end
+
+  # ファイル名に使えない文字を置換する
+  def safe_filename_component(value)
+    value.to_s.gsub(%r{[\\/:*?"<>|]}, "_").strip
+  end
 end

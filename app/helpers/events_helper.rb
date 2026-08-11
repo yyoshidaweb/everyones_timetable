@@ -9,7 +9,8 @@ module EventsHelper
       :span,
       "lock",
       class: "material-symbols-outlined leading-none align-middle shrink-0",
-      style: "font-size: 1rem;"
+      style: "font-size: 1rem;",
+      data: { timetable_image_hide: true }
     )
   end
 
@@ -35,11 +36,14 @@ module EventsHelper
 
   # タイムテーブルとマイタイムテーブルで共有URLを分けるためのヘルパーメソッド
   def share_path_for
-    if @my_timetable_view
-      share_path(type: "my-timetable", event_key: @event.event_key, username: @user.username)
+    options = if @my_timetable_view
+      { type: "my-timetable", event_key: @event.event_key, username: @user.username }
     else
-      share_path(type: "event", event_key: @event.event_key)
+      { type: "event", event_key: @event.event_key }
     end
+    # 表示中の日付を渡し、画像ファイル名に使う
+    options[:d] = @selected_date if @selected_date.present?
+    share_path(options)
   end
 
   # 作成したタイムテーブル一覧かどうか判定する
