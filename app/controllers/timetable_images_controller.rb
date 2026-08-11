@@ -17,8 +17,7 @@ class TimetableImagesController < ApplicationController
 
   private
     def prepare_event_capture!
-      @event = Event.find_by!(event_key: params[:event_key])
-      authorize_published_event!(@event)
+      load_and_authorize_event!
       return if performed?
 
       @my_timetable_view = false
@@ -34,8 +33,7 @@ class TimetableImagesController < ApplicationController
     end
 
     def prepare_my_timetable_capture!
-      @event = Event.find_by!(event_key: params[:event_key])
-      authorize_published_event!(@event)
+      load_and_authorize_event!
       return if performed?
 
       @user = User.find_by!(username: params[:username])
@@ -48,7 +46,7 @@ class TimetableImagesController < ApplicationController
         if favorite_ids.empty?
           Performance.none
         else
-          performances_for_selected_date.where(id: favorite_ids).includes(performer: :performer_name_tag)
+          base_performances.where(id: favorite_ids).includes(performer: :performer_name_tag)
         end
       @performances_by_stage = @performances.group_by(&:stage_id)
       @stages = @stages.where(id: @performances_by_stage.keys)
@@ -62,18 +60,24 @@ class TimetableImagesController < ApplicationController
       @stages = @event.stages.order(:position).includes(:stage_name_tag)
       raise ActiveRecord::RecordNotFound if @days.blank?
 
-      @selected_date =
-        if params[:d].present?
-          Date.parse(params[:d].to_s)
-        else
-          @days.first.date
-        end
+      @selected_date = selected_date_from_param
 
       unless @days.any? { |day| day.date == @selected_date }
         raise ActiveRecord::RecordNotFound
       end
 
       @include_favorite_markers = !@my_timetable_view && include_favorite_markers?
+    end
+
+    def load_and_authorize_event!
+      @event = Event.find_by!(event_key: params[:event_key])
+      authorize_published_event!(@event)
+    end
+
+    def selected_date_from_param
+      return @days.first.date if params[:d].blank?
+
+      Date.parse(params[:d].to_s)
     end
 
     # favorites=0 のときだけマーカーを除外（未指定・1 は含める）
