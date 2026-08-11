@@ -105,5 +105,4 @@ module ShareHelper
   rescue Date::Error, ArgumentError
     Date.current.strftime("%m%d")
   end
-
 end
