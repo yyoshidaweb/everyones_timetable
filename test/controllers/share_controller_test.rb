@@ -26,13 +26,15 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "should show image save button and day options for published event share" do
+  test "should show image save button and day select for published event share" do
     get share_path(type: "event", event_key: @event.event_key),
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
     assert_select "button[data-action='click->timetable-image#start']", text: /画像を保存/
     assert_select "[data-timetable-image-capture-url-value]"
     assert_select "[data-timetable-image-days-value]"
+    assert_select "select[data-timetable-image-target='daySelect']"
+    assert_select "select[data-timetable-image-target='daySelect'] option", minimum: 1
   end
 
   test "should show image save button for published my timetable share" do

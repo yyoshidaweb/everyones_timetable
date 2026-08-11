@@ -69,20 +69,6 @@
         </button>
       </div>
 
-      <%# ===== 日付選択 ===== %>
-      <div data-timetable-image-target="daySelectContent" class="hidden w-full">
-        <div class="flex flex-col items-center">
-          <h1 class="text-gray-800 mb-4 text-xl font-bold text-center">日付を選択</h1>
-          <p class="text-gray-500 text-sm text-center mb-4">画像化する開催日を選んでください</p>
-          <div data-timetable-image-target="dayList" class="w-full flex flex-col gap-2 mb-4"></div>
-          <button type="button"
-                  data-action="click->timetable-image#backToShare"
-                  class="text-sm text-gray-500 hover:text-gray-700 cursor-pointer underline">
-            共有に戻る
-          </button>
-        </div>
-      </div>
-
       <%# ===== ローディング ===== %>
       <div data-timetable-image-target="loadingContent" class="hidden w-full">
         <div class="flex flex-col items-center py-10">
@@ -95,6 +81,19 @@
       <div data-timetable-image-target="previewContent" class="hidden w-full">
         <div class="flex flex-col items-center">
           <h1 class="text-gray-800 mb-4 text-xl font-bold text-center">画像プレビュー</h1>
+          <% if @days.present? %>
+            <div class="w-full mb-4">
+              <label for="timetable-image-day-select" class="block text-sm text-gray-600 mb-1">開催日</label>
+              <select id="timetable-image-day-select"
+                      data-timetable-image-target="daySelect"
+                      data-action="change->timetable-image#changeDay"
+                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800">
+                <% @days.each do |day| %>
+                  <option value="<%= day.date.iso8601 %>"><%= day.date.strftime("%-m/%-d") %></option>
+                <% end %>
+              </select>
+            </div>
+          <% end %>
           <div class="w-full max-h-[50svh] overflow-auto mb-4 border border-gray-200 rounded bg-gray-50">
             <img data-timetable-image-target="previewImage"
                  alt="タイムテーブル画像プレビュー"

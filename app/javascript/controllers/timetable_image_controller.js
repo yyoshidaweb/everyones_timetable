@@ -5,13 +5,12 @@ import { domToPng } from "modern-screenshot"
 export default class extends Controller {
   static targets = [
     "shareContent",
-    "daySelectContent",
-    "dayList",
     "loadingContent",
     "previewContent",
     "errorContent",
     "errorMessage",
-    "previewImage"
+    "previewImage",
+    "daySelect"
   ]
   static values = {
     filename: String,
@@ -20,7 +19,7 @@ export default class extends Controller {
     days: { type: Array, default: [] }
   }
 
-  // 「画像を保存」→日付選択（複数日）またはそのまま生成
+  // 「画像を保存」→1日目を画像化してプレビュー表示
   start(event) {
     event.preventDefault()
 
@@ -29,19 +28,12 @@ export default class extends Controller {
       return
     }
 
-    if (this.daysValue.length === 1) {
-      this.#generateForDate(this.daysValue[0])
-      return
-    }
-
-    this.#renderDayList()
-    this.#showOnly("daySelectContent")
+    this.#generateForDate(this.daysValue[0])
   }
 
-  // 日付ボタンから生成
-  selectDay(event) {
-    event.preventDefault()
-    const date = event.currentTarget.dataset.date
+  // プレビュー内のselectで日付変更→その日の画像を再生成
+  changeDay(event) {
+    const date = event.target.value
     const day = this.daysValue.find((item) => item.date === date)
     if (!day) {
       this.showError("選択した日付のタイムテーブルを取得できませんでした。")
@@ -71,9 +63,12 @@ export default class extends Controller {
     this.#showOnly("loadingContent")
   }
 
-  showPreview(dataUrl) {
+  showPreview(dataUrl, day) {
     if (this.hasPreviewImageTarget) {
       this.previewImageTarget.src = dataUrl
+    }
+    if (this.hasDaySelectTarget && day?.date) {
+      this.daySelectTarget.value = day.date
     }
     this.#showOnly("previewContent")
   }
@@ -104,7 +99,7 @@ export default class extends Controller {
         backgroundColor: "#ffffff"
       })
 
-      this.showPreview(dataUrl)
+      this.showPreview(dataUrl, day)
     } catch (error) {
       console.error(error)
       this.showError("画像の生成に失敗しました。<br>時間をおいて再度お試しください。")
@@ -143,21 +138,6 @@ export default class extends Controller {
     return root
   }
 
-  #renderDayList() {
-    if (!this.hasDayListTarget) return
-
-    this.dayListTarget.innerHTML = ""
-    this.daysValue.forEach((day) => {
-      const button = document.createElement("button")
-      button.type = "button"
-      button.dataset.date = day.date
-      button.dataset.action = "click->timetable-image#selectDay"
-      button.className = "w-full py-2 rounded-full bg-gray-800 text-white font-semibold cursor-pointer hover:bg-gray-900"
-      button.textContent = day.label
-      this.dayListTarget.appendChild(button)
-    })
-  }
-
   #filenameFor(date) {
     const mmdd = date.slice(5, 7) + date.slice(8, 10)
     if (this.filenameTemplateValue) {
@@ -169,7 +149,6 @@ export default class extends Controller {
   #showOnly(targetName) {
     const map = {
       shareContent: this.hasShareContentTarget ? this.shareContentTarget : null,
-      daySelectContent: this.hasDaySelectContentTarget ? this.daySelectContentTarget : null,
       loadingContent: this.hasLoadingContentTarget ? this.loadingContentTarget : null,
       previewContent: this.hasPreviewContentTarget ? this.previewContentTarget : null,
       errorContent: this.hasErrorContentTarget ? this.errorContentTarget : null
