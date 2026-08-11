@@ -54,20 +54,19 @@ module ShareHelper
     end
   end
 
-  # タイムテーブル画像のダウンロードファイル名を返す
-  def timetable_image_filename(date:)
-    date_str = timetable_image_date_str(date)
+  # タイムテーブル画像のファイル名ベース（_{MMDD}.png の前）
+  def timetable_image_filename_base
     case params[:type]
     when "event"
-      "#{@event.event_key}_#{date_str}.png"
+      @event.event_key
     when "my-timetable"
-      "#{@event.event_key}_#{@user.username}_#{date_str}.png"
+      "#{@event.event_key}_#{@user.username}"
     end
   end
 
-  # 日付部分を差し替える用のファイル名テンプレート（DATE が MMDD に置換される）
-  def timetable_image_filename_template
-    timetable_image_filename(date: Date.new(2000, 1, 1)).sub("_0101.png", "_DATE.png")
+  # タイムテーブル画像のダウンロードファイル名を返す
+  def timetable_image_filename(date:)
+    "#{timetable_image_filename_base}_#{timetable_image_date_str(date)}.png"
   end
 
   # 画像キャプチャ用HTMLのパス
@@ -80,14 +79,10 @@ module ShareHelper
     end
   end
 
-  # 日付選択肢（モーダル用）
+  # 日付選択肢（モーダル用）。ファイル名は含めず、JS側で filenameBase + 日付から組み立てる
   def timetable_image_day_options
     Array(@days).map do |day|
-      {
-        date: day.date.iso8601,
-        label: day.date.strftime("%-m/%-d"),
-        filename: timetable_image_filename(date: day.date)
-      }
+      { date: day.date.iso8601 }
     end
   end
 

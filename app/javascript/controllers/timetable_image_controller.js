@@ -15,7 +15,7 @@ export default class extends Controller {
   ]
   static values = {
     filename: String,
-    filenameTemplate: String,
+    filenameBase: String,
     captureUrl: String,
     days: { type: Array, default: [] }
   }
@@ -92,7 +92,7 @@ export default class extends Controller {
   }
 
   async #generateForDate(day) {
-    this.filenameValue = day.filename || this.#filenameFor(day.date)
+    this.filenameValue = this.#filenameFor(day.date)
     this.showLoading()
 
     let captureRoot = null
@@ -220,8 +220,8 @@ export default class extends Controller {
 
   #filenameFor(date) {
     const mmdd = date.slice(5, 7) + date.slice(8, 10)
-    if (this.filenameTemplateValue) {
-      return this.filenameTemplateValue.replace("DATE", mmdd)
+    if (this.filenameBaseValue) {
+      return `${this.filenameBaseValue}_${mmdd}.png`
     }
     return `timetable_${mmdd}.png`
   }
