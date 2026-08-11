@@ -127,7 +127,12 @@ module TimetablesHelper
 
   # 画像化時のキャプチャ幅（PC風の横並びを確保）
   def timetable_image_capture_width
+    min_capture_width = 1024
+    stage_column_width = 120
+    time_column_width = 20
     stage_count = [ @stages&.size.to_i, 1 ].max
-    [ 1024, stage_count * 120 + 20 ].max
+    content_width = stage_count * stage_column_width + time_column_width
+
+    [ min_capture_width, content_width ].max
   end
 end
