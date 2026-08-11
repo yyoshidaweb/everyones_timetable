@@ -60,7 +60,7 @@ export default class extends Controller {
 
     const link = document.createElement("a")
     link.href = this.previewImageTarget.src
-    link.download = this.filenameValue || "timetable.png"
+    link.download = this.filenameValue
     link.click()
   }
 
@@ -220,10 +220,7 @@ export default class extends Controller {
 
   #filenameFor(date) {
     const mmdd = date.slice(5, 7) + date.slice(8, 10)
-    if (this.filenameBaseValue) {
-      return `${this.filenameBaseValue}_${mmdd}.png`
-    }
-    return `timetable_${mmdd}.png`
+    return `${this.filenameBaseValue}_${mmdd}.png`
   }
 
   #showOnly(targetName) {
