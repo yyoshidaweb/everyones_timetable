@@ -40,7 +40,7 @@
     .tti-stage-header:nth-child(odd) { background: #e5e7eb; }
     .tti-stage-header:nth-child(even) { background: #d1d5db; }
     .tti-body-col {
-      flex: 1; min-width: 0; position: relative;
+      flex: 1; min-width: 0; position: relative; overflow: visible;
       background-image:
         linear-gradient(to bottom, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1.1px),
         linear-gradient(to bottom, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1.1px);
@@ -58,10 +58,11 @@
       position: absolute; left: 1px; right: 1px;
       background: #ffffff; border-radius: 2px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.06); padding: 1px;
-      font-size: 12px; overflow: hidden;
+      font-size: 12px; overflow: visible;
     }
     .tti-card-time { font-size: 10px; line-height: 1; color: #6b7280; }
     .tti-card-name { margin: 0; font-weight: 600; line-height: 1.1; word-break: break-word; }
+    .tti-card-name.is-short { transform: translateY(-0.125rem); }
     .tti-favorite {
       background-image: linear-gradient(transparent 50%, rgba(245, 73, 0, 0.2) 50%);
     }
@@ -114,7 +115,7 @@
                 <% if performance.show_start_time? %>
                   <div class="tti-card-time"><%= formatted_time(performance.start_time) %></div>
                 <% end %>
-                <p class="tti-card-name"
+                <p class="tti-card-name <%= 'is-short' if duration <= 5 %>"
                    style="font-size: <%= duration <= 5 ? '10px' : '12px' %>;
                           display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
                           -webkit-line-clamp: <%= line_clamp_count_by_duration(duration) %>;">
