@@ -9,8 +9,7 @@ module EventsHelper
       :span,
       "lock",
       class: "material-symbols-outlined leading-none align-middle shrink-0",
-      style: "font-size: 1rem;",
-      data: { timetable_image_hide: true }
+      style: "font-size: 1rem;"
     )
   end
 

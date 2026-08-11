@@ -1,89 +1,21 @@
 <% width = timetable_image_capture_width %>
-<% header_bg = @my_timetable_view ? "#ea580c" : "#1f2937" %>
+<% header_bg = @my_timetable_view ? "bg-orange-600" : "bg-gray-800" %>
 <% height_rem = @performances.present? ? timetable_height_rem(@performances) : 6 %>
-<div data-timetable-image-capture-root
-     style="width: <%= width %>px; background: #ffffff; color: #1f2937; font-family: system-ui, -apple-system, sans-serif;">
-  <style>
-    [data-timetable-image-capture-root] * { box-sizing: border-box; }
-    [data-timetable-image-capture-root] a { color: inherit; text-decoration: none; }
-    .tti-header {
-      display: flex; align-items: center; justify-content: center;
-      width: 100%; min-height: 32px; padding: 8px 12px;
-      background: <%= header_bg %>; color: #ffffff;
-    }
-    .tti-header-title {
-      margin: 0; font-size: 14px; font-weight: 700; line-height: 1.3;
-      text-align: center; white-space: normal; word-break: break-word;
-    }
-    .tti-days {
-      display: flex; width: 100%; background: #ffffff;
-      border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
-    }
-    .tti-day {
-      flex: 1; padding: 8px 4px; font-size: 12px; font-weight: 700;
-      text-align: center; color: #1f2937; border-bottom: 4px solid transparent;
-    }
-    .tti-day.is-selected { border-bottom-color: #1f2937; }
-    .tti-grid { width: 100%; background: #ffffff; position: relative; }
-    .tti-stage-row, .tti-body-row { display: flex; width: 100%; }
-    .tti-time-gutter {
-      width: 20px; flex: 0 0 20px; background: #ffffff;
-      font-size: 12px; text-align: center; color: #1f2937;
-    }
-    .tti-stage-header {
-      flex: 1; min-width: 0; min-height: 32px; max-height: 48px;
-      display: flex; align-items: center; justify-content: center;
-      padding: 1px; border-bottom: 1px solid #d1d5db;
-      font-size: 12px; font-weight: 700; text-align: center;
-      overflow: hidden; word-break: break-word;
-    }
-    .tti-stage-header:nth-child(odd) { background: #e5e7eb; }
-    .tti-stage-header:nth-child(even) { background: #d1d5db; }
-    .tti-body-col {
-      flex: 1; min-width: 0; position: relative; overflow: visible;
-      background-image:
-        linear-gradient(to bottom, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1.1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1.1px);
-      background-size: 100% 6rem, 100% 1rem;
-      background-repeat: repeat-y;
-    }
-    .tti-body-col:nth-child(odd) { background-color: #f3f4f6; }
-    .tti-body-col:nth-child(even) { background-color: #e5e7eb; }
-    .tti-hour {
-      height: 6rem; margin: 0; padding-top: 4px;
-      font-variant-numeric: tabular-nums;
-      transform: translateY(-0.6875rem);
-    }
-    .tti-card {
-      position: absolute; left: 1px; right: 1px;
-      background: #ffffff; border-radius: 2px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06); padding: 1px;
-      font-size: 12px; overflow: visible;
-    }
-    .tti-card-time { font-size: 10px; line-height: 1; color: #6b7280; }
-    .tti-card-name { margin: 0; font-weight: 600; line-height: 1.1; word-break: break-word; }
-    .tti-card-name.is-short { transform: translateY(-0.125rem); }
-    .tti-favorite {
-      background-image: linear-gradient(transparent 50%, rgba(245, 73, 0, 0.2) 50%);
-    }
-    .tti-empty {
-      position: relative; padding: 48px 16px; text-align: center; color: #6b7280; font-size: 14px;
-    }
-    .tti-watermark {
-      position: absolute; right: 8px; bottom: 4px; z-index: 10;
-      margin: 0; padding: 0; font-size: 11px; line-height: 1.4;
-      color: rgba(0, 0, 0, 0.35); pointer-events: none; white-space: nowrap;
-    }
-  </style>
 
-  <header class="tti-header">
-    <h1 class="tti-header-title"><%= event_header_title %></h1>
+<div data-timetable-image-capture-root
+     style="width: <%= width %>px;"
+     class="bg-white text-gray-800 relative">
+  <header class="<%= header_bg %> w-full p-2 h-8 flex justify-center items-center">
+    <h1 class="text-sm text-white flex items-center justify-center leading-none font-bold px-2 text-center wrap-break-word">
+      <%= event_header_title %>
+    </h1>
   </header>
 
   <% if @days.any? %>
-    <nav class="tti-days">
+    <nav class="flex h-8 w-full justify-around bg-white border-t border-gray-200">
       <% @days.each do |day| %>
-        <div class="tti-day <%= day.date == @selected_date ? 'is-selected' : '' %>">
+        <% selected = (day.date == @selected_date) %>
+        <div class="flex-1 px-2 py-2 text-xs text-gray-800 font-bold border-b-4 <%= selected ? 'border-gray-800' : 'border-transparent' %> text-center whitespace-nowrap">
           <%= day.date.strftime("%-m/%-d") %>
         </div>
       <% end %>
@@ -91,35 +23,40 @@
   <% end %>
 
   <% if @performances.present? && @stages.present? %>
-    <div class="tti-grid">
-      <div class="tti-stage-row">
-        <div class="tti-time-gutter"></div>
+    <div class="min-w-max relative overflow-visible">
+      <div class="flex bg-white">
+        <div class="w-5 bg-white"></div>
         <% @stages.each do |stage| %>
-          <div class="tti-stage-header">
-            <%= stage.stage_name_tag.name %>
+          <div class="stage-header-col flex-1 flex justify-center items-center min-h-8 max-h-12 w-0 min-w-16 overflow-hidden border-b text-xs font-bold text-center p-px">
+            <span class="line-clamp-3 wrap-break-word w-full"><%= stage.stage_name_tag.name %></span>
           </div>
         <% end %>
       </div>
-      <div class="tti-body-row">
-        <div class="tti-time-gutter">
+      <div class="flex relative overflow-visible">
+        <div class="w-5 bg-white">
           <% time_slots_for_timetable(@performances).each do |hour| %>
-            <p class="tti-hour"><%= hour %></p>
+            <p class="h-24 text-xs text-center pt-1 tabular-nums -translate-y-2.75">
+              <%= hour %>
+            </p>
           <% end %>
         </div>
         <% @stages.each do |stage| %>
-          <div class="tti-body-col" style="height: <%= height_rem %>rem;">
+          <div class="timetable-body-col flex-1 w-0 min-w-16 relative overflow-visible"
+               style="height: <%= height_rem %>rem;">
             <% (@performances_by_stage[stage.id] || []).each do |performance| %>
               <% duration = performance.duration %>
-              <div class="tti-card"
+              <% line_clamp = line_clamp_class_by_duration(duration) %>
+              <% font_size = font_size_class_by_duration(duration) %>
+              <% translate_y = translate_y_by_duration(duration) %>
+              <div class="absolute left-px right-px bg-white rounded shadow-xs p-px text-xs overflow-visible"
                    style="top: <%= performance_top_rem(performance) %>rem; height: <%= performance_height_rem(performance) %>rem;">
                 <% if performance.show_start_time? %>
-                  <div class="tti-card-time"><%= formatted_time(performance.start_time) %></div>
+                  <div class="text-[10px] leading-none text-gray-500">
+                    <%= formatted_time(performance.start_time) %>
+                  </div>
                 <% end %>
-                <p class="tti-card-name <%= 'is-short' if duration <= 5 %>"
-                   style="font-size: <%= duration <= 5 ? '10px' : '12px' %>;
-                          display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
-                          -webkit-line-clamp: <%= line_clamp_count_by_duration(duration) %>;">
-                  <span class="<%= 'tti-favorite' if @include_favorite_markers && favorite_marker(performance).present? %>">
+                <p class="font-semibold leading-none wrap-break-word <%= font_size %> <%= line_clamp %> <%= translate_y %>">
+                  <span class="<%= @include_favorite_markers ? favorite_marker(performance) : '' %>">
                     <%= performance.performer.display_name %>
                   </span>
                 </p>
@@ -128,12 +65,18 @@
           </div>
         <% end %>
       </div>
-      <p class="tti-watermark">powered by みんなのタイムテーブル</p>
+      <p class="absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
+         style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
+        powered by みんなのタイムテーブル
+      </p>
     </div>
   <% else %>
-    <div class="tti-empty">
+    <div class="relative p-12 text-center text-sm text-gray-500">
       この日の出演情報はありません
-      <p class="tti-watermark">powered by みんなのタイムテーブル</p>
+      <p class="absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
+         style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
+        powered by みんなのタイムテーブル
+      </p>
     </div>
   <% end %>
 </div>

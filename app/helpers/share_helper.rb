@@ -59,9 +59,9 @@ module ShareHelper
     date_str = timetable_image_date_str(date)
     case params[:type]
     when "event"
-      "#{safe_filename_component(@event.display_name)}_#{date_str}.png"
+      "#{@event.event_key}_#{date_str}.png"
     when "my-timetable"
-      "#{safe_filename_component(@user.name)}の#{safe_filename_component(@event.display_name)}マイタイムテーブル_#{date_str}.png"
+      "#{@event.event_key}_#{@user.username}_#{date_str}.png"
     end
   end
 
@@ -106,8 +106,4 @@ module ShareHelper
     Date.current.strftime("%m%d")
   end
 
-  # ファイル名に使えない文字を置換する
-  def safe_filename_component(value)
-    value.to_s.gsub(%r{[\\/:*?"<>|]}, "_").strip
-  end
 end

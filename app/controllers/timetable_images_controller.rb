@@ -10,6 +10,8 @@ class TimetableImagesController < ApplicationController
       raise ActionController::RoutingError, "Not Found"
     end
 
+    return if performed?
+
     render layout: false
   end
 
@@ -17,12 +19,14 @@ class TimetableImagesController < ApplicationController
     def prepare_event_capture!
       @event = Event.find_by!(event_key: params[:event_key])
       authorize_published_event!(@event)
+      return if performed?
+
       @my_timetable_view = false
       load_capture_base!
       @performances = performances_for_selected_date.includes(performer: :performer_name_tag)
       @performances_by_stage = @performances.group_by(&:stage_id)
       @favorite_performance_map =
-        if include_favorite_markers? && user_signed_in?
+        if @include_favorite_markers && user_signed_in?
           current_user.favorite_performance_map_by_performances(@performances)
         else
           {}
@@ -32,6 +36,8 @@ class TimetableImagesController < ApplicationController
     def prepare_my_timetable_capture!
       @event = Event.find_by!(event_key: params[:event_key])
       authorize_published_event!(@event)
+      return if performed?
+
       @user = User.find_by!(username: params[:username])
       @my_timetable_view = true
       load_capture_base!
@@ -47,12 +53,8 @@ class TimetableImagesController < ApplicationController
       @performances_by_stage = @performances.group_by(&:stage_id)
       @stages = @stages.where(id: @performances_by_stage.keys)
 
-      @favorite_performance_map =
-        if include_favorite_markers? && user_signed_in?
-          current_user.favorite_performance_map_by_performances(@performances)
-        else
-          {}
-        end
+      # マイタイムテーブル画像ではお気に入りマーカーを表示しない
+      @favorite_performance_map = {}
     end
 
     def load_capture_base!
@@ -71,7 +73,7 @@ class TimetableImagesController < ApplicationController
         raise ActiveRecord::RecordNotFound
       end
 
-      @include_favorite_markers = include_favorite_markers?
+      @include_favorite_markers = !@my_timetable_view && include_favorite_markers?
     end
 
     # favorites=0 のときだけマーカーを除外（未指定・1 は含める）

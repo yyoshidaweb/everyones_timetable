@@ -5,6 +5,7 @@ class TimetableImagesControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     @user = users(:one)
+    @user_two = users(:two)
     @event = events(:one)
     @unpublished_event = events(:unpublished)
     @day = days(:one)
@@ -41,6 +42,19 @@ class TimetableImagesControllerTest < ActionDispatch::IntegrationTest
 
   test "should return 404 for unpublished event capture" do
     get timetable_image_capture_path(type: "event", event_key: @unpublished_event.event_key, d: Date.current)
+    assert_response :not_found
+  end
+
+  test "should not raise double render for unpublished event with days" do
+    Day.create!(event: @unpublished_event, date: Date.current + 10.days)
+    sign_in @user_two
+
+    get timetable_image_capture_path(
+      type: "event",
+      event_key: @unpublished_event.event_key,
+      d: Date.current + 10.days
+    )
+
     assert_response :not_found
   end
 

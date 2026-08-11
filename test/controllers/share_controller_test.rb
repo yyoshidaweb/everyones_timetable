@@ -43,5 +43,6 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
     assert_select "button[data-action='click->timetable-image#start']", text: /画像を保存/
+    assert_select "input[data-timetable-image-target='favoriteMarkers'][type='checkbox']", count: 0
   end
 end
