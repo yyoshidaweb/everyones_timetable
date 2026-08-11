@@ -26,20 +26,19 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "should show image save button for published event share" do
-    get share_path(type: "event", event_key: @event.event_key, d: "2026-08-09"),
+  test "should show image save button and day options for published event share" do
+    get share_path(type: "event", event_key: @event.event_key),
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
-    assert_select "button[data-action='click->timetable-image#generate']", text: /画像を保存/
-    assert_select "[data-timetable-image-filename-value=?]", "#{@event.display_name}_0809.png"
+    assert_select "button[data-action='click->timetable-image#start']", text: /画像を保存/
+    assert_select "[data-timetable-image-capture-url-value]"
+    assert_select "[data-timetable-image-days-value]"
   end
 
   test "should show image save button for published my timetable share" do
-    get share_path(type: "my-timetable", event_key: @event.event_key, username: @user.username, d: "2026-08-09"),
+    get share_path(type: "my-timetable", event_key: @event.event_key, username: @user.username),
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
-    assert_select "button[data-action='click->timetable-image#generate']", text: /画像を保存/
-    expected = "#{@user.name}の#{@event.display_name}マイタイムテーブル_0809.png"
-    assert_select "[data-timetable-image-filename-value=?]", expected
+    assert_select "button[data-action='click->timetable-image#start']", text: /画像を保存/
   end
 end

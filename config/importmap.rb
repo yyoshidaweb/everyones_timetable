@@ -6,4 +6,4 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "sortablejs" # @1.15.6
-pin "html-to-image" # @1.11.13
+pin "modern-screenshot" # @4.7.0

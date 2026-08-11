@@ -73,6 +73,8 @@ Rails.application.routes.draw do
   delete "/performer_favorites", to: "performer_favorites#destroy"
 
   get "/share", to: "share#show", as: :share
+  # タイムテーブル画像化用HTML断片
+  get "/timetable_images/capture", to: "timetable_images#capture", as: :timetable_image_capture
 
   # 利用規約・プライバシーポリシー
   get "/terms", to: "static_pages#terms"

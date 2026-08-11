@@ -84,13 +84,18 @@ module TimetablesHelper
 
   # 出演時間に応じた line-clamp クラスを返す
   def line_clamp_class_by_duration(duration)
+    "line-clamp-#{line_clamp_count_by_duration(duration)}"
+  end
+
+  # 出演時間に応じた line-clamp 行数を返す
+  def line_clamp_count_by_duration(duration)
     case duration
-    when ..15 then "line-clamp-1"
-    when ..20 then "line-clamp-2"
-    when ..35 then "line-clamp-3"
-    when ..40 then "line-clamp-4"
-    when ..50 then "line-clamp-5"
-    else           "line-clamp-6"
+    when ..15 then 1
+    when ..20 then 2
+    when ..35 then 3
+    when ..40 then 4
+    when ..50 then 5
+    else           6
     end
   end
 
@@ -123,5 +128,11 @@ module TimetablesHelper
   # イベントに出演情報があるか判定
   def event_has_performances?
     @event_has_performances
+  end
+
+  # 画像化時のキャプチャ幅（PC風の横並びを確保）
+  def timetable_image_capture_width
+    stage_count = [ @stages&.size.to_i, 1 ].max
+    [ 1024, stage_count * 120 + 20 ].max
   end
 end
