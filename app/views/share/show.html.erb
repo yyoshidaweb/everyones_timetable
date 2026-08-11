@@ -4,7 +4,7 @@
         data-controller="modal clipboard timetable-image"
         data-action="click->modal#close"
         data-clipboard-text-value="<%= share_url_for %>"
-        data-timetable-image-filename-value="<%= timetable_image_filename %>"
+        data-timetable-image-filename-value="<%= @days.present? ? timetable_image_filename(date: @days.first.date) : '' %>"
         data-timetable-image-filename-template-value="<%= timetable_image_filename_template %>"
         data-timetable-image-capture-url-value="<%= timetable_image_capture_path_for %>"
         data-timetable-image-days-value="<%= h timetable_image_day_options.to_json %>">

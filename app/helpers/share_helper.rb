@@ -55,7 +55,7 @@ module ShareHelper
   end
 
   # タイムテーブル画像のダウンロードファイル名を返す
-  def timetable_image_filename(date: nil)
+  def timetable_image_filename(date:)
     date_str = timetable_image_date_str(date)
     case params[:type]
     when "event"
@@ -92,17 +92,7 @@ module ShareHelper
   end
 
   # 画像ファイル名用の日付（MMDD）
-  def timetable_image_date_str(date = nil)
-    resolved =
-      if date.present?
-        date
-      elsif params[:d].present?
-        Date.parse(params[:d].to_s)
-      else
-        Date.current
-      end
-    resolved.strftime("%m%d")
-  rescue Date::Error, ArgumentError
-    Date.current.strftime("%m%d")
+  def timetable_image_date_str(date)
+    date.strftime("%m%d")
   end
 end
