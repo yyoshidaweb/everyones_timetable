@@ -35,14 +35,11 @@ module EventsHelper
 
   # タイムテーブルとマイタイムテーブルで共有URLを分けるためのヘルパーメソッド
   def share_path_for
-    options = if @my_timetable_view
-      { type: "my-timetable", event_key: @event.event_key, username: @user.username }
+    if @my_timetable_view
+      share_path(type: "my-timetable", event_key: @event.event_key, username: @user.username)
     else
-      { type: "event", event_key: @event.event_key }
+      share_path(type: "event", event_key: @event.event_key)
     end
-    # 表示中の日付を渡し、画像ファイル名に使う
-    options[:d] = @selected_date if @selected_date.present?
-    share_path(options)
   end
 
   # 作成したタイムテーブル一覧かどうか判定する
