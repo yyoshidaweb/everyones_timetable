@@ -84,18 +84,13 @@ module TimetablesHelper
 
   # 出演時間に応じた line-clamp クラスを返す
   def line_clamp_class_by_duration(duration)
-    "line-clamp-#{line_clamp_count_by_duration(duration)}"
-  end
-
-  # 出演時間に応じた line-clamp 行数を返す
-  def line_clamp_count_by_duration(duration)
     case duration
-    when ..15 then 1
-    when ..20 then 2
-    when ..35 then 3
-    when ..40 then 4
-    when ..50 then 5
-    else           6
+    when ..15 then "line-clamp-1"
+    when ..20 then "line-clamp-2"
+    when ..35 then "line-clamp-3"
+    when ..40 then "line-clamp-4"
+    when ..50 then "line-clamp-5"
+    else           "line-clamp-6"
     end
   end
 
