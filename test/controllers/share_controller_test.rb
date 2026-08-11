@@ -26,7 +26,8 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "should show image save button and day select for published event share" do
+  test "should show favorite marker checkbox for signed-in event share" do
+    sign_in @user
     get share_path(type: "event", event_key: @event.event_key),
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
@@ -36,6 +37,21 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[data-timetable-image-target='daySelect']"
     assert_select "select[data-timetable-image-target='daySelect'] option", minimum: 1
     assert_select "input[data-timetable-image-target='favoriteMarkers'][type='checkbox']"
+  end
+
+  test "should hide favorite marker checkbox for guest event share" do
+    get share_path(type: "event", event_key: @event.event_key),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "input[data-timetable-image-target='favoriteMarkers'][type='checkbox']", count: 0
+  end
+
+  test "should render long-press message and desktop-only download button in preview" do
+    get share_path(type: "event", event_key: @event.event_key),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "button[data-action='click->timetable-image#download'][class*='min-[1025px]:flex']", count: 1
+    assert_select "p", text: "画像を長押しして保存してください。"
   end
 
   test "should show image save button for published my timetable share" do
