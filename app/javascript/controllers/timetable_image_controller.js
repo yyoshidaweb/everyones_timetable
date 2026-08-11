@@ -10,7 +10,8 @@ export default class extends Controller {
     "errorContent",
     "errorMessage",
     "previewImage",
-    "daySelect"
+    "daySelect",
+    "favoriteMarkers"
   ]
   static values = {
     filename: String,
@@ -34,7 +35,17 @@ export default class extends Controller {
   // プレビュー内のselectで日付変更→その日の画像を再生成
   changeDay(event) {
     const date = event.target.value
-    const day = this.daysValue.find((item) => item.date === date)
+    const day = this.#dayByDate(date)
+    if (!day) {
+      this.showError("選択した日付のタイムテーブルを取得できませんでした。")
+      return
+    }
+    this.#generateForDate(day)
+  }
+
+  // お気に入りマーカー表示の切り替え→現在の日付で再生成
+  changeFavoriteMarkers() {
+    const day = this.#selectedDay()
     if (!day) {
       this.showError("選択した日付のタイムテーブルを取得できませんでした。")
       return
@@ -111,6 +122,7 @@ export default class extends Controller {
   async #fetchCaptureRoot(date) {
     const url = new URL(this.captureUrlValue, window.location.origin)
     url.searchParams.set("d", date)
+    url.searchParams.set("favorites", this.#includeFavoriteMarkers() ? "1" : "0")
 
     const response = await fetch(url.toString(), {
       headers: { Accept: "text/html" },
@@ -136,6 +148,21 @@ export default class extends Controller {
     root.style.zIndex = "0"
 
     return root
+  }
+
+  #selectedDay() {
+    if (this.hasDaySelectTarget) {
+      return this.#dayByDate(this.daySelectTarget.value)
+    }
+    return this.daysValue[0] || null
+  }
+
+  #dayByDate(date) {
+    return this.daysValue.find((item) => item.date === date) || null
+  }
+
+  #includeFavoriteMarkers() {
+    return !this.hasFavoriteMarkersTarget || this.favoriteMarkersTarget.checked
   }
 
   #filenameFor(date) {

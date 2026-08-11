@@ -22,7 +22,7 @@ class TimetableImagesController < ApplicationController
       @performances = performances_for_selected_date.includes(performer: :performer_name_tag)
       @performances_by_stage = @performances.group_by(&:stage_id)
       @favorite_performance_map =
-        if user_signed_in?
+        if include_favorite_markers? && user_signed_in?
           current_user.favorite_performance_map_by_performances(@performances)
         else
           {}
@@ -48,7 +48,7 @@ class TimetableImagesController < ApplicationController
       @stages = @stages.where(id: @performances_by_stage.keys)
 
       @favorite_performance_map =
-        if user_signed_in?
+        if include_favorite_markers? && user_signed_in?
           current_user.favorite_performance_map_by_performances(@performances)
         else
           {}
@@ -70,6 +70,13 @@ class TimetableImagesController < ApplicationController
       unless @days.any? { |day| day.date == @selected_date }
         raise ActiveRecord::RecordNotFound
       end
+
+      @include_favorite_markers = include_favorite_markers?
+    end
+
+    # favorites=0 のときだけマーカーを除外（未指定・1 は含める）
+    def include_favorite_markers?
+      params[:favorites].to_s != "0"
     end
 
     def performances_for_selected_date

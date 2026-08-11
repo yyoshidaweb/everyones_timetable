@@ -35,6 +35,7 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-timetable-image-days-value]"
     assert_select "select[data-timetable-image-target='daySelect']"
     assert_select "select[data-timetable-image-target='daySelect'] option", minimum: 1
+    assert_select "input[data-timetable-image-target='favoriteMarkers'][type='checkbox']"
   end
 
   test "should show image save button for published my timetable share" do

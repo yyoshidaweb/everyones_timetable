@@ -17,6 +17,17 @@ class TimetableImagesControllerTest < ActionDispatch::IntegrationTest
     assert_match "powered by みんなのタイムテーブル", response.body
   end
 
+  test "should omit favorite marker class when favorites is 0" do
+    get timetable_image_capture_path(
+      type: "event",
+      event_key: @event.event_key,
+      d: @day.date,
+      favorites: "0"
+    )
+    assert_response :success
+    assert_select ".tti-favorite", count: 0
+  end
+
   test "should return capture html for published my timetable" do
     get timetable_image_capture_path(
       type: "my-timetable",

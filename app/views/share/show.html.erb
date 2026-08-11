@@ -94,6 +94,14 @@
                 <% end %>
               </select>
             </div>
+            <label class="w-full mb-4 flex items-center gap-2 text-sm text-gray-800 cursor-pointer">
+              <input type="checkbox"
+                     data-timetable-image-target="favoriteMarkers"
+                     data-action="change->timetable-image#changeFavoriteMarkers"
+                     checked
+                     class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800 cursor-pointer">
+              <span>お気に入りマーカーを含める</span>
+            </label>
           <% end %>
           <div class="w-full max-h-[50svh] overflow-auto mb-4 border border-gray-200 rounded bg-gray-50">
             <img data-timetable-image-target="previewImage"

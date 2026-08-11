@@ -118,7 +118,7 @@
                    style="font-size: <%= duration <= 5 ? '10px' : '12px' %>;
                           display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
                           -webkit-line-clamp: <%= line_clamp_count_by_duration(duration) %>;">
-                  <span class="<%= 'tti-favorite' if favorite_marker(performance).present? %>">
+                  <span class="<%= 'tti-favorite' if @include_favorite_markers && favorite_marker(performance).present? %>">
                     <%= performance.performer.display_name %>
                   </span>
                 </p>
