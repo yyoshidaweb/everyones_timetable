@@ -26,7 +26,7 @@ class TimetableImagesControllerTest < ActionDispatch::IntegrationTest
       favorites: "0"
     )
     assert_response :success
-    assert_select ".tti-favorite", count: 0
+    assert_select ".favorite-marker", count: 0
   end
 
   test "should return capture html for published my timetable" do
