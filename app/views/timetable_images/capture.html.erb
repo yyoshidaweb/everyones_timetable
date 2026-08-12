@@ -68,18 +68,16 @@
           </div>
         <% end %>
       </div>
-      <p class="absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
-         style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
-        みんなのタイムテーブル
-      </p>
     </div>
   <% else %>
     <div class="relative p-12 text-center text-sm" style="color: #6b7280;">
       この日の出演情報はありません
-      <p class="absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
-         style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
-        みんなのタイムテーブル
-      </p>
     </div>
   <% end %>
+
+  <%# 画像化時に right 基準の位置が再現されないため、左基準の全幅ボックスで右寄せする %>
+  <p class="yusei-magic-credit text-[11px] whitespace-nowrap"
+     style="position: absolute; left: 0; bottom: 4px; width: 100%; box-sizing: border-box; padding-right: 8px; text-align: right; margin: 0; line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
+    みんなのタイムテーブル
+  </p>
 </div>

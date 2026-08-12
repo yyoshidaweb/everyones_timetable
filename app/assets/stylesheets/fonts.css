@@ -4,3 +4,22 @@
     font-weight: 400;
     font-style: normal;
 }
+
+/*
+ * タイムテーブル画像のクレジット用フォント。
+ * Google Fontsの日本語配信はサブセットが多数に分かれており画像化時に埋め込めないため、
+ * クレジットの文字だけを同一オリジンから配信する。
+ */
+@font-face {
+    font-family: "Yusei Magic Credit";
+    src: url("/fonts/yusei-magic-credit.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+.yusei-magic-credit {
+    font-family: "Yusei Magic Credit", "Yusei Magic", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
