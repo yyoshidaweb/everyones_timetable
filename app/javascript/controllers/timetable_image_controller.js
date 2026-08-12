@@ -148,6 +148,7 @@ export default class extends Controller {
     })
   }
 
+  // キャプチャ用DOMを画面外に置き、生成中に見えないようにする
   #applyOffscreenStyle(root) {
     root.style.position = "fixed"
     root.style.top = "0"
