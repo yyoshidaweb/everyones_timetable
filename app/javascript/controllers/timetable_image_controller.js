@@ -136,6 +136,7 @@ export default class extends Controller {
     return root
   }
 
+  // フォントと描画の完了を待ってからDOMをPNG化する
   async #renderCapture(captureRoot) {
     if (document.fonts?.ready) {
       await document.fonts.ready
