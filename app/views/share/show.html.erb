@@ -6,7 +6,7 @@
         data-clipboard-text-value="<%= share_url_for %>"
         data-timetable-image-filename-base-value="<%= timetable_image_filename_base %>"
         data-timetable-image-capture-url-value="<%= timetable_image_capture_path_for %>"
-        data-timetable-image-days-value="<%= h timetable_image_day_options.to_json %>">
+        data-timetable-image-days-value="<%= timetable_image_day_options.to_json %>">
     <div class="flex flex-col justify-center items-center relative max-h-[80svh] overflow-y-auto bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6
                 <%= share_modal_border %>"
           data-action="click->modal#stop">
