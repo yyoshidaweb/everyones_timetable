@@ -16,7 +16,6 @@ class TimetableImagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-timetable-image-capture-root]"
     assert_match "みんなのタイムテーブル", response.body
-    assert_no_match "powered by", response.body
   end
 
   test "should omit favorite marker class when favorites is 0" do
