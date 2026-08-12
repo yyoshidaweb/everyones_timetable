@@ -55,6 +55,12 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_select "img[data-timetable-image-target='previewImage'][class*='max-h-[50svh]']"
     assert_select "div.overflow-auto img[data-timetable-image-target='previewImage']", count: 0
     assert_select "button[data-action='click->timetable-image#backToShare']", text: "←戻る", count: 2
+    assert_select "[data-action='click->modal#stop']" do |elements|
+      classes = elements.first["class"]
+      assert_includes classes, "min-h-0"
+      assert_includes classes, "overflow-y-auto"
+      refute_includes classes, "justify-center"
+    end
   end
 
   test "should show image save button for published my timetable share" do
