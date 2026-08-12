@@ -75,9 +75,9 @@
     </div>
   <% end %>
 
-  <%# クレジットはキャプチャ全体の右下に置く（内側の横長コンテナ基準だと右端からはみ出すため） %>
-  <p class="yusei-magic-regular absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
-     style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
+  <%# 絶対配置だと画像化時に右端からはみ出すため、通常フローの最終行として右寄せする %>
+  <p class="yusei-magic-regular text-[11px] text-right whitespace-nowrap"
+     style="padding: 2px 8px 4px; line-height: 1.4; color: rgba(0, 0, 0, 0.35); background: #ffffff;">
     みんなのタイムテーブル
   </p>
 </div>
