@@ -52,6 +52,9 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "button[data-action='click->timetable-image#download'][class*='min-[1025px]:flex']", count: 1
     assert_select "p", text: "画像を長押しして保存してください。"
+    assert_select "img[data-timetable-image-target='previewImage'][class*='max-h-[50svh]']"
+    assert_select "div.overflow-auto img[data-timetable-image-target='previewImage']", count: 0
+    assert_select "button[data-action='click->timetable-image#backToShare']", text: /←\s*戻る/, count: 2
   end
 
   test "should show image save button for published my timetable share" do
