@@ -75,9 +75,9 @@
     </div>
   <% end %>
 
-  <%# 絶対配置だと画像化時に右端からはみ出すため、通常フローの最終行として右寄せする %>
-  <p class="yusei-magic-regular text-[11px] text-right whitespace-nowrap"
-     style="padding: 2px 8px 4px; line-height: 1.4; color: rgba(0, 0, 0, 0.35); background: #ffffff;">
+  <%# 画像化時に right 基準の位置が再現されないため、左基準の全幅ボックスで右寄せする %>
+  <p class="yusei-magic-regular text-[11px] whitespace-nowrap"
+     style="position: absolute; left: 0; bottom: 4px; width: 100%; box-sizing: border-box; padding-right: 8px; text-align: right; margin: 0; line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
     みんなのタイムテーブル
   </p>
 </div>
