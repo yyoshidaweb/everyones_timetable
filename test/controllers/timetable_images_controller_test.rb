@@ -15,7 +15,8 @@ class TimetableImagesControllerTest < ActionDispatch::IntegrationTest
     get timetable_image_capture_path(type: "event", event_key: @event.event_key, d: @day.date)
     assert_response :success
     assert_select "[data-timetable-image-capture-root]"
-    assert_match "powered by みんなのタイムテーブル", response.body
+    assert_match "みんなのタイムテーブル", response.body
+    assert_no_match "powered by", response.body
   end
 
   test "should omit favorite marker class when favorites is 0" do
