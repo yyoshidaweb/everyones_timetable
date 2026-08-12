@@ -1,0 +1,85 @@
+<% width = timetable_image_capture_width %>
+<% header_bg = @my_timetable_view ? "#ea580c" : "#1f2937" %>
+<% height_rem = @performances.present? ? timetable_height_rem(@performances) : 6 %>
+
+<div data-timetable-image-capture-root
+     style="width: <%= width %>px; background: #ffffff; color: #1f2937; font-family: system-ui, -apple-system, sans-serif;"
+     class="relative">
+  <header class="w-full p-2 h-8 flex justify-center items-center"
+          style="background: <%= header_bg %>; color: #ffffff;">
+    <h1 class="text-sm flex items-center justify-center leading-none font-bold px-2 text-center wrap-break-word">
+      <%= event_header_title %>
+    </h1>
+  </header>
+
+  <% if @days.any? %>
+    <nav class="flex h-8 w-full justify-around border-t border-gray-200"
+         style="background: #ffffff; border-top-color: #e5e7eb;">
+      <% @days.each do |day| %>
+        <% selected = (day.date == @selected_date) %>
+        <div class="flex-1 px-2 py-2 text-xs font-bold border-b-4 text-center whitespace-nowrap"
+             style="color: #1f2937; border-bottom-color: <%= selected ? '#1f2937' : 'transparent' %>;">
+          <%= day.date.strftime("%-m/%-d") %>
+        </div>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% if @performances.present? && @stages.present? %>
+    <div class="min-w-max relative overflow-visible">
+      <div class="flex" style="background: #ffffff;">
+        <div class="w-5" style="background: #ffffff;"></div>
+        <% @stages.each do |stage| %>
+          <div class="stage-header-col flex-1 flex justify-center items-center min-h-8 max-h-12 w-0 min-w-16 overflow-hidden border-b text-xs font-bold text-center p-px">
+            <span class="line-clamp-3 wrap-break-word w-full"><%= stage.stage_name_tag.name %></span>
+          </div>
+        <% end %>
+      </div>
+      <div class="flex relative overflow-visible">
+        <div class="w-5" style="background: #ffffff;">
+          <% time_slots_for_timetable(@performances).each do |hour| %>
+            <p class="h-24 text-xs text-center pt-1 tabular-nums -translate-y-2.75">
+              <%= hour %>
+            </p>
+          <% end %>
+        </div>
+        <% @stages.each do |stage| %>
+          <div class="timetable-body-col flex-1 w-0 min-w-16 relative overflow-visible"
+               style="height: <%= height_rem %>rem;">
+            <% (@performances_by_stage[stage.id] || []).each do |performance| %>
+              <% duration = performance.duration %>
+              <% line_clamp = line_clamp_class_by_duration(duration) %>
+              <% font_size = font_size_class_by_duration(duration) %>
+              <% translate_y = translate_y_by_duration(duration) %>
+              <div class="absolute left-px right-px rounded shadow-xs p-px text-xs overflow-visible"
+                   style="top: <%= performance_top_rem(performance) %>rem; height: <%= performance_height_rem(performance) %>rem; background: #ffffff;">
+                <% if performance.show_start_time? %>
+                  <div class="text-[10px] leading-none" style="color: #6b7280;">
+                    <%= formatted_time(performance.start_time) %>
+                  </div>
+                <% end %>
+                <p class="font-semibold leading-none wrap-break-word <%= font_size %> <%= line_clamp %> <%= translate_y %>">
+                  <span class="<%= @include_favorite_markers ? favorite_marker(performance) : '' %>">
+                    <%= performance.performer.display_name %>
+                  </span>
+                </p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <p class="absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
+         style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
+        powered by みんなのタイムテーブル
+      </p>
+    </div>
+  <% else %>
+    <div class="relative p-12 text-center text-sm" style="color: #6b7280;">
+      この日の出演情報はありません
+      <p class="absolute right-2 bottom-1 z-10 m-0 p-0 text-[11px] pointer-events-none whitespace-nowrap"
+         style="line-height: 1.4; color: rgba(0, 0, 0, 0.35);">
+        powered by みんなのタイムテーブル
+      </p>
+    </div>
+  <% end %>
+</div>

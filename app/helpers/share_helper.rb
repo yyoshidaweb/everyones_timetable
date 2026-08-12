@@ -53,4 +53,41 @@ module ShareHelper
       "ring-6 ring-orange-400"
     end
   end
+
+  # タイムテーブル画像のファイル名ベース（_{MMDD}.png の前）
+  def timetable_image_filename_base
+    case params[:type]
+    when "event"
+      @event.event_key
+    when "my-timetable"
+      "#{@event.event_key}_#{@user.username}"
+    end
+  end
+
+  # タイムテーブル画像のダウンロードファイル名を返す
+  def timetable_image_filename(date:)
+    "#{timetable_image_filename_base}_#{timetable_image_date_str(date)}.png"
+  end
+
+  # 画像キャプチャ用HTMLのパス
+  def timetable_image_capture_path_for
+    case params[:type]
+    when "event"
+      timetable_image_capture_path(type: "event", event_key: @event.event_key)
+    when "my-timetable"
+      timetable_image_capture_path(type: "my-timetable", event_key: @event.event_key, username: @user.username)
+    end
+  end
+
+  # 日付選択肢（モーダル用）。ファイル名は含めず、JS側で filenameBase + 日付から組み立てる
+  def timetable_image_day_options
+    Array(@days).map do |day|
+      { date: day.date.iso8601 }
+    end
+  end
+
+  # 画像ファイル名用の日付（MMDD）
+  def timetable_image_date_str(date)
+    date.strftime("%m%d")
+  end
 end
