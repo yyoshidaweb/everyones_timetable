@@ -97,17 +97,10 @@ export default class extends Controller {
 
     let captureRoot = null
     try {
-      captureRoot = await this.#fetchCaptureRoot(day.date, "offscreen")
+      captureRoot = await this.#fetchCaptureRoot(day.date)
       document.body.appendChild(captureRoot)
 
-      let dataUrl = await this.#renderCapture(captureRoot)
-      if (await this.#looksBlankCapture(dataUrl)) {
-        captureRoot.remove()
-        captureRoot = await this.#fetchCaptureRoot(day.date, "onscreen-fallback")
-        document.body.appendChild(captureRoot)
-        dataUrl = await this.#renderCapture(captureRoot)
-      }
-
+      const dataUrl = await this.#renderCapture(captureRoot)
       this.showPreview(dataUrl, day)
     } catch (error) {
       console.error(error)
@@ -117,7 +110,7 @@ export default class extends Controller {
     }
   }
 
-  async #fetchCaptureRoot(date, placement = "offscreen") {
+  async #fetchCaptureRoot(date) {
     const url = new URL(this.captureUrlValue, window.location.origin)
     url.searchParams.set("d", date)
     url.searchParams.set("favorites", this.#includeFavoriteMarkers() ? "1" : "0")
@@ -138,7 +131,7 @@ export default class extends Controller {
       throw new Error("capture root not found")
     }
 
-    this.#applyPlacementStyle(root, placement)
+    this.#applyOffscreenStyle(root)
 
     return root
   }
@@ -155,52 +148,11 @@ export default class extends Controller {
     })
   }
 
-  #applyPlacementStyle(root, placement) {
+  #applyOffscreenStyle(root) {
     root.style.position = "fixed"
     root.style.top = "0"
-    root.style.pointerEvents = "none"
-
-    if (placement === "onscreen-fallback") {
-      // 一部ブラウザで画面外配置が白画像化するため、透過表示で再試行する
-      root.style.left = "0"
-      root.style.opacity = "0.01"
-      root.style.zIndex = "-1"
-      return
-    }
-
     root.style.left = "-10000px"
-    root.style.zIndex = "0"
-  }
-
-  async #looksBlankCapture(dataUrl) {
-    const image = new Image()
-    image.src = dataUrl
-    await image.decode()
-
-    const canvas = document.createElement("canvas")
-    canvas.width = image.width
-    canvas.height = image.height
-    const context = canvas.getContext("2d")
-    if (!context) return false
-
-    context.drawImage(image, 0, 0)
-    const sampleX = Math.max(1, Math.floor(canvas.width / 5))
-    const sampleY = Math.max(1, Math.floor(canvas.height / 5))
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data
-
-    for (let y = 0; y < canvas.height; y += sampleY) {
-      for (let x = 0; x < canvas.width; x += sampleX) {
-        const index = (y * canvas.width + x) * 4
-        const r = pixels[index]
-        const g = pixels[index + 1]
-        const b = pixels[index + 2]
-        const a = pixels[index + 3]
-        if (a > 0 && (r < 245 || g < 245 || b < 245)) {
-          return false
-        }
-      }
-    }
-    return true
+    root.style.pointerEvents = "none"
   }
 
   #selectedDay() {
