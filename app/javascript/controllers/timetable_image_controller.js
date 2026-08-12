@@ -102,10 +102,10 @@ export default class extends Controller {
 
       const dataUrl = await this.#renderCapture(captureRoot)
       this.showPreview(dataUrl, day)
-    } catch (error) {
-      console.error(error)
+    } catch {
       this.showError("画像の生成に失敗しました。<br>時間をおいて再度お試しください。")
     } finally {
+      // 成功・失敗に関わらず、画面外に置いたキャプチャ用DOMを取り除く
       captureRoot?.remove()
     }
   }
