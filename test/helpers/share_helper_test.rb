@@ -24,7 +24,6 @@ class ShareHelperTest < ActionView::TestCase
   end
 
   test "timetable_image_day_options includes date only" do
-    controller.params = ActionController::Parameters.new(type: "event")
     options = timetable_image_day_options
     assert_operator options.length, :>=, 1
     assert_equal [ :date ], options.first.keys
