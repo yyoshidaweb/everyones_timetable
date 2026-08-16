@@ -2,6 +2,7 @@
 require "rubygems"
 require "bundler/setup"
 
-ARGV.unshift("--ensure-latest")
+# Dependabotのversion update cooldown（3日）に合わせ、最新版が3日以上経過してから失敗させる
+ARGV.unshift("--ensure-latest", "3")
 
 load Gem.bin_path("brakeman", "brakeman")
