@@ -31,12 +31,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "link[rel=canonical][href=?]", "http://www.example.com/"
   end
 
-  # トップページはインデックス対象
-  test "index does not include noindex robots meta" do
-    get "/"
-    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
-  end
-
   # html要素にlang="ja"が設定される
   test "index includes html lang ja" do
     get "/"

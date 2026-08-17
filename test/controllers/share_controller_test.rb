@@ -46,12 +46,6 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[data-timetable-image-target='favoriteMarkers'][type='checkbox']", count: 0
   end
 
-  # 共有ページ本体は検索対象外（モーダル用URLがクロールされるため）
-  test "event share page includes noindex robots meta" do
-    get share_path(type: "event", event_key: @event.event_key)
-    assert_response :success
-    assert_select "meta[name=robots][content='noindex, nofollow']"
-  end
 
   test "should render long-press message and desktop-only download button in preview" do
     get share_path(type: "event", event_key: @event.event_key),

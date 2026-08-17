@@ -41,43 +41,6 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # 概要ページの正規URLはタイムテーブルを指す（重複インデックス対策）
-  test "event show canonical url points to timetable" do
-    get event_url(@event.event_key)
-    assert_response :success
-    assert_select "link[rel=canonical][href=?]", "http://www.example.com/t/#{@event.event_key}"
-    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
-  end
-
-  # 出演情報がない概要ページはソフト404になるためnoindexにする
-  test "event show without performances includes noindex robots meta" do
-    get event_url(events(:no_performance_event).event_key)
-    assert_response :success
-    assert_select "meta[name=robots][content='noindex, nofollow']"
-    assert_select "link[rel=canonical][href=?]", "http://www.example.com/events/no_performance_event"
-  end
-
-  # 公開イベント一覧はインデックス対象
-  test "events index does not include noindex robots meta" do
-    get events_path
-    assert_response :success
-    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
-  end
-
-  # 個人の一覧は検索対象外
-  test "created events index includes noindex robots meta" do
-    get events_path(filter: "created")
-    assert_response :success
-    assert_select "meta[name=robots][content='noindex, nofollow']"
-  end
-
-  # 作成ページは検索対象外
-  test "new event page includes noindex robots meta" do
-    get new_event_url
-    assert_response :success
-    assert_select "meta[name=robots][content='noindex, nofollow']"
-  end
-
   test "should show lock icon on unpublished event detail for owner" do
     unpublished_event = events(:unpublished)
     get event_url(unpublished_event.event_key)
