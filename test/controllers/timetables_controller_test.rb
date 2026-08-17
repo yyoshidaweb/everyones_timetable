@@ -170,7 +170,6 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-
   # AIタイムテーブル作成ページにアクセスできる
   test "should get new timetable page" do
     get new_event_timetable_path(@event.event_key)

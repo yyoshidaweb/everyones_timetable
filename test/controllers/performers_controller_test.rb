@@ -58,7 +58,6 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-
   # 出演者追加ページ
   test "should get new" do
     get new_event_performer_url(@event.event_key)

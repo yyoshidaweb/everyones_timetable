@@ -46,7 +46,6 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[data-timetable-image-target='favoriteMarkers'][type='checkbox']", count: 0
   end
 
-
   test "should render long-press message and desktop-only download button in preview" do
     get share_path(type: "event", event_key: @event.event_key),
         headers: { "Turbo-Frame" => "modal" }

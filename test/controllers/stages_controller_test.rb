@@ -58,7 +58,6 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-
   # ステージ追加ページ
   test "should get new" do
     get new_event_stage_url(@event.event_key)
