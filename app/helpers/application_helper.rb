@@ -14,6 +14,35 @@ module ApplicationHelper
     end
   end
 
+  # 検索エンジンへインデックスさせないページかどうかを返す
+  # 公開してよいページ以外は noindex にし、GSC の「インデックス未登録」通知を意図的な除外として扱う
+  def robots_noindex?
+    return true if Rails.env.staging?
+    return true if defined?(@my_timetable_view) && @my_timetable_view
+    return true if defined?(@event) && @event.present? && !@event.is_published?
+
+    case "#{controller_path}##{action_name}"
+    when "home#index", "static_pages#terms", "static_pages#privacy"
+      false
+    when "events#index"
+      params[:filter].present?
+    when "events#show"
+      !@event.performances.exists?
+    when "timetables#show"
+      defined?(@performances) && @performances.blank?
+    when "performers#index"
+      defined?(@performers) && @performers.blank?
+    when "performers#show"
+      thin_performer_page?
+    when "stages#index"
+      defined?(@stages) && @stages.blank?
+    when "stages#show"
+      thin_stage_page?
+    else
+      true
+    end
+  end
+
   # body要素のクラスを返す
   # タイムテーブル画面はページ全体スクロールを止め、内側コンテナのみスクロールさせる
   def body_element_class
@@ -54,4 +83,20 @@ module ApplicationHelper
     )
     content_tag(:p, sanitized.html_safe.html_safe, class: "text-gray-800 whitespace-pre-line")
   end
+
+  private
+    # 出演情報も説明も公式サイトもない出演者詳細はソフト404になりやすい
+    def thin_performer_page?
+      return true unless defined?(@performer) && @performer.present?
+
+      performances = defined?(@performances) ? @performances : []
+      @performer.description.blank? && @performer.website_url.blank? && performances.blank?
+    end
+
+    # 説明も住所もないステージ詳細はソフト404になりやすい
+    def thin_stage_page?
+      return true unless defined?(@stage) && @stage.present?
+
+      @stage.description.blank? && @stage.address.blank?
+    end
 end

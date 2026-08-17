@@ -15,12 +15,25 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # 公開イベントのイベントページとタイムテーブルページがサイトマップに含まれる
-  test "sitemap includes published events" do
+  # 出演情報がある公開タイムテーブルはサイトマップに含まれる
+  test "sitemap includes published timetables with performances" do
     get sitemap_path
     event = events(:one)
-    assert_includes response.body, "<loc>http://www.example.com/events/#{event.event_key}</loc>"
     assert_includes response.body, "<loc>http://www.example.com/t/#{event.event_key}</loc>"
+  end
+
+  # 概要ページはタイムテーブルへcanonicalするためサイトマップに含めない
+  test "sitemap excludes event show pages" do
+    get sitemap_path
+    event = events(:one)
+    assert_not_includes response.body, "<loc>http://www.example.com/events/#{event.event_key}</loc>"
+  end
+
+  # 出演情報がないタイムテーブルはソフト404になるためサイトマップに含めない
+  test "sitemap excludes timetables without performances" do
+    get sitemap_path
+    event = events(:no_performance_event)
+    assert_not_includes response.body, "<loc>http://www.example.com/t/#{event.event_key}</loc>"
   end
 
   # 非公開イベントはサイトマップに含まれない

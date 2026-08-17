@@ -58,6 +58,29 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # 説明または住所があるステージ詳細はインデックス対象
+  test "stage show with content does not include noindex robots meta" do
+    sign_out @user
+    get event_stage_url(@event.event_key, stages(:one))
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
+  end
+
+  # 固有情報がないステージ詳細はソフト404になるためnoindexにする
+  test "stage show without unique content includes noindex robots meta" do
+    sign_out @user
+    get event_stage_url(@event.event_key, stages(:sort_zero))
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']"
+  end
+
+  # ステージ作成ページは検索対象外
+  test "new stage page includes noindex robots meta" do
+    get new_event_stage_url(@event.event_key)
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']"
+  end
+
   # ステージ追加ページ
   test "should get new" do
     get new_event_stage_url(@event.event_key)

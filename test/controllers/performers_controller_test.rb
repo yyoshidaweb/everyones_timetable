@@ -58,6 +58,31 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # 説明または出演情報がある出演者詳細はインデックス対象
+  test "performer show with content does not include noindex robots meta" do
+    sign_out @user
+    get event_performer_url(@event.event_key, performers(:one))
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
+  end
+
+  # 固有情報がない出演者詳細はソフト404になるためnoindexにする
+  test "performer show without unique content includes noindex robots meta" do
+    performer = performers(:one)
+    performer.update!(description: nil, website_url: nil)
+    performer.performances.destroy_all
+    get event_performer_url(@event.event_key, performer)
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']"
+  end
+
+  # 出演者作成ページは検索対象外
+  test "new performer page includes noindex robots meta" do
+    get new_event_performer_url(@event.event_key)
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']"
+  end
+
   # 出演者追加ページ
   test "should get new" do
     get new_event_performer_url(@event.event_key)

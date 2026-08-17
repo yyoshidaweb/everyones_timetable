@@ -13,7 +13,7 @@ class SitemapBuilder
   # host は "https://minnanotimetable.com" のようなプロトコル付きのホスト
   def self.build(host:)
     adapter = MemoryAdapter.new
-    events = published_events_with_lastmod
+    events, performance_event_ids = published_events_with_lastmod
     # トップページとイベント一覧はイベントの更新に追従して変わる
     events_lastmod = events.values.max
 
@@ -32,7 +32,10 @@ class SitemapBuilder
       add privacy_path, lastmod: nil, changefreq: "yearly", priority: 0.3
 
       events.each do |event, lastmod|
-        add event_path(event.event_key), lastmod: lastmod, changefreq: "weekly", priority: 0.7
+        # 概要ページはタイムテーブルへcanonicalするためサイトマップには含めない
+        # 出演情報がないタイムテーブルはソフト404になりやすいので含めない
+        next unless performance_event_ids.include?(event.id)
+
         add show_timetable_path(event.event_key), lastmod: lastmod, changefreq: "weekly", priority: 0.8
       end
     end
@@ -40,7 +43,7 @@ class SitemapBuilder
     adapter.xml
   end
 
-  # 公開イベントをキー、最終更新日時（イベント自体と出演情報のうち新しい方）を値とするHashを返す
+  # 公開イベントの lastmod と、出演情報があるイベントIDの集合を返す
   def self.published_events_with_lastmod
     events = Event.where(is_published: true).order(:id).to_a
     # 出演情報を追加してもイベント自体の updated_at は変わらないため、別途取得する
@@ -50,9 +53,11 @@ class SitemapBuilder
       .group("performers.event_id")
       .maximum(:updated_at)
 
-    events.index_with do |event|
+    lastmod_by_event = events.index_with do |event|
       [ event.updated_at, performances_updated_at[event.id] ].compact.max
     end
+
+    [ lastmod_by_event, performances_updated_at.keys.to_set ]
   end
   private_class_method :published_events_with_lastmod
 end

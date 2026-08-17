@@ -170,6 +170,13 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # 出演情報がないタイムテーブルはソフト404になるためnoindexにする
+  test "timetable without performances includes noindex robots meta" do
+    get show_timetable_path(@no_performance_event.event_key)
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']"
+  end
+
   # AIタイムテーブル作成ページにアクセスできる
   test "should get new timetable page" do
     get new_event_timetable_path(@event.event_key)

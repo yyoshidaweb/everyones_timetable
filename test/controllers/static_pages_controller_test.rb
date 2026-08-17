@@ -6,6 +6,13 @@ class StaticPagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # 利用規約はインデックス対象
+  test "terms does not include noindex robots meta" do
+    get terms_path
+    assert_response :success
+    assert_select "meta[name=robots][content='noindex, nofollow']", count: 0
+  end
+
   test "should get privacy" do
     get privacy_path
     assert_response :success
