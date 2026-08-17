@@ -9,7 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%# 公開してよいページ以外は検索エンジンにインデックスさせない（GSCの意図しない除外判定を防ぐ） %>
+    <%# 公開ドキュメント以外はnoindex。タイムテーブルの子タブはnoindexせずcanonicalで親へ集約する %>
     <% if robots_noindex? %>
       <meta name="robots" content="noindex, nofollow">
     <% end %>

@@ -1,4 +1,13 @@
 module ApplicationHelper
+  # 下部タブのうちタイムテーブル以外と、その配下の詳細ページ
+  TIMETABLE_CHILD_PAGES = %w[
+    events#show
+    performers#index
+    performers#show
+    stages#index
+    stages#show
+  ].freeze
+
   # 時刻を hh:mm 形式でフォーマットして返す
   def formatted_time(time)
     time&.strftime("%H:%M")
@@ -6,38 +15,31 @@ module ApplicationHelper
 
   # 正規URLを返す（クエリパラメータは除く）。content_for :canonical で上書き可能
   # タイムテーブルの ?d= など日付違いURLの重複インデックスを防ぐ
+  # 概要・出演者・ステージはタイムテーブルの子なので、親のタイムテーブルへ集約する
   def canonical_url
     if content_for?(:canonical)
       content_for(:canonical)
+    elsif timetable_child_page? && indexable_timetable_event?
+      show_timetable_url(@event.event_key)
     else
       "#{request.base_url}#{request.path}"
     end
   end
 
   # 検索エンジンへインデックスさせないページかどうかを返す
-  # 公開してよいページ以外は noindex にし、GSC の「インデックス未登録」通知を意図的な除外として扱う
+  # 子タブは noindex せず canonical で親へ集約する。ログイン・共有・編集・空のタイムテーブルなどは noindex
   def robots_noindex?
     return true if Rails.env.staging?
     return true if defined?(@my_timetable_view) && @my_timetable_view
     return true if defined?(@event) && @event.present? && !@event.is_published?
 
-    case "#{controller_path}##{action_name}"
+    case current_page
     when "home#index", "static_pages#terms", "static_pages#privacy"
       false
     when "events#index"
       params[:filter].present?
-    when "events#show"
-      !@event.performances.exists?
-    when "timetables#show"
-      defined?(@performances) && @performances.blank?
-    when "performers#index"
-      defined?(@performers) && @performers.blank?
-    when "performers#show"
-      thin_performer_page?
-    when "stages#index"
-      defined?(@stages) && @stages.blank?
-    when "stages#show"
-      thin_stage_page?
+    when "timetables#show", *TIMETABLE_CHILD_PAGES
+      !indexable_timetable_event?
     else
       true
     end
@@ -85,18 +87,16 @@ module ApplicationHelper
   end
 
   private
-    # 出演情報も説明も公式サイトもない出演者詳細はソフト404になりやすい
-    def thin_performer_page?
-      return true unless defined?(@performer) && @performer.present?
-
-      performances = defined?(@performances) ? @performances : []
-      @performer.description.blank? && @performer.website_url.blank? && performances.blank?
+    def current_page
+      "#{controller_path}##{action_name}"
     end
 
-    # 説明も住所もないステージ詳細はソフト404になりやすい
-    def thin_stage_page?
-      return true unless defined?(@stage) && @stage.present?
+    def timetable_child_page?
+      TIMETABLE_CHILD_PAGES.include?(current_page)
+    end
 
-      @stage.description.blank? && @stage.address.blank?
+    # 検索の入り口になる公開タイムテーブルがあるか
+    def indexable_timetable_event?
+      defined?(@event) && @event.present? && @event.is_published? && @event.performances.exists?
     end
 end
