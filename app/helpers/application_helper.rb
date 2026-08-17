@@ -1,4 +1,13 @@
 module ApplicationHelper
+  # 下部タブのうちタイムテーブル以外と、その配下の詳細ページ
+  TIMETABLE_CHILD_PAGES = %w[
+    events#show
+    performers#index
+    performers#show
+    stages#index
+    stages#show
+  ].freeze
+
   # 時刻を hh:mm 形式でフォーマットして返す
   def formatted_time(time)
     time&.strftime("%H:%M")
@@ -6,11 +15,33 @@ module ApplicationHelper
 
   # 正規URLを返す（クエリパラメータは除く）。content_for :canonical で上書き可能
   # タイムテーブルの ?d= など日付違いURLの重複インデックスを防ぐ
+  # 概要・出演者・ステージはタイムテーブルの子なので、親のタイムテーブルへ集約する
   def canonical_url
     if content_for?(:canonical)
       content_for(:canonical)
+    elsif timetable_child_page? && indexable_timetable_event?
+      show_timetable_url(@event.event_key)
     else
       "#{request.base_url}#{request.path}"
+    end
+  end
+
+  # 検索エンジンへインデックスさせないページかどうかを返す
+  # 子タブは noindex せず canonical で親へ集約する。ログイン・共有・編集・空のタイムテーブルなどは noindex
+  def robots_noindex?
+    return true if Rails.env.staging?
+    return true if defined?(@my_timetable_view) && @my_timetable_view
+    return true if defined?(@event) && @event.present? && !@event.is_published?
+
+    case current_page
+    when "home#index", "static_pages#terms", "static_pages#privacy"
+      false
+    when "events#index"
+      params[:filter].present?
+    when "timetables#show", *TIMETABLE_CHILD_PAGES
+      !indexable_timetable_event?
+    else
+      true
     end
   end
 
@@ -54,4 +85,18 @@ module ApplicationHelper
     )
     content_tag(:p, sanitized.html_safe.html_safe, class: "text-gray-800 whitespace-pre-line")
   end
+
+  private
+    def current_page
+      "#{controller_path}##{action_name}"
+    end
+
+    def timetable_child_page?
+      TIMETABLE_CHILD_PAGES.include?(current_page)
+    end
+
+    # 検索の入り口になる公開タイムテーブルがあるか
+    def indexable_timetable_event?
+      defined?(@event) && @event.present? && @event.is_published? && @event.performances.exists?
+    end
 end

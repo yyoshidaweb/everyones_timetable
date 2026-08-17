@@ -9,8 +9,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%# ステージング・非公開・マイタイムテーブルは検索エンジンにインデックスさせない（重複コンテンツ対策） %>
-    <% if Rails.env.staging? || (@event.present? && !@event.is_published?) || @my_timetable_view %>
+    <%# 公開ドキュメント以外はnoindex。タイムテーブルの子タブはnoindexせずcanonicalで親へ集約する %>
+    <% if robots_noindex? %>
       <meta name="robots" content="noindex, nofollow">
     <% end %>
     <%# canonical（クエリパラメータを除いた正規URL。?d= などによる重複インデックスを防ぐ） %>
