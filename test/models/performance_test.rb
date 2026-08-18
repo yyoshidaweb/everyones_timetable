@@ -90,12 +90,23 @@ class PerformanceTest < ActiveSupport::TestCase
     assert_includes performance.errors[:duration], "は5以上で入力してください"
   end
 
+  # durationが120の場合は有効
+  test "is valid when duration is 120" do
+    performance = Performance.new(
+      performer: @performer,
+      start_time: Time.zone.parse("12:00"),
+      duration: 120
+    )
+
+    assert performance.valid?
+  end
+
   # durationが120より大きい場合はエラー
   test "is invalid when duration is greater than 120" do
     performance = Performance.new(
       performer: @performer,
       start_time: Time.zone.parse("12:00"),
-      duration: 125
+      duration: 121
     )
 
     assert_not performance.valid?
