@@ -74,7 +74,7 @@ class TimetableCreator
         start_time: performance_data["start_time"],
         duration: temp_duration
       )
-    end.sort_by(&:start_time)
+    end.sort_by { |performance| FestivalTime.to_minutes(performance.start_time) }
   end
 
   # durationを計算
@@ -92,7 +92,8 @@ class TimetableCreator
 
   # duration計算ロジック
   def calc_duration(current_time, next_time)
-    minutes = ((next_time - current_time) / 60).to_i
+    minutes = FestivalTime.to_minutes(next_time) - FestivalTime.to_minutes(current_time)
+    minutes += FestivalTime::MINUTES_PER_DAY if minutes.negative?
     duration = minutes / 2
     duration = (duration / 5) * 5
     duration = duration.clamp(5, 60)
