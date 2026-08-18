@@ -84,13 +84,12 @@ class FestivalTime
   end
 
   # 6時未満を後ろに回す ORDER BY 用SQL（SQLite / PostgreSQL 両対応）
-  def self.wrap_order_sql(column = "performances.start_time")
-    hour_sql =
-      if ApplicationRecord.connection.adapter_name == "PostgreSQL"
-        "EXTRACT(HOUR FROM #{column})"
-      else
-        "CAST(strftime('%H', #{column}) AS INTEGER)"
-      end
-    Arel.sql("CASE WHEN #{hour_sql} < #{DAY_START_HOUR} THEN 1 ELSE 0 END")
+  # 列名や境界時刻を変数埋め込みしない（Brakeman の SQL Injection 警告を避ける）
+  def self.wrap_order_sql
+    if ApplicationRecord.connection.adapter_name == "PostgreSQL"
+      Arel.sql("CASE WHEN EXTRACT(HOUR FROM performances.start_time) < 6 THEN 1 ELSE 0 END")
+    else
+      Arel.sql("CASE WHEN CAST(strftime('%H', performances.start_time) AS INTEGER) < 6 THEN 1 ELSE 0 END")
+    end
   end
 end
