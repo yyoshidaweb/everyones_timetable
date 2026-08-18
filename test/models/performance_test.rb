@@ -210,6 +210,13 @@ class PerformanceTest < ActiveSupport::TestCase
     assert performance.valid?
   end
 
+  # 0時過ぎの開始時刻は24時台で表示する
+  test "formats overnight start time with hour 24 or later" do
+    performance = create_timed_performance("01:30", duration: 30)
+
+    assert_equal "25:30", performance.formatted_start_time
+  end
+
   private
     def create_timed_performance(start_hm, duration:, stage: @stage, performer: @performer, day: @day)
       Performance.create!(

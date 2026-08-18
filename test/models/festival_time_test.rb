@@ -44,13 +44,31 @@ class FestivalTimeTest < ActiveSupport::TestCase
 
   test "builds wrapping hour slots from start to exclusive end" do
     assert_equal [ 10, 11, 12 ], FestivalTime.hour_slots(10 * 60, 13 * 60)
-    assert_equal [ 22, 23, 0, 1 ], FestivalTime.hour_slots(22 * 60, 26 * 60)
+    assert_equal [ 22, 23, 24, 25 ], FestivalTime.hour_slots(22 * 60, 26 * 60)
   end
 
-  test "hour select values start at 6 and end at 5" do
+  test "hour select values start at 6 and end at 29" do
     hours = FestivalTime.hour_values
     assert_equal 6, hours.first
-    assert_equal 5, hours.last
-    assert_equal (6..23).to_a + (0..5).to_a, hours
+    assert_equal 29, hours.last
+    assert_equal (6..23).to_a + (24..29).to_a, hours
+  end
+
+  test "formats times before 6:00 as 24:00 through 29:59" do
+    assert_equal "06:00", FestivalTime.format_clock(Time.zone.parse("06:00"))
+    assert_equal "23:00", FestivalTime.format_clock(Time.zone.parse("23:00"))
+    assert_equal "24:00", FestivalTime.format_clock(Time.zone.parse("00:00"))
+    assert_equal "25:30", FestivalTime.format_clock(Time.zone.parse("01:30"))
+    assert_equal "29:59", FestivalTime.format_clock(Time.zone.parse("05:59"))
+    assert_nil FestivalTime.format_clock(nil)
+  end
+
+  test "converts between clock hours and display hours" do
+    assert_equal 24, FestivalTime.display_hour(0)
+    assert_equal 29, FestivalTime.display_hour(5)
+    assert_equal 6, FestivalTime.display_hour(6)
+    assert_equal 0, FestivalTime.clock_hour(24)
+    assert_equal 5, FestivalTime.clock_hour(29)
+    assert_equal 10, FestivalTime.clock_hour(10)
   end
 end

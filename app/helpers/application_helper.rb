@@ -17,7 +17,7 @@ module ApplicationHelper
 
   # 時刻を hh:mm 形式でフォーマットして返す
   def formatted_time(time)
-    time&.strftime("%H:%M")
+    FestivalTime.format_clock(time)
   end
 
   # 正規URLを返す（クエリパラメータは除く）。content_for :canonical で上書き可能

@@ -39,9 +39,31 @@ class FestivalTime
     minutes + (60 - (minutes % 60))
   end
 
-  # フェス分から表示用の時（0-23）を返す
+  # フェス分から表示用の時を返す（0時過ぎは24〜29）
   def self.hour_from_minutes(minutes)
-    (minutes / 60) % 24
+    minutes / 60
+  end
+
+  # 時計の時を表示用の時に変換する（0〜5 → 24〜29）
+  def self.display_hour(hour)
+    return if hour.nil?
+
+    hour < DAY_START_HOUR ? hour + 24 : hour
+  end
+
+  # 表示用の時を時計の時に戻す（24〜29 → 0〜5）
+  def self.clock_hour(hour)
+    return if hour.blank?
+
+    hour = hour.to_i
+    hour >= 24 ? hour - 24 : hour
+  end
+
+  # 6時未満は +24 した hh:mm を返す
+  def self.format_clock(time)
+    return if time.blank?
+
+    format("%02d:%02d", display_hour(time.hour), time.min)
   end
 
   # 開始正時から終了正時の直前まで、ラップする時刻スロットを返す
@@ -56,9 +78,9 @@ class FestivalTime
     hours
   end
 
-  # フォームの時セレクト（6〜23 のあと 0〜5）
+  # フォームの時セレクト（6〜23 のあと 24〜29）
   def self.hour_values
-    (DAY_START_HOUR...24).to_a + (0...DAY_START_HOUR).to_a
+    (DAY_START_HOUR...24).to_a + (24...(24 + DAY_START_HOUR)).to_a
   end
 
   # 6時未満を後ろに回す ORDER BY 用SQL（SQLite / PostgreSQL 両対応）

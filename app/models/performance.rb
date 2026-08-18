@@ -87,7 +87,7 @@ class Performance < ApplicationRecord
 
   # hh:mm 形式の開始時刻
   def formatted_start_time
-    format("%02d:%02d", start_time.hour, start_time.min)
+    FestivalTime.format_clock(start_time)
   end
 
   # 5分単位に変換した出演時間

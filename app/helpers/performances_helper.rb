@@ -1,5 +1,5 @@
 module PerformancesHelper
-  # 5分刻みの時刻スロットを生成（時は6時始まりで0時過ぎを後ろに回す）
+  # 5分刻みの時刻スロットを生成（時は6時始まりで、0時過ぎは24〜29）
   def time_select_options(hour_step: 1, minute_step: 5)
     {
       hours: FestivalTime.hour_values.each_slice(hour_step).map(&:first).map { |h| [ format("%02d", h), h ] },

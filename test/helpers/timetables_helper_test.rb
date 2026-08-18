@@ -19,9 +19,9 @@ class TimetablesHelperTest < ActionView::TestCase
       performance_at("01:00", duration: 30)
     ]
 
-    assert_equal [ 22, 23, 0, 1 ], time_slots_for_timetable(performances)
+    assert_equal [ 22, 23, 24, 25 ], time_slots_for_timetable(performances)
     assert_equal 4 * TimetablesHelper::TIMETABLE_REM_PER_HOUR, timetable_height_rem(performances)
-    assert_equal 2, timetable_bottom_spacer_hour(performances)
+    assert_equal 26, timetable_bottom_spacer_hour(performances)
   end
 
   test "places overnight performance below evening on the timetable" do
