@@ -217,6 +217,22 @@ class PerformanceTest < ActiveSupport::TestCase
     assert_equal "25:30", performance.formatted_start_time
   end
 
+  # 24時間の出演は終了時刻が同じ時計でも翌日として扱う
+  test "treats duration 1440 as next-date end time in festival minutes" do
+    performance = Performance.new(
+      performer: @performer,
+      start_time: Time.zone.parse("10:00"),
+      duration: 1440
+    )
+    performance.valid?
+    performance.save!
+    performance.reload
+
+    assert_equal 10, performance.end_time.hour
+    assert_equal 0, performance.end_time.min
+    assert_equal performance.festival_start_minutes + 1440, performance.festival_end_minutes
+  end
+
   private
     def create_timed_performance(start_hm, duration:, stage: @stage, performer: @performer, day: @day)
       Performance.create!(
