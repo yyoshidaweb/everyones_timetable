@@ -37,6 +37,42 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "html[lang=ja]"
   end
 
+  # トップページにサイト名とサイトリンク対象ページの構造化データがある
+  test "index includes website structured data with sitelinks" do
+    get "/"
+    assert_select "script[type='application/ld+json']" do |elements|
+      data = JSON.parse(elements.first.text)
+      website = data["@graph"].find { |node| node["@type"] == "WebSite" }
+      sitelinks = data["@graph"].find { |node| node["@type"] == "ItemList" }
+
+      assert_equal "みんなのタイムテーブル", website["name"]
+      assert_equal "http://www.example.com/", website["url"]
+      assert_equal(
+        [ "みんなが作ったタイムテーブル", "利用規約", "プライバシーポリシー" ],
+        sitelinks["itemListElement"].map { |item| item["name"] }
+      )
+      assert_equal(
+        [
+          "http://www.example.com/events",
+          "http://www.example.com/terms",
+          "http://www.example.com/privacy"
+        ],
+        sitelinks["itemListElement"].map { |item| item["url"] }
+      )
+    end
+  end
+
+  # フッターの主要ページ案内はサイトリンク対象の3ページに限定する
+  test "footer includes only sitelink pages in primary nav" do
+    get "/"
+    assert_select "footer nav[aria-label=主要ページ]" do
+      assert_select "a", count: 3
+      assert_select "a[href=?]", events_path, text: "みんなが作ったタイムテーブル"
+      assert_select "a[href=?]", terms_path, text: "利用規約"
+      assert_select "a[href=?]", privacy_path, text: "プライバシーポリシー"
+    end
+  end
+
   # 名前が未確認のユーザーには名前変更モーダルが自動で読み込まれる
   test "should load name confirmation modal when name is not confirmed" do
     sign_in users(:name_unconfirmed)
