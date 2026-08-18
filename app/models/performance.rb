@@ -35,12 +35,13 @@ class Performance < ApplicationRecord
   }
 
   # 開催日順のあと、6時起点の開始時刻順
+  # daysをJOINすると、Eventがperformers経由でperformancesをJOINしたときに
+  # daysテーブル名が衝突するため、相関サブクエリで日付を参照する
   scope :ordered_by_festival_day_and_time, -> {
-    left_joins(:day)
-      .order(
-        Arel.sql("days.date IS NULL ASC"), # dayあり → dayなし の順
-        "days.date ASC"
-      )
+    order(
+      Arel.sql("(SELECT days.date FROM days WHERE days.id = performances.day_id) IS NULL ASC"),
+      Arel.sql("(SELECT days.date FROM days WHERE days.id = performances.day_id) ASC")
+    )
       .ordered_by_festival_start_time
   }
 
