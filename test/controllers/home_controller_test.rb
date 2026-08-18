@@ -62,15 +62,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # フッターの主要ページ案内はサイトリンク対象の3ページに限定する
-  test "footer includes only sitelink pages in primary nav" do
+  # フッターにみんなが作ったタイムテーブルへのリンクは置かない
+  test "footer does not include all timetables link" do
     get "/"
-    assert_select "footer nav[aria-label=主要ページ]" do
-      assert_select "a", count: 3
-      assert_select "a[href=?]", events_path, text: "みんなが作ったタイムテーブル"
-      assert_select "a[href=?]", terms_path, text: "利用規約"
-      assert_select "a[href=?]", privacy_path, text: "プライバシーポリシー"
-    end
+    assert_select "footer a[href=?]", events_path, count: 0
+    assert_select "footer a[href=?]", terms_path, text: "利用規約"
+    assert_select "footer a[href=?]", privacy_path, text: "プライバシーポリシー"
   end
 
   # 名前が未確認のユーザーには名前変更モーダルが自動で読み込まれる

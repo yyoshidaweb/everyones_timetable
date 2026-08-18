@@ -4,12 +4,10 @@
     <div class="mx-auto max-w-7xl px-4 py-8">
       <div class="flex flex-col items-center justify-between gap-4">
         <div class="flex items-center flex-wrap gap-8 text-sm">
-          <nav aria-label="主要ページ" class="flex items-center flex-wrap gap-8">
-            <% sitelink_pages.each do |page| %>
-              <%= link_to page[:name], page[:path],
-                  class: "text-gray-700 hover:text-gray-900 hover:underline" %>
-            <% end %>
-          </nav>
+          <%= link_to "利用規約", terms_path,
+              class: "text-gray-700 hover:text-gray-900 hover:underline" %>
+          <%= link_to "プライバシーポリシー", privacy_path,
+              class: "text-gray-700 hover:text-gray-900 hover:underline" %>
           <%= link_to "お問い合わせ", "https://docs.google.com/forms/d/e/1FAIpQLSfJBlhMJb4MWDX_xWlc2lel1P_X5zGTmySXlcWU7De_XtSJmw/viewform?usp=dialog",
                     class: "text-gray-700 hover:text-gray-900 hover:underline",
                     target: "_blank",
