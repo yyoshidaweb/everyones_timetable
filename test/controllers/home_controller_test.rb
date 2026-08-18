@@ -14,9 +14,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "index includes embedded feedback google form when signed in" do
     sign_in users(:one)
     get "/"
+    assert_select "[data-controller=?]", "iframe-loading"
+    assert_select "[data-iframe-loading-target=?]", "spinner"
     assert_select "iframe[title=?]", "ご意見箱"
     assert_select "iframe[src=?]",
                   "https://docs.google.com/forms/d/e/1FAIpQLSdDYkoTm6JJ40NbK2gK2p-9p626HNShJdPssRoj1sG8KkKV_g/viewform?embedded=true"
+    assert_select "iframe[data-action=?]", "load->iframe-loading#hide"
   end
 
   # 未ログイン時はご意見箱を表示しない
