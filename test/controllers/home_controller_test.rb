@@ -37,6 +37,39 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "html[lang=ja]"
   end
 
+  # トップページにサイト名とサイトリンク対象ページの構造化データがある
+  test "index includes website structured data with sitelinks" do
+    get "/"
+    assert_select "script[type='application/ld+json']" do |elements|
+      data = JSON.parse(elements.first.text)
+      website = data["@graph"].find { |node| node["@type"] == "WebSite" }
+      sitelinks = data["@graph"].find { |node| node["@type"] == "ItemList" }
+
+      assert_equal "みんなのタイムテーブル", website["name"]
+      assert_equal "http://www.example.com/", website["url"]
+      assert_equal(
+        [ "みんなが作ったタイムテーブル", "利用規約", "プライバシーポリシー" ],
+        sitelinks["itemListElement"].map { |item| item["name"] }
+      )
+      assert_equal(
+        [
+          "http://www.example.com/events",
+          "http://www.example.com/terms",
+          "http://www.example.com/privacy"
+        ],
+        sitelinks["itemListElement"].map { |item| item["url"] }
+      )
+    end
+  end
+
+  # フッターにみんなが作ったタイムテーブルへのリンクは置かない
+  test "footer does not include all timetables link" do
+    get "/"
+    assert_select "footer a[href=?]", events_path, count: 0
+    assert_select "footer a[href=?]", terms_path, text: "利用規約"
+    assert_select "footer a[href=?]", privacy_path, text: "プライバシーポリシー"
+  end
+
   # 名前が未確認のユーザーには名前変更モーダルが自動で読み込まれる
   test "should load name confirmation modal when name is not confirmed" do
     sign_in users(:name_unconfirmed)

@@ -8,6 +8,13 @@ module ApplicationHelper
     stages#show
   ].freeze
 
+  # Google検索のサイトリンクとして案内するページ
+  SITELINK_PAGES = [
+    { name: "みんなが作ったタイムテーブル", path_method: :events_path },
+    { name: "利用規約", path_method: :terms_path },
+    { name: "プライバシーポリシー", path_method: :privacy_path }
+  ].freeze
+
   # 時刻を hh:mm 形式でフォーマットして返す
   def formatted_time(time)
     time&.strftime("%H:%M")
@@ -24,6 +31,39 @@ module ApplicationHelper
     else
       "#{request.base_url}#{request.path}"
     end
+  end
+
+  # サイトリンク対象ページの名称とパスを返す
+  def sitelink_pages
+    SITELINK_PAGES.map do |page|
+      { name: page[:name], path: public_send(page[:path_method]) }
+    end
+  end
+
+  # トップページ用のWebSite構造化データ（サイト名とサイトリンク対象ページ）
+  def website_structured_data
+    {
+      "@context" => "https://schema.org",
+      "@graph" => [
+        {
+          "@type" => "WebSite",
+          "name" => "みんなのタイムテーブル",
+          "alternateName" => [ "minnanotimetable" ],
+          "url" => root_url
+        },
+        {
+          "@type" => "ItemList",
+          "itemListElement" => sitelink_pages.map.with_index do |page, index|
+            {
+              "@type" => "SiteNavigationElement",
+              "position" => index + 1,
+              "name" => page[:name],
+              "url" => "#{request.base_url}#{page[:path]}"
+            }
+          end
+        }
+      ]
+    }
   end
 
   # 検索エンジンへインデックスさせないページかどうかを返す
