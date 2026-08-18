@@ -34,15 +34,19 @@ class Performance < ApplicationRecord
     order(FestivalTime.wrap_order_sql, "performances.start_time ASC")
   }
 
-  # 開催日と開始時刻順で並べ、必要な関連も事前ロードするスコープ
-  scope :ordered_for_performer_detail, -> {
+  # 開催日順のあと、6時起点の開始時刻順
+  scope :ordered_by_festival_day_and_time, -> {
     left_joins(:day)
-      .includes(:day, stage: :stage_name_tag)
       .order(
         Arel.sql("days.date IS NULL ASC"), # dayあり → dayなし の順
         "days.date ASC"
       )
       .ordered_by_festival_start_time
+  }
+
+  # 開催日と開始時刻順で並べ、必要な関連も事前ロードするスコープ
+  scope :ordered_for_performer_detail, -> {
+    ordered_by_festival_day_and_time.includes(:day, stage: :stage_name_tag)
   }
 
   # タイムテーブル描画に必要な情報がすべて揃った performance を取得するスコープ

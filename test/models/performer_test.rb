@@ -24,4 +24,24 @@ class PerformerTest < ActiveSupport::TestCase
       performance.reload
     end
   end
+
+  # 出演情報は開催日と6時起点の開始時刻順
+  test "performances are ordered by festival day and time" do
+    overnight = Performance.create!(
+      performer: @performer,
+      day: @day,
+      stage: stages(:two),
+      start_time: Time.zone.parse("01:00"),
+      duration: 30
+    )
+    evening = Performance.create!(
+      performer: @performer,
+      day: @day,
+      stage: stages(:two),
+      start_time: Time.zone.parse("22:00"),
+      duration: 30
+    )
+
+    assert_operator @performer.performances.index(evening), :<, @performer.performances.index(overnight)
+  end
 end

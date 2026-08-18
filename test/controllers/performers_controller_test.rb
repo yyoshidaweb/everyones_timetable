@@ -58,6 +58,28 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # 出演者カードの先頭出演は6時起点の順（22:00が01:00より先）
+  test "index card shows earliest festival performance first" do
+    performer = create_overnight_performer
+
+    get event_performers_url(@event.event_key)
+    assert_response :success
+    assert_select "a[href=?]", event_performer_path(@event.event_key, performer) do
+      assert_select "p", text: /22:00~/
+      assert_select "p", text: /25:00~/, count: 0
+    end
+  end
+
+  # 出演者詳細の出演一覧も6時起点の順
+  test "show lists performances in festival time order" do
+    performer = create_overnight_performer
+
+    get event_performer_url(@event.event_key, performer)
+    assert_response :success
+    body = response.body
+    assert_operator body.index("22:00~"), :<, body.index("25:00~")
+  end
+
   # 出演者追加ページ
   test "should get new" do
     get new_event_performer_url(@event.event_key)
@@ -282,4 +304,26 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :not_found
   end
+
+  private
+    def create_overnight_performer
+      tag = PerformerNameTag.create!(name: "オールナイト出演者")
+      performer = @event.performers.create!(performer_name_tag: tag)
+      day = @event.days.first
+      Performance.create!(
+        performer: performer,
+        day: day,
+        stage: @event.stages.first,
+        start_time: Time.zone.parse("01:00"),
+        duration: 30
+      )
+      Performance.create!(
+        performer: performer,
+        day: day,
+        stage: @event.stages.second,
+        start_time: Time.zone.parse("22:00"),
+        duration: 30
+      )
+      performer
+    end
 end

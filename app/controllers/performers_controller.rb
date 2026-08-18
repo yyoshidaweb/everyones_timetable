@@ -13,7 +13,8 @@ class PerformersController < ApplicationController
   def index
     @performers = @event.performers
                         .order_by_name
-                        .includes(:performer_name_tag, performances: [ :day, { stage: :stage_name_tag } ])
+                        .includes(:performer_name_tag)
+                        .preload(performances: [ :day, { stage: :stage_name_tag } ])
     # お気に入り登録している出演者IDの配列を取得
     if user_signed_in?
       @favorite_performer_map = current_user.favorite_performer_map

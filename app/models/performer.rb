@@ -3,7 +3,8 @@ class Performer < ApplicationRecord
   belongs_to :performer_name_tag
 
   # 出演者を削除すると、紐づいている出演情報も全て削除される
-  has_many :performances, dependent: :destroy
+  has_many :performances, -> { merge(Performance.ordered_by_festival_day_and_time) },
+           dependent: :destroy
 
   # nested attributes を許可（フォームで fields_for を使うため）
   accepts_nested_attributes_for :performer_name_tag, update_only: false
