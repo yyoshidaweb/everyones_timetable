@@ -153,4 +153,71 @@ class PerformanceTest < ActiveSupport::TestCase
 
     assert @performance_for_overlaps.valid?
   end
+
+  # 同じ開催日では22:00のあとに01:00が並ぶ
+  test "orders 01:00 after 22:00 on the same day" do
+    evening = create_timed_performance("22:00", duration: 30)
+    overnight = create_timed_performance("01:00", duration: 30)
+
+    ordered = @performer.performances.ordered_for_performer_detail.to_a
+    assert_operator ordered.index(evening), :<, ordered.index(overnight)
+
+    timetable_ordered = Performance.timetable_ready_for_event_on_date(@performer.event, @day.date).to_a
+    assert_operator timetable_ordered.index(evening), :<, timetable_ordered.index(overnight)
+  end
+
+  # 日付境界の6:00は5:00より前に並ぶ
+  test "orders 05:00 after 06:00 on the same day" do
+    six = create_timed_performance("06:00", duration: 30)
+    five = create_timed_performance("05:00", duration: 30)
+
+    ordered = @performer.performances.ordered_for_performer_detail.to_a
+    assert_operator ordered.index(six), :<, ordered.index(five)
+  end
+
+  # 昼間の出演は従来どおり開始時刻順
+  test "keeps daytime performances in clock order" do
+    ordered = @performer.performances.ordered_for_performer_detail.to_a
+    assert_equal [ performances(:one), performances(:one_second) ], ordered
+  end
+
+  # 0時をまたぐ出演は深夜帯の重複を検出する
+  test "is invalid when overnight performance overlaps after midnight" do
+    create_timed_performance("23:00", duration: 120, stage: @another_stage)
+    overlapping = Performance.new(
+      performer: performers(:two),
+      day: @day,
+      stage: @another_stage,
+      start_time: Time.zone.parse("00:30"),
+      duration: 30
+    )
+
+    assert_not overlapping.valid?
+    assert_includes overlapping.errors[:base], "同じ時間帯に他の出演情報が存在します"
+  end
+
+  # 0時をまたぐ出演でも、前の時間帯と接していなければ作成できる
+  test "is valid when overnight performance does not overlap evening slot" do
+    create_timed_performance("23:00", duration: 120, stage: @another_stage)
+    performance = Performance.new(
+      performer: performers(:two),
+      day: @day,
+      stage: @another_stage,
+      start_time: Time.zone.parse("22:00"),
+      duration: 60
+    )
+
+    assert performance.valid?
+  end
+
+  private
+    def create_timed_performance(start_hm, duration:, stage: @stage, performer: @performer, day: @day)
+      Performance.create!(
+        performer: performer,
+        stage: stage,
+        day: day,
+        start_time: Time.zone.parse(start_hm),
+        duration: duration
+      )
+    end
 end

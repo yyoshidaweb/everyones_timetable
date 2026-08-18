@@ -91,6 +91,6 @@ class TimetableImagesController < ApplicationController
         .where.not(start_time: nil, end_time: nil, duration: nil)
         .where(performers: { event_id: @event.id })
         .where(days: { date: @selected_date })
-        .order(:start_time)
+        .ordered_by_festival_start_time
     end
 end
