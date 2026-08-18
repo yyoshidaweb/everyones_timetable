@@ -1,11 +1,18 @@
-<section class="mb-12 w-full">
-  <div class="w-full overflow-hidden">
+<section class="mb-12 w-full" data-controller="iframe-loading">
+  <div class="relative w-full overflow-hidden">
+    <div data-iframe-loading-target="spinner"
+         class="absolute inset-0 z-10 flex items-center justify-center bg-white"
+         role="status"
+         aria-label="読み込み中">
+      <div class="h-8 w-8 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin" aria-hidden="true"></div>
+    </div>
     <iframe
       title="ご意見箱"
       src="https://docs.google.com/forms/d/e/1FAIpQLSdDYkoTm6JJ40NbK2gK2p-9p626HNShJdPssRoj1sG8KkKV_g/viewform?embedded=true"
       class="w-full border-0"
       style="min-height: 700px;"
-      loading="lazy">
+      loading="lazy"
+      data-action="load->iframe-loading#hide">
       読み込んでいます…
     </iframe>
   </div>
