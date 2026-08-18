@@ -90,6 +90,18 @@ class PerformanceTest < ActiveSupport::TestCase
     assert_includes performance.errors[:duration], "は5以上で入力してください"
   end
 
+  # durationが120より大きい場合はエラー
+  test "is invalid when duration is greater than 120" do
+    performance = Performance.new(
+      performer: @performer,
+      start_time: Time.zone.parse("12:00"),
+      duration: 125
+    )
+
+    assert_not performance.valid?
+    assert_includes performance.errors[:duration], "は120以下で入力してください"
+  end
+
   # 同じ日・同じステージで時間が重複する出演情報は作成できない
   test "is invalid when time overlaps on same day and stage" do
     performance = Performance.new(
@@ -215,22 +227,6 @@ class PerformanceTest < ActiveSupport::TestCase
     performance = create_timed_performance("01:30", duration: 30)
 
     assert_equal "25:30", performance.formatted_start_time
-  end
-
-  # 24時間の出演は終了時刻が同じ時計でも翌日として扱う
-  test "treats duration 1440 as next-date end time in festival minutes" do
-    performance = Performance.new(
-      performer: @performer,
-      start_time: Time.zone.parse("10:00"),
-      duration: 1440
-    )
-    performance.valid?
-    performance.save!
-    performance.reload
-
-    assert_equal 10, performance.end_time.hour
-    assert_equal 0, performance.end_time.min
-    assert_equal performance.festival_start_minutes + 1440, performance.festival_end_minutes
   end
 
   private

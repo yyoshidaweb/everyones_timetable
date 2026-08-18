@@ -12,16 +12,13 @@ class FestivalTime
     minutes < DAY_START_MINUTES ? minutes + MINUTES_PER_DAY : minutes
   end
 
-  # 終了時刻のフェス分。開始より前、または同じ時計時刻（24時間以上）なら翌日扱いとして24時間を足す
+  # 終了時刻のフェス分。開始より前なら翌日扱いとして24時間を足す
   def self.end_minutes(start_time, end_time)
     start_m = to_minutes(start_time)
     end_m = to_minutes(end_time)
     return if start_m.nil? || end_m.nil?
 
-    elapsed = ((end_time - start_time) / 60).to_i
-    return start_m + elapsed if elapsed >= MINUTES_PER_DAY
-
-    end_m += MINUTES_PER_DAY if end_m <= start_m
+    end_m += MINUTES_PER_DAY if end_m < start_m
     end_m
   end
 

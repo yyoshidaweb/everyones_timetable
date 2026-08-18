@@ -11,6 +11,7 @@ class Performance < ApplicationRecord
   belongs_to :stage, optional: true
 
   validate :duration_more_five, if: -> { start_time && duration }
+  validate :duration_at_most_one_hundred_twenty, if: -> { start_time && duration }
 
   # 5分刻みであることをチェック
   validate :time_must_be_5min_step
@@ -120,6 +121,11 @@ class Performance < ApplicationRecord
   # durationが5以上かチェック
   def duration_more_five
     errors.add(:duration, "は5以上で入力してください") if duration < 5
+  end
+
+  # セレクトの上限（120分）を超えていないかチェック
+  def duration_at_most_one_hundred_twenty
+    errors.add(:duration, "は120以下で入力してください") if duration > 120
   end
 
   # 5分刻みであることをチェック

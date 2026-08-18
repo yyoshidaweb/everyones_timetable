@@ -29,15 +29,6 @@ class FestivalTimeTest < ActiveSupport::TestCase
     )
   end
 
-  test "treats equal clock times as a 24-hour interval" do
-    start_time = Time.zone.parse("10:00")
-    next_day_end = start_time + FestivalTime::MINUTES_PER_DAY.minutes
-    same_clock_end = Time.zone.parse("10:00")
-
-    assert_equal 10 * 60 + FestivalTime::MINUTES_PER_DAY, FestivalTime.end_minutes(start_time, next_day_end)
-    assert_equal 10 * 60 + FestivalTime::MINUTES_PER_DAY, FestivalTime.end_minutes(start_time, same_clock_end)
-  end
-
   test "floors and ceils festival minutes to the hour" do
     assert_equal 22 * 60, FestivalTime.floor_hour_minutes(Time.zone.parse("22:30"))
     assert_equal 25 * 60, FestivalTime.floor_hour_minutes(Time.zone.parse("01:30"))
