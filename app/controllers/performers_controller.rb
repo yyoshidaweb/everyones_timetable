@@ -27,6 +27,7 @@ class PerformersController < ApplicationController
       @favorite_performance_map =
         current_user.favorite_performance_map_by_performer(@performer)
     end
+    render layout: false if turbo_frame_request?
   end
 
   def new

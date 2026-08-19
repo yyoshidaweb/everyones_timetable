@@ -1,0 +1,25 @@
+<%# 編集ボタン（作成者本人のみ表示） %>
+<% if user_signed_in? && current_user == @event.user %>
+  <%= link_to edit_event_stage_path(@event.event_key, @stage),
+              data: { turbo_frame: "_top" },
+              class: local_assigns.fetch(:edit_button_class, "absolute top-4 right-0 text-xs text-gray-800") do %>
+    <span class="material-symbols-outlined">edit</span>
+  <% end %>
+<% end %>
+<%# ステージ名 %>
+<h1 class="text-xl font-bold text-gray-900 mb-2">
+  <%= @stage.stage_name_tag.name %>
+</h1>
+<%# 説明 %>
+<% if @stage.description.present? %>
+  <div class="mb-6">
+    <%= auto_link_text(@stage.description) %>
+  </div>
+<% end %>
+<%# 住所 %>
+<% if @stage.address.present? %>
+  <div class="mb-6">
+    <h2 class="text-md font-bold text-gray-900 mb-2">住所</h2>
+    <p class="text-gray-800 whitespace-pre-line"><%= @stage.address %></p>
+  </div>
+<% end %>

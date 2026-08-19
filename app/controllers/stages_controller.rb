@@ -16,6 +16,7 @@ class StagesController < ApplicationController
 
   # ステージ
   def show
+    render layout: false if turbo_frame_request?
   end
 
   # ステージ追加ページ

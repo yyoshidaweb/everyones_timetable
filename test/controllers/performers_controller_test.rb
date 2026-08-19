@@ -58,6 +58,28 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # 通常の詳細はページ表示で、モーダル用オーバーレイは出さない
+  test "show renders full page without modal overlay" do
+    performer = @event.performers.first
+    get event_performer_url(@event.event_key, performer)
+    assert_response :success
+    assert_select "h1", text: performer.display_name
+    assert_select "div[data-controller='modal'][data-action='click->modal#close']", count: 0
+  end
+
+  # Turbo Frameでは出演者詳細をモーダルとして返す
+  test "show renders modal when requested as turbo frame" do
+    performer = @event.performers.first
+    get event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "turbo-frame#modal" do
+      assert_select "div[data-controller='modal'][data-action='click->modal#close']"
+      assert_select "button[data-action='click->modal#close']"
+      assert_select "h1", text: performer.display_name
+    end
+  end
+
   # 出演者カードの先頭出演は6時起点の順（22:00が01:00より先）
   test "index card shows earliest festival performance first" do
     performer = create_overnight_performer

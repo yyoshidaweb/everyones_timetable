@@ -1,0 +1,32 @@
+<%# 編集ボタン（作成者本人のみ表示） %>
+<% if user_signed_in? && current_user == @event.user %>
+  <%= link_to edit_event_performer_path(@event.event_key, @performer),
+              data: { turbo_frame: "_top" },
+              class: local_assigns.fetch(:edit_button_class, "absolute top-4 right-0 text-xs text-gray-800") do %>
+    <span class="material-symbols-outlined">edit</span>
+  <% end %>
+<% end %>
+<%# 出演者名 %>
+<h1 class="text-xl font-bold text-gray-900">
+  <%= @performer.performer_name_tag.name %>
+</h1>
+<%# 出演情報を一覧表示 %>
+<%= render "performers/performances",
+      performances: @performances %>
+<%# 説明 %>
+<% if @performer.description.present? %>
+  <div class="mb-6">
+    <%= auto_link_text(@performer.description) %>
+  </div>
+<% end %>
+<%# Official website %>
+<% if @performer.website_url.present? %>
+  <div class="mb-6">
+    <h2 class="text-md font-bold text-gray-900">Official website</h2>
+    <%# ヘルパーを使用し、URLを検証・整形して表示する %>
+    <%= safe_website_link(@performer,
+        class: "text-blue-600 hover:border-b border-blue-600 transition cursor-pointer",
+        target: "_blank",
+        rel: "noopener noreferrer") %>
+  </div>
+<% end %>

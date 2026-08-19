@@ -1,31 +1,12 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@event.display_name} #{@stage.display_name} | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}のステージ「#{@stage.display_name}」の詳細。ステージ情報や住所を確認できます。" %>
-<div class="relative max-w-md mx-auto p-4 pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
-  <%# 編集ボタン（作成者本人のみ表示） %>
-  <% if user_signed_in? && current_user == @event.user %>
-    <%= link_to edit_event_stage_path(@event.event_key, @stage),
-                class: "absolute top-4 right-0 text-xs text-gray-800" do %>
-      <span class="material-symbols-outlined">edit</span>
-    <% end %>
-  <% end %>
-  <%# ステージ名 %>
-  <h1 class="text-xl font-bold text-gray-900 mb-2">
-    <%= @stage.stage_name_tag.name %>
-  </h1>
-  <%# 説明 %>
-  <% if @stage.description.present? %>
-    <div class="mb-6">
-      <%= auto_link_text(@stage.description) %>
-    </div>
-  <% end %>
-  <%# 住所 %>
-  <% if @stage.address.present? %>
-    <div class="mb-6">
-      <h2 class="text-md font-bold text-gray-900 mb-2">住所</h2>
-      <p class="text-gray-800 whitespace-pre-line"><%= @stage.address %></p>
-    </div>
-  <% end %>
-</div>
-<%# 下部タブメニュー %>
-<%= render "layouts/bottom_tab" %>
+<% if turbo_frame_request? %>
+  <%= render "modal_show" %>
+<% else %>
+  <div class="relative max-w-md mx-auto p-4 pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+    <%= render "detail" %>
+  </div>
+  <%# 下部タブメニュー %>
+  <%= render "layouts/bottom_tab" %>
+<% end %>
