@@ -28,6 +28,18 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to @referer
   end
 
+  test "turbo_stream: お気に入り登録するとボタンが更新される" do
+    assert_difference("PerformanceFavorite.count", 1) do
+      post performance_favorites_path,
+            params: { performance_id: @not_favorite_performance.id },
+            as: :turbo_stream
+    end
+    assert_response :success
+    assert_select "turbo-stream[action='replace'][target=?]",
+                  "favorite_performance_#{@not_favorite_performance.id}"
+    assert_select "span.material-symbols-filled.text-orange-600", text: /favorite/
+  end
+
   test "お気に入り解除できる" do
     assert_difference("PerformanceFavorite.count", -1) do
       delete performance_favorite_path(@favorite),
@@ -35,5 +47,16 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
     end
     # 解除後はリファラーにリダイレクトされることを確認
     assert_redirected_to @referer
+  end
+
+  test "turbo_stream: お気に入り解除するとボタンが更新される" do
+    performance = @favorite.performance
+    assert_difference("PerformanceFavorite.count", -1) do
+      delete performance_favorite_path(@favorite), as: :turbo_stream
+    end
+    assert_response :success
+    assert_select "turbo-stream[action='replace'][target=?]",
+                  "favorite_performance_#{performance.id}"
+    assert_select "span.material-symbols-filled.text-orange-600", count: 0
   end
 end

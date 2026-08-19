@@ -1,7 +1,7 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@event.display_name} #{@stage.display_name} | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}のステージ「#{@stage.display_name}」の詳細。ステージ情報や住所を確認できます。" %>
-<% if turbo_frame_request? %>
+<% if modal_turbo_frame? %>
   <%= render "modal_show" %>
 <% else %>
   <div class="relative max-w-md mx-auto p-4 pb-[calc(5.25rem+env(safe-area-inset-bottom))]">

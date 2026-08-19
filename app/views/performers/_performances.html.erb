@@ -36,7 +36,7 @@
             <%# 編集ボタン（出演者の作成者のみ表示） %>
             <% if current_user == @event.user %>
               <%= link_to edit_event_performance_path(@event.event_key, performance),
-                              data: { turbo_frame: "_top" },
+                              data: { turbo_frame: "modal" },
                               class: "mx-4 flex items-center text-sm text-gray-800" do %>
                 <span class="material-symbols-outlined">edit_calendar</span>
               <% end %>

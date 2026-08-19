@@ -77,6 +77,20 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
       assert_select "div[data-controller='modal'][data-action='click->modal#close']"
       assert_select "button[data-action='click->modal#close']"
       assert_select "h1", text: stage.display_name
+      assert_select "a[href=?][data-turbo-frame=modal]",
+                    edit_event_stage_path(@event.event_key, stage)
+    end
+  end
+
+  # ステージ編集はTurbo Frameではモーダルとして返す
+  test "edit renders modal when requested as turbo frame" do
+    stage = @event.stages.first
+    get edit_event_stage_url(@event.event_key, stage),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "turbo-frame#modal" do
+      assert_select "form[action=?]", event_stage_path(@event.event_key, stage)
+      assert_select "button[data-action='click->modal#close']"
     end
   end
 

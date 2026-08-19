@@ -1,7 +1,7 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@event.display_name} #{@performer.display_name} | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}の出演者「#{@performer.display_name}」の出演情報。出演時間や出演ステージを確認できます。" %>
-<% if turbo_frame_request? %>
+<% if modal_turbo_frame? %>
   <%= render "modal_show" %>
 <% else %>
   <div class="relative max-w-md mx-auto p-4 pb-[calc(5.25rem+env(safe-area-inset-bottom))]">

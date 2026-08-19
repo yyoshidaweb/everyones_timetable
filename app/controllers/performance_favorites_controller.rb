@@ -4,17 +4,26 @@ class PerformanceFavoritesController < ApplicationController
 
   # 出演情報お気に入り登録実行
   def create
-    performance = Performance.find(params[:performance_id])
-    current_user.performance_favorites.create!(performance: performance)
-    # 登録後は元のページにリダイレクトする（もし元のページが不明の場合はトップページにリダイレクトする）
-    redirect_back fallback_location: root_path
+    @performance = Performance.find(params[:performance_id])
+    favorite = current_user.performance_favorites.create!(performance: @performance)
+    respond_to do |format|
+      format.turbo_stream do
+        @favorite_performance_map = { @performance.id => favorite.id }
+      end
+      format.html { redirect_back fallback_location: root_path }
+    end
   end
 
   # 出演情報お気に入り登録解除実行
   def destroy
     favorite = current_user.performance_favorites.find(params[:id])
+    @performance = favorite.performance
     favorite.destroy!
-    # 解除後は元のページにリダイレクトする（もし元のページが不明の場合はトップページにリダイレクトする）
-    redirect_back fallback_location: root_path
+    respond_to do |format|
+      format.turbo_stream do
+        @favorite_performance_map = {}
+      end
+      format.html { redirect_back fallback_location: root_path }
+    end
   end
 end
