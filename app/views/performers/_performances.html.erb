@@ -20,9 +20,7 @@
           <p>
             <% if performance.stage.present? %>
               <% if local_assigns[:in_modal] %>
-                <span class="flex items-center">
-                  <span class="line-clamp-1"><%= performance.stage.display_name %></span>
-                </span>
+                <span class="line-clamp-1"><%= performance.stage.display_name %></span>
               <% else %>
                 <%= link_to event_stage_path(@event.event_key, performance.stage),
                           class: "flex items-center text-blue-600" do %>

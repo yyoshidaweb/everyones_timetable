@@ -1,18 +1,16 @@
-<div class="flex items-center gap-1">
-  <%# 出演者名 %>
-  <h1 class="text-xl font-bold text-gray-900 min-w-0 flex-1">
-    <%= @performer.performer_name_tag.name %>
-  </h1>
-  <%# 編集ボタン（ページ表示かつ作成者本人のみ） %>
-  <% unless local_assigns[:in_modal] %>
-    <% if user_signed_in? && current_user == @event.user %>
-      <%= link_to edit_event_performer_path(@event.event_key, @performer),
-                  class: "shrink-0 text-gray-800" do %>
-        <span class="material-symbols-outlined">edit</span>
-      <% end %>
+<% unless local_assigns[:in_modal] %>
+  <%# 編集ボタン（作成者本人のみ表示） %>
+  <% if user_signed_in? && current_user == @event.user %>
+    <%= link_to edit_event_performer_path(@event.event_key, @performer),
+                class: "absolute top-4 right-0 text-xs text-gray-800" do %>
+      <span class="material-symbols-outlined">edit</span>
     <% end %>
   <% end %>
-</div>
+<% end %>
+<%# 出演者名 %>
+<h1 class="text-xl font-bold text-gray-900">
+  <%= @performer.performer_name_tag.name %>
+</h1>
 <%# 出演情報を一覧表示 %>
 <%= render "performers/performances",
       performances: @performances,
