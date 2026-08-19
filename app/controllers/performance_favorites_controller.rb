@@ -55,7 +55,7 @@ class PerformanceFavoritesController < ApplicationController
     def my_timetable_referer?
       return false if request.referer.blank?
 
-      path = URI.parse(request.referer).path.delete_suffix("/")
+      path = (URI.parse(request.referer).path || "").delete_suffix("/")
       path == show_my_timetable_path(event_key: @event.event_key, username: current_user.username)
     rescue URI::InvalidURIError
       false
