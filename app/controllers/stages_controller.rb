@@ -9,7 +9,7 @@ class StagesController < ApplicationController
   before_action :set_page_title, except: %i[ destroy ]
   before_action :show_event_header, except: %i[ destroy ]
   # モーダル表示時はレイアウトの空turbo-frame#modalと重ならないようにする
-  layout -> { (modal_turbo_frame? && action_name.in?(%w[show edit update])) ? false : "application" }
+  layout -> { (modal_turbo_frame? && action_name == "show") ? false : "application" }
 
   # ステージ一覧
   def index

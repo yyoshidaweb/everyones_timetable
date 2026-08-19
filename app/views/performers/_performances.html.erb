@@ -19,11 +19,16 @@
           </p>
           <p>
             <% if performance.stage.present? %>
-              <%= link_to event_stage_path(@event.event_key, performance.stage),
-                        data: { turbo_frame: "modal" },
-                        class: "flex items-center text-blue-600" do %>
-                <span class="line-clamp-1"><%= performance.stage.display_name %></span>
-                <span class="material-symbols-outlined" style="font-size: 1.2rem;">moved_location</span>
+              <% if local_assigns[:in_modal] %>
+                <span class="flex items-center">
+                  <span class="line-clamp-1"><%= performance.stage.display_name %></span>
+                </span>
+              <% else %>
+                <%= link_to event_stage_path(@event.event_key, performance.stage),
+                          class: "flex items-center text-blue-600" do %>
+                  <span class="line-clamp-1"><%= performance.stage.display_name %></span>
+                  <span class="material-symbols-outlined" style="font-size: 1.2rem;">moved_location</span>
+                <% end %>
               <% end %>
             <% else %>
               ステージ：未定
@@ -32,13 +37,14 @@
         </div>
         <%# お気に入りボタンと編集ボタン %>
         <div class="flex items-center">
-          <% if user_signed_in? %>
-            <%# 編集ボタン（出演者の作成者のみ表示） %>
-            <% if current_user == @event.user %>
-              <%= link_to edit_event_performance_path(@event.event_key, performance),
-                              data: { turbo_frame: "modal" },
-                              class: "mx-4 flex items-center text-sm text-gray-800" do %>
-                <span class="material-symbols-outlined">edit_calendar</span>
+          <% unless local_assigns[:in_modal] %>
+            <% if user_signed_in? %>
+              <%# 編集ボタン（出演者の作成者のみ表示） %>
+              <% if current_user == @event.user %>
+                <%= link_to edit_event_performance_path(@event.event_key, performance),
+                                class: "mx-4 flex items-center text-sm text-gray-800" do %>
+                  <span class="material-symbols-outlined">edit_calendar</span>
+                <% end %>
               <% end %>
             <% end %>
           <% end %>
@@ -49,14 +55,15 @@
   <% end %>
 </div>
 <%# 出演情報作成ボタン %>
-<% if user_signed_in? && current_user == @event.user %>
-  <div class="flex justify-end items-center mb-4">
-    <%= link_to new_event_performance_path(@event.event_key, performer_id: @performer.id),
-                    data: { turbo_frame: "_top" },
-                    class: "flex items-center justify-center px-2.5 py-1.5 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900" do %>
-      <span class="material-symbols-outlined mr-1"
-                    style="font-size: 1.35rem">calendar_add_on</span>
-      <span class="text-xs">出演情報を追加</span>
-    <% end %>
-  </div>
+<% unless local_assigns[:in_modal] %>
+  <% if user_signed_in? && current_user == @event.user %>
+    <div class="flex justify-end items-center mb-4">
+      <%= link_to new_event_performance_path(@event.event_key, performer_id: @performer.id),
+                      class: "flex items-center justify-center px-2.5 py-1.5 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900" do %>
+        <span class="material-symbols-outlined mr-1"
+                      style="font-size: 1.35rem">calendar_add_on</span>
+        <span class="text-xs">出演情報を追加</span>
+      <% end %>
+    </div>
+  <% end %>
 <% end %>

@@ -128,19 +128,6 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # 出演情報編集はTurbo Frameではモーダルとして返す
-  test "edit renders modal when requested as turbo frame" do
-    get edit_event_performance_url(@event.event_key, @performance),
-        headers: { "Turbo-Frame" => "modal" }
-    assert_response :success
-    assert_select "turbo-frame#modal" do
-      assert_select "form[action=?]", event_performance_path(@event.event_key, @performance)
-      assert_select "button[data-action='click->modal#close']"
-      assert_select "a", text: "開催日を追加", count: 0
-      assert_select "a", text: "ステージを追加", count: 0
-    end
-  end
-
   # 0時過ぎの出演は編集フォームで24時台が選択される
   test "should select display hour 25 when editing overnight performance" do
     performance = Performance.create!(

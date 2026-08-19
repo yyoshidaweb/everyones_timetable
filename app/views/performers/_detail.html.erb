@@ -3,18 +3,20 @@
   <h1 class="text-xl font-bold text-gray-900 min-w-0 flex-1">
     <%= @performer.performer_name_tag.name %>
   </h1>
-  <%# 編集ボタン（作成者本人のみ表示） %>
-  <% if user_signed_in? && current_user == @event.user %>
-    <%= link_to edit_event_performer_path(@event.event_key, @performer),
-                data: { turbo_frame: "modal" },
-                class: "shrink-0 text-gray-800" do %>
-      <span class="material-symbols-outlined">edit</span>
+  <%# 編集ボタン（ページ表示かつ作成者本人のみ） %>
+  <% unless local_assigns[:in_modal] %>
+    <% if user_signed_in? && current_user == @event.user %>
+      <%= link_to edit_event_performer_path(@event.event_key, @performer),
+                  class: "shrink-0 text-gray-800" do %>
+        <span class="material-symbols-outlined">edit</span>
+      <% end %>
     <% end %>
   <% end %>
 </div>
 <%# 出演情報を一覧表示 %>
 <%= render "performers/performances",
-      performances: @performances %>
+      performances: @performances,
+      in_modal: local_assigns[:in_modal] %>
 <%# 説明 %>
 <% if @performer.description.present? %>
   <div class="mb-6">
@@ -30,5 +32,14 @@
         class: "text-blue-600 hover:border-b border-blue-600 transition cursor-pointer",
         target: "_blank",
         rel: "noopener noreferrer") %>
+  </div>
+<% end %>
+<% if local_assigns[:in_modal] && user_signed_in? && current_user == @event.user %>
+  <div class="mt-4 flex justify-end">
+    <%= link_to event_performer_path(@event.event_key, @performer),
+                data: { turbo_frame: "_top" },
+                class: "text-sm font-semibold text-blue-600 hover:underline" do %>
+      詳細→
+    <% end %>
   </div>
 <% end %>

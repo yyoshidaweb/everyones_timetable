@@ -77,21 +77,35 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
       assert_select "div[data-controller='modal'][data-action='click->modal#close']"
       assert_select "button[data-action='click->modal#close']"
       assert_select "h1", text: performer.display_name
-      assert_select "a[href=?][data-turbo-frame=modal]",
-                    edit_event_performer_path(@event.event_key, performer)
+      assert_select "a[href=?]", edit_event_performer_path(@event.event_key, performer), count: 0
+      assert_select "a[href*=?]", "/performances/", count: 0
+      assert_select "a[href=?][data-turbo-frame=_top]",
+                    event_performer_path(@event.event_key, performer),
+                    text: "詳細→"
     end
   end
 
-  # 出演者編集はTurbo Frameではモーダルとして返す
-  test "edit renders modal when requested as turbo frame" do
+  # 未ログインのモーダルには詳細リンクと編集ボタンを出さない
+  test "show modal hides detail link and edit for guest" do
+    sign_out @user
     performer = @event.performers.first
-    get edit_event_performer_url(@event.event_key, performer),
+    get event_performer_url(@event.event_key, performer),
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
-    assert_select "turbo-frame#modal" do
-      assert_select "form[action=?]", event_performer_path(@event.event_key, performer)
-      assert_select "button[data-action='click->modal#close']"
-    end
+    assert_select "a", text: "詳細→", count: 0
+    assert_select "a[href=?]", edit_event_performer_path(@event.event_key, performer), count: 0
+  end
+
+  # 他ユーザーのモーダルにも詳細リンクと編集ボタンを出さない
+  test "show modal hides detail link and edit for other user" do
+    sign_out @user
+    sign_in users(:two)
+    performer = @event.performers.first
+    get event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "a", text: "詳細→", count: 0
+    assert_select "a[href=?]", edit_event_performer_path(@event.event_key, performer), count: 0
   end
 
   # 出演者カードの先頭出演は6時起点の順（22:00が01:00より先）

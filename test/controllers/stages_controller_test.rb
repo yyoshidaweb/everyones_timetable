@@ -77,21 +77,34 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
       assert_select "div[data-controller='modal'][data-action='click->modal#close']"
       assert_select "button[data-action='click->modal#close']"
       assert_select "h1", text: stage.display_name
-      assert_select "a[href=?][data-turbo-frame=modal]",
-                    edit_event_stage_path(@event.event_key, stage)
+      assert_select "a[href=?]", edit_event_stage_path(@event.event_key, stage), count: 0
+      assert_select "a[href=?][data-turbo-frame=_top]",
+                    event_stage_path(@event.event_key, stage),
+                    text: "詳細→"
     end
   end
 
-  # ステージ編集はTurbo Frameではモーダルとして返す
-  test "edit renders modal when requested as turbo frame" do
+  # 未ログインのモーダルには詳細リンクと編集ボタンを出さない
+  test "show modal hides detail link and edit for guest" do
+    sign_out @user
     stage = @event.stages.first
-    get edit_event_stage_url(@event.event_key, stage),
+    get event_stage_url(@event.event_key, stage),
         headers: { "Turbo-Frame" => "modal" }
     assert_response :success
-    assert_select "turbo-frame#modal" do
-      assert_select "form[action=?]", event_stage_path(@event.event_key, stage)
-      assert_select "button[data-action='click->modal#close']"
-    end
+    assert_select "a", text: "詳細→", count: 0
+    assert_select "a[href=?]", edit_event_stage_path(@event.event_key, stage), count: 0
+  end
+
+  # 他ユーザーのモーダルにも詳細リンクと編集ボタンを出さない
+  test "show modal hides detail link and edit for other user" do
+    sign_out @user
+    sign_in users(:two)
+    stage = @event.stages.first
+    get event_stage_url(@event.event_key, stage),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "a", text: "詳細→", count: 0
+    assert_select "a[href=?]", edit_event_stage_path(@event.event_key, stage), count: 0
   end
 
   # ステージ追加ページ

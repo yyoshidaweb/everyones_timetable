@@ -1,12 +1,8 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@page_title} #{@event.display_name} #{@performer.display_name} | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}の#{@page_title}「#{@performer.display_name}」。" %>
-<% if modal_turbo_frame? %>
-  <%= render "modal_edit" %>
-<% else %>
-  <div class="pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
-    <%= render "edit_form" %>
-  </div>
-  <%# 下部タブメニュー %>
-  <%= render "layouts/bottom_tab" %>
-<% end %>
+<div class="pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+  <%= render "edit_form" %>
+</div>
+<%# 下部タブメニュー %>
+<%= render "layouts/bottom_tab" %>

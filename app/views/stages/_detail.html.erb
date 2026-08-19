@@ -3,12 +3,13 @@
   <h1 class="text-xl font-bold text-gray-900 min-w-0 flex-1">
     <%= @stage.stage_name_tag.name %>
   </h1>
-  <%# 編集ボタン（作成者本人のみ表示） %>
-  <% if user_signed_in? && current_user == @event.user %>
-    <%= link_to edit_event_stage_path(@event.event_key, @stage),
-                data: { turbo_frame: "modal" },
-                class: "shrink-0 text-gray-800" do %>
-      <span class="material-symbols-outlined">edit</span>
+  <%# 編集ボタン（ページ表示かつ作成者本人のみ） %>
+  <% unless local_assigns[:in_modal] %>
+    <% if user_signed_in? && current_user == @event.user %>
+      <%= link_to edit_event_stage_path(@event.event_key, @stage),
+                  class: "shrink-0 text-gray-800" do %>
+        <span class="material-symbols-outlined">edit</span>
+      <% end %>
     <% end %>
   <% end %>
 </div>
@@ -23,5 +24,14 @@
   <div class="mb-6">
     <h2 class="text-md font-bold text-gray-900 mb-2">住所</h2>
     <p class="text-gray-800 whitespace-pre-line"><%= @stage.address %></p>
+  </div>
+<% end %>
+<% if local_assigns[:in_modal] && user_signed_in? && current_user == @event.user %>
+  <div class="mt-4 flex justify-end">
+    <%= link_to event_stage_path(@event.event_key, @stage),
+                data: { turbo_frame: "_top" },
+                class: "text-sm font-semibold text-blue-600 hover:underline" do %>
+      詳細→
+    <% end %>
   </div>
 <% end %>

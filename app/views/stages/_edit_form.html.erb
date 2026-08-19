@@ -45,6 +45,6 @@
   <%= button_to "削除",
               event_stage_path(@event.event_key, @stage),
               method: :delete,
-              data: { turbo_confirm: "⚠️ 削除しますか？ 一度削除すると元に戻せません", turbo_frame: "_top" },
+              data: { turbo_confirm: "⚠️ 削除しますか？ 一度削除すると元に戻せません" },
               class: "flex justify-center w-full mt-24 py-2 rounded-md bg-gray-800 text-red-500 hover:bg-red-700 hover:text-red-200 transition cursor-pointer" %>
 </div>

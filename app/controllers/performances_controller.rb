@@ -13,8 +13,6 @@ class PerformancesController < ApplicationController
   before_action :set_page_title, except: %i[ destroy ]
   before_action :show_event_header, except: %i[ destroy ]
   before_action :set_form_type, only: %i[ new create edit update ]
-  # モーダル表示時はレイアウトの空turbo-frame#modalと重ならないようにする
-  layout -> { (modal_turbo_frame? && action_name.in?(%w[edit update])) ? false : "application" }
 
   def new
     @performance = Performance.new
