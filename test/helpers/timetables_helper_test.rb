@@ -1,7 +1,8 @@
 require "test_helper"
-require "ostruct"
 
 class TimetablesHelperTest < ActionView::TestCase
+  HelperPerformance = Data.define(:start_time, :end_time, :duration)
+
   test "builds daytime hour slots and height from 10:00 to 22:00" do
     performances = [
       performance_at("10:00", duration: 60),
@@ -39,7 +40,7 @@ class TimetablesHelperTest < ActionView::TestCase
   private
     def performance_at(start_hm, duration:)
       start_time = Time.zone.parse(start_hm)
-      OpenStruct.new(
+      HelperPerformance.new(
         start_time: start_time,
         end_time: start_time + duration.minutes,
         duration: duration
