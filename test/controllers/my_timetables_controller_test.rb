@@ -41,6 +41,7 @@ class MyTimetablesControllerTest < ActionDispatch::IntegrationTest
                   event_stage_path(@event.event_key, @performance1.stage)
     assert_select "a[href=?][data-turbo-frame=modal]",
                   event_performer_path(@event.event_key, @performance1.performer)
+    assert_select "a#my_timetable_performance_#{@performance1.id}"
   end
 
   # マイタイムテーブルは検索エンジンにインデックスさせない

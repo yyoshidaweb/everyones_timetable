@@ -1,0 +1,9 @@
+<%= turbo_stream.replace "favorite_performance_#{@performance.id}",
+      partial: "performances/favorite_button",
+      locals: { performance: @performance } %>
+<%= turbo_stream.replace "favorite_marker_performance_#{@performance.id}",
+      partial: "performances/favorite_marker",
+      locals: { performance: @performance } %>
+<% unless @favorite_performance_map[@performance.id] %>
+  <%= turbo_stream.remove "my_timetable_performance_#{@performance.id}" %>
+<% end %>

@@ -9,6 +9,7 @@ class PerformanceFavoritesController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         @favorite_performance_map = { @performance.id => favorite.id }
+        render :refresh
       end
       format.html { redirect_back fallback_location: root_path }
     end
@@ -22,6 +23,7 @@ class PerformanceFavoritesController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         @favorite_performance_map = {}
+        render :refresh
       end
       format.html { redirect_back fallback_location: root_path }
     end

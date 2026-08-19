@@ -66,6 +66,7 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
                   event_stage_path(@event.event_key, @performance1.stage)
     assert_select "a[href=?][data-turbo-frame=modal]",
                   event_performer_path(@event.event_key, @performance1.performer)
+    assert_select "#favorite_marker_performance_#{@performance1.id}"
   end
 
   # オーナーには下部アクションボタンが常時表示される

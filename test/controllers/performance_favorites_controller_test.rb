@@ -42,6 +42,13 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
         assert_select "input[name=_method][value=delete]"
       end
     end
+    assert_select "turbo-stream[action='replace'][target=?]",
+                  "favorite_marker_performance_#{@not_favorite_performance.id}" do
+      assert_select "span.favorite-marker"
+    end
+    assert_select "turbo-stream[action='remove'][target=?]",
+                  "my_timetable_performance_#{@not_favorite_performance.id}",
+                  count: 0
   end
 
   test "お気に入り解除できる" do
@@ -65,5 +72,11 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
         assert_select "input[name=_method][value=delete]", count: 0
       end
     end
+    assert_select "turbo-stream[action='replace'][target=?]",
+                  "favorite_marker_performance_#{performance.id}" do
+      assert_select "span.favorite-marker", count: 0
+    end
+    assert_select "turbo-stream[action='remove'][target=?]",
+                  "my_timetable_performance_#{performance.id}"
   end
 end

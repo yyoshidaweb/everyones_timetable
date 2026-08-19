@@ -85,9 +85,7 @@
                     <%# 出演者名 %>
                     <p class="font-semibold leading-none wrap-break-word
                               <%= font_size %> <%= line_clamp %> <%= translate_y %>">
-                      <span class="<%= favorite_marker(performance) %>">
-                        <%= performance.performer.display_name %>
-                      </span>
+                      <%= render "performances/favorite_marker", performance: performance %>
                     </p>
                   <% end %>
                 <% end %>
