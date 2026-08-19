@@ -46,9 +46,23 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
                   "favorite_marker_performance_#{@not_favorite_performance.id}" do
       assert_select "span.favorite-marker"
     end
-    assert_select "turbo-stream[action='remove'][target=?]",
-                  "my_timetable_performance_#{@not_favorite_performance.id}",
-                  count: 0
+    assert_select "turbo-stream[action='replace'][target=my_timetable]", count: 0
+  end
+
+  test "turbo_stream: マイタイムテーブルでお気に入り登録するとカードが表示される" do
+    performance = performances(:two)
+    referer = show_my_timetable_url(event_key: @event.event_key, username: @user.username)
+
+    assert_difference("PerformanceFavorite.count", 1) do
+      post performance_favorites_path,
+            params: { performance_id: performance.id },
+            headers: { "HTTP_REFERER" => referer },
+            as: :turbo_stream
+    end
+    assert_response :success
+    assert_select "turbo-stream[action='replace'][target=my_timetable]" do
+      assert_select "a#my_timetable_performance_#{performance.id}"
+    end
   end
 
   test "お気に入り解除できる" do
@@ -76,7 +90,21 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
                   "favorite_marker_performance_#{performance.id}" do
       assert_select "span.favorite-marker", count: 0
     end
-    assert_select "turbo-stream[action='remove'][target=?]",
-                  "my_timetable_performance_#{performance.id}"
+    assert_select "turbo-stream[action='replace'][target=my_timetable]", count: 0
+  end
+
+  test "turbo_stream: マイタイムテーブルでお気に入り解除するとカードが消える" do
+    performance = @favorite.performance
+    referer = show_my_timetable_url(event_key: @event.event_key, username: @user.username)
+
+    assert_difference("PerformanceFavorite.count", -1) do
+      delete performance_favorite_path(@favorite),
+             headers: { "HTTP_REFERER" => referer },
+             as: :turbo_stream
+    end
+    assert_response :success
+    assert_select "turbo-stream[action='replace'][target=my_timetable]" do
+      assert_select "a#my_timetable_performance_#{performance.id}", count: 0
+    end
   end
 end
