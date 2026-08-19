@@ -11,6 +11,7 @@ class Performance < ApplicationRecord
   belongs_to :stage, optional: true
 
   validate :duration_more_five, if: -> { start_time && duration }
+  validate :duration_at_most_one_hundred_twenty, if: -> { start_time && duration }
 
   # 5分刻みであることをチェック
   validate :time_must_be_5min_step
@@ -28,15 +29,25 @@ class Performance < ApplicationRecord
       .where(performers: { event_id: event.id })
   }
 
+  # 6時起点の開催日内の開始時刻順
+  scope :ordered_by_festival_start_time, -> {
+    order(FestivalTime.wrap_order_sql, "performances.start_time ASC")
+  }
+
+  # 開催日順のあと、6時起点の開始時刻順
+  # daysをJOINすると、Eventがperformers経由でperformancesをJOINしたときに
+  # daysテーブル名が衝突するため、相関サブクエリで日付を参照する
+  scope :ordered_by_festival_day_and_time, -> {
+    order(
+      Arel.sql("(SELECT days.date FROM days WHERE days.id = performances.day_id) IS NULL ASC"),
+      Arel.sql("(SELECT days.date FROM days WHERE days.id = performances.day_id) ASC")
+    )
+      .ordered_by_festival_start_time
+  }
+
   # 開催日と開始時刻順で並べ、必要な関連も事前ロードするスコープ
   scope :ordered_for_performer_detail, -> {
-    left_joins(:day)
-      .includes(:day, stage: :stage_name_tag)
-      .order(
-        Arel.sql("days.date IS NULL ASC"), # dayあり → dayなし の順
-        "days.date ASC",
-        "performances.start_time ASC"
-      )
+    ordered_by_festival_day_and_time.includes(:day, stage: :stage_name_tag)
   }
 
   # タイムテーブル描画に必要な情報がすべて揃った performance を取得するスコープ
@@ -50,7 +61,7 @@ class Performance < ApplicationRecord
     .where(performers: { event_id: event.id })
     .where(days: { date: date })
     .includes(performer: :performer_name_tag)
-    .order(:start_time)
+    .ordered_by_festival_start_time
   }
 
   # ==== タイムテーブル表示用メソッド ====
@@ -65,14 +76,24 @@ class Performance < ApplicationRecord
     start_time.min
   end
 
-  # 開始時刻を分単位のキーに変換（並び・位置計算用）
+  # 開始時刻をフェス日内の分単位のキーに変換（並び・位置計算用）
   def start_key
-    start_time.hour * 60 + start_time.min
+    festival_start_minutes
+  end
+
+  # 開始時刻のフェス分
+  def festival_start_minutes
+    FestivalTime.to_minutes(start_time)
+  end
+
+  # 終了時刻のフェス分（日付またぎを含む）
+  def festival_end_minutes
+    FestivalTime.end_minutes(start_time, end_time)
   end
 
   # hh:mm 形式の開始時刻
   def formatted_start_time
-    format("%02d:%02d", start_time.hour, start_time.min)
+    FestivalTime.format_clock(start_time)
   end
 
   # 5分単位に変換した出演時間
@@ -105,6 +126,11 @@ class Performance < ApplicationRecord
   # durationが5以上かチェック
   def duration_more_five
     errors.add(:duration, "は5以上で入力してください") if duration < 5
+  end
+
+  # セレクトの上限（120分）を超えていないかチェック
+  def duration_at_most_one_hundred_twenty
+    errors.add(:duration, "は120以下で入力してください") if duration > 120
   end
 
   # 5分刻みであることをチェック
@@ -146,19 +172,21 @@ class Performance < ApplicationRecord
     return unless performer.present?
     return if start_time.blank? || end_time.blank?
     return if day.blank? || stage.blank?
-    overlapping = Performance
+    others = Performance
       .joins(:performer)
       .where(performers: { event_id: performer.event_id })
       .where(day_id: day_id, stage_id: stage_id)
       .where.not(id: id)
-      .where(
-        "start_time < ? AND end_time > ?",
-        end_time,
-        start_time
-      )
+      .where.not(start_time: nil, end_time: nil)
 
-    if overlapping.exists?
+    if others.any? { |other| festival_ranges_overlap?(other) }
       errors.add(:base, "同じ時間帯に他の出演情報が存在します")
     end
+  end
+
+  # フェス分の半開区間で重なっているか
+  def festival_ranges_overlap?(other)
+    festival_start_minutes < other.festival_end_minutes &&
+      festival_end_minutes > other.festival_start_minutes
   end
 end

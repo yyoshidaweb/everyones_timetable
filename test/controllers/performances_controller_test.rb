@@ -49,6 +49,26 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to show_timetable_path(@event.event_key, d: day.date)
   end
 
+  # 表示用の25時は時計の1時として保存される
+  test "should create overnight performance from display hour 25" do
+    day = @event.days.first
+    assert_difference("Performance.for_event(@event).count") do
+      post event_performances_path(@event.event_key), params: {
+        performance: {
+          performer_id: @event.performers.first.id,
+          day_id: day.id,
+          stage_id: @event.stages.second.id,
+          start_time_hour: "25",
+          start_time_minute: "00",
+          duration: 30
+        }
+      }
+    end
+    performance = Performance.for_event(@event).order(:id).last
+    assert_equal 1, performance.start_time.hour
+    assert_equal 0, performance.start_time.min
+  end
+
   # 出演者名だけで出演情報を作成でき、日付を指定していないためdパラメータ無しでリダイレクトされる
   test "should create performance only with performer" do
     assert_difference("Performance.for_event(@event).count") do
@@ -106,6 +126,20 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     get edit_event_performance_url(@event.event_key, @performance)
     assert_response :success
+  end
+
+  # 0時過ぎの出演は編集フォームで24時台が選択される
+  test "should select display hour 25 when editing overnight performance" do
+    performance = Performance.create!(
+      performer: @event.performers.first,
+      day: @event.days.first,
+      stage: @event.stages.second,
+      start_time: Time.zone.parse("01:00"),
+      duration: 30
+    )
+    get edit_event_performance_url(@event.event_key, performance)
+    assert_response :success
+    assert_select 'select[name="performance[start_time_hour]"] option[selected][value="25"]'
   end
 
   # 他者の出演情報編集ページはアクセスできない

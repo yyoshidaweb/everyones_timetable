@@ -33,7 +33,7 @@
                 </p>
                 <p class="text-sm">
                   <% if performance.start_time.present? && performance.end_time.present? %>
-                    <%= "#{performance.start_time.strftime("%H:%M")}~" %>
+                    <%= "#{formatted_time(performance.start_time)}~" %>
                   <% else %>
                     時刻：未定
                   <% end %>

@@ -56,7 +56,7 @@ class PerformancesController < ApplicationController
   def edit
     # 出演者詳細ページから遷移した場合は出演者をセットする
     @performer = @performance.performer
-    @performance.start_time_hour   = @performance.start_time&.hour
+    @performance.start_time_hour   = FestivalTime.display_hour(@performance.start_time&.hour)
     @performance.start_time_minute = @performance.start_time&.min
   end
 
@@ -169,7 +169,7 @@ class PerformancesController < ApplicationController
     # 時刻をhourとminuteから作成
     def parse_time_from_hour_minute(hour, minute)
       return nil if hour.blank? || minute.blank?
-      Time.zone.local(2000, 1, 1, hour.to_i, minute.to_i)
+      Time.zone.local(2000, 1, 1, FestivalTime.clock_hour(hour), minute.to_i)
     end
 
     def restore_time_virtual_attributes

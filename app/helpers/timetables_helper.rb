@@ -7,11 +7,8 @@ module TimetablesHelper
 
   # タイムテーブル全体の高さを rem で返す（1時間単位）
   def timetable_height_rem(performances)
-    start_hour = performances.min_by(&:start_time).start_time.hour
-    end_time   = performances.max_by(&:end_time).end_time
-    # 終了時刻は「次の時間」に切り上げ
-    end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
-    total_hours = end_hour - start_hour
+    start_minutes, end_ceil_minutes = festival_timetable_span(performances)
+    total_hours = (end_ceil_minutes - start_minutes) / 60.0
     total_hours * TIMETABLE_REM_PER_HOUR
   end
 
@@ -19,16 +16,15 @@ module TimetablesHelper
   def timetable_start_minute
     # 最初の1回だけ計算して、1リクエスト中は結果を使い回す
     @timetable_start_minute ||= begin
-      earliest = @performances.min_by(&:start_time).start_time
-      # タイムテーブル描画開始位置を正時にするため、minuteを切り捨てる
-      earliest.hour * 60
+      earliest = earliest_festival_performance(@performances)
+      FestivalTime.floor_hour_minutes(earliest.start_time)
     end
   end
 
   # performance の開始位置の top を rem で返す
   def performance_top_rem(performance)
     timetable_start_min = timetable_start_minute
-    start_min = performance.start_time.hour * 60 + performance.start_time.min
+    start_min = FestivalTime.to_minutes(performance.start_time)
     diff_min  = start_min - timetable_start_min
     rem_per_min  = TIMETABLE_REM_PER_HOUR / 60.0
     instead_of_margin = 0.05 # マージンの代わり
@@ -37,17 +33,8 @@ module TimetablesHelper
 
   # タイムテーブル用の時刻スロット配列を生成
   def time_slots_for_timetable(performances)
-    start_time = performances.min_by(&:start_time).start_time
-    end_time   = performances.max_by(&:end_time).end_time
-    start_hour = start_time.hour
-    # 終了時刻が00分なら、その時間は表示しない
-    last_hour =
-      if end_time.min.zero?
-        end_time.hour - 1
-      else
-        end_time.hour
-      end
-    (start_hour..last_hour).to_a
+    start_minutes, end_ceil_minutes = festival_timetable_span(performances)
+    FestivalTime.hour_slots(start_minutes, end_ceil_minutes)
   end
 
   # 下余白のCSS変数を:rootへ定義するstyleタグ
@@ -69,9 +56,8 @@ module TimetablesHelper
 
   # 下余白の開始位置に表示する正時（タイムテーブル末尾の次の時刻）
   def timetable_bottom_spacer_hour(performances)
-    end_time = performances.max_by(&:end_time).end_time
-    end_hour = end_time.min.zero? ? end_time.hour : end_time.hour + 1
-    end_hour % 24
+    _start_minutes, end_ceil_minutes = festival_timetable_span(performances)
+    FestivalTime.hour_from_minutes(end_ceil_minutes)
   end
 
   # performance の高さを rem で返す
@@ -135,4 +121,27 @@ module TimetablesHelper
 
     [ min_capture_width, content_width ].max
   end
+
+  private
+    # フェス分で最も早い出演
+    def earliest_festival_performance(performances)
+      performances.min_by { |performance| FestivalTime.to_minutes(performance.start_time) }
+    end
+
+    # フェス分で最も遅く終わる出演
+    def latest_festival_performance(performances)
+      performances.max_by { |performance|
+        FestivalTime.end_minutes(performance.start_time, performance.end_time)
+      }
+    end
+
+    # タイムテーブルの開始正時と終了正時（排他）をフェス分で返す
+    def festival_timetable_span(performances)
+      earliest = earliest_festival_performance(performances)
+      latest = latest_festival_performance(performances)
+      [
+        FestivalTime.floor_hour_minutes(earliest.start_time),
+        FestivalTime.ceil_hour_minutes(latest.start_time, latest.end_time)
+      ]
+    end
 end
