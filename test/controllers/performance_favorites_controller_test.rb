@@ -35,9 +35,13 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
             as: :turbo_stream
     end
     assert_response :success
+    favorite = PerformanceFavorite.find_by!(user: @user, performance: @not_favorite_performance)
     assert_select "turbo-stream[action='replace'][target=?]",
-                  "favorite_performance_#{@not_favorite_performance.id}"
-    assert_select "span.material-symbols-filled.text-orange-600", text: /favorite/
+                  "favorite_performance_#{@not_favorite_performance.id}" do
+      assert_select "form[action=?]", performance_favorite_path(favorite) do
+        assert_select "input[name=_method][value=delete]"
+      end
+    end
   end
 
   test "お気に入り解除できる" do
@@ -56,7 +60,10 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :success
     assert_select "turbo-stream[action='replace'][target=?]",
-                  "favorite_performance_#{performance.id}"
-    assert_select "span.material-symbols-filled.text-orange-600", count: 0
+                  "favorite_performance_#{performance.id}" do
+      assert_select "form[action=?]", performance_favorites_path(performance_id: performance.id) do
+        assert_select "input[name=_method][value=delete]", count: 0
+      end
+    end
   end
 end
