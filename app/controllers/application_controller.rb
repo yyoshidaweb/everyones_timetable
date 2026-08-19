@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
   # ビューでpreview_environment?メソッドを使用できるようにする
   helper_method :preview_environment?
 
-  # レイアウトの turbo-frame#modal からのリクエストかどうか
+  # レイアウトのturbo-frame#modal からのリクエストかどうか
   def modal_turbo_frame?
     turbo_frame_request_id == "modal"
   end

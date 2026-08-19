@@ -24,7 +24,7 @@
 <%# Official website %>
 <% if @performer.website_url.present? %>
   <div class="mb-6">
-    <h2 class="text-md font-bold text-gray-900">Official website</h2>
+    <h2 class="text-md font-bold text-gray-900">公式サイト</h2>
     <%# ヘルパーを使用し、URLを検証・整形して表示する %>
     <%= safe_website_link(@performer,
         class: "text-blue-600 hover:border-b border-blue-600 transition cursor-pointer",
