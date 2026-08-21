@@ -34,6 +34,12 @@ class ApplicationController < ActionController::Base
   # ビューでpreview_environment?メソッドを使用できるようにする
   helper_method :preview_environment?
 
+  # レイアウトのturbo-frame#modal からのリクエストかどうか
+  def modal_turbo_frame?
+    turbo_frame_request_id == "modal"
+  end
+  helper_method :modal_turbo_frame?
+
   # 名前変更モーダルを表示するかどうかを判定するヘルパーメソッド
   def show_name_confirmation_modal?
     user_signed_in? && !current_user.name_confirmed?

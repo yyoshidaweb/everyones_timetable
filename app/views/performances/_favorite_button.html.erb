@@ -2,11 +2,12 @@
   <%# お気に入りボタン %>
   <%= turbo_frame_tag "favorite_performance_#{performance.id}" do %>
     <%# performance_favoriteのidを取得 %>
-    <% favorite_id = @favorite_performance_map[performance.id] %>
+    <% favorite_id = local_assigns.key?(:favorite_id) ? local_assigns[:favorite_id] : @favorite_performance_map&.[](performance.id) %>
     <% if favorite_id %>
       <%# お気に入り済みの場合 %>
       <%= button_to performance_favorite_path(favorite_id),
                                             method: :delete,
+                                            data: { turbo_stream: true },
                                             class: "flex items-center cursor-pointer" do %>
         <span class="material-symbols-outlined material-symbols-filled text-orange-600">
           favorite
@@ -16,6 +17,7 @@
       <%# お気に入りではない場合 %>
       <%= button_to performance_favorites_path(performance_id: performance.id),
                                             method: :post,
+                                            data: { turbo_stream: true },
                                             class: "flex items-center text-gray-800 cursor-pointer" do %>
         <span class="material-symbols-outlined">
           favorite

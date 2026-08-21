@@ -1,0 +1,16 @@
+<%= turbo_stream.replace "favorite_performance_#{@performance.id}",
+      partial: "performances/favorite_button",
+      locals: { performance: @performance, favorite_id: @toggled_favorite_id } %>
+<%= turbo_stream.replace "favorite_marker_performance_#{@performance.id}",
+      partial: "performances/favorite_marker",
+      locals: {
+        performance: @performance,
+        marker_class: @toggled_favorite_id.present? ? "favorite-marker" : ""
+      } %>
+<% if @refresh_my_timetable %>
+  <%= turbo_stream.replace "my_timetable" do %>
+    <div id="my_timetable">
+      <%= render "my_timetables/content" %>
+    </div>
+  <% end %>
+<% end %>

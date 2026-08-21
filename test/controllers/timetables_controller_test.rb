@@ -58,6 +58,17 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", show_timetable_path(@event.event_key, d: @day2.date)
   end
 
+  # 出演情報カードとステージ名は詳細ページへ遷移せずモーダルで開く
+  test "performance cards and stage names open detail in modal" do
+    get show_timetable_path(@event.event_key)
+    assert_response :success
+    assert_select "a.stage-header-col[href=?][data-turbo-frame=modal]",
+                  event_stage_path(@event.event_key, @performance1.stage)
+    assert_select "a[href=?][data-turbo-frame=modal]",
+                  event_performer_path(@event.event_key, @performance1.performer)
+    assert_select "#favorite_marker_performance_#{@performance1.id}"
+  end
+
   # オーナーには下部アクションボタンが常時表示される
   test "owner sees bottom action buttons on timetable" do
     get show_timetable_path(@event.event_key)
