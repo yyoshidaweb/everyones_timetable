@@ -57,7 +57,18 @@ class MyTimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "body.h-svh.overflow-hidden"
     assert_select "main.min-h-0.overflow-hidden"
+    assert_select "div#my_timetable.h-full"
     assert_select "div.flex-1.min-h-0.overflow-auto.overscroll-none"
+  end
+
+  # 出演情報0件の空状態は上下左右中央に表示する
+  test "empty my timetable centers the empty state" do
+    get show_my_timetable_path(event_key: @no_performance_event.event_key, username: @user.username)
+    assert_response :success
+    assert_select "div#my_timetable.h-full" do
+      assert_select "div.h-full.flex.flex-col.items-center.justify-center"
+    end
+    assert_select "p", text: /出演情報をお気に入り登録すると/
   end
 
   test "should not get unpublished my_timetable with logout" do
