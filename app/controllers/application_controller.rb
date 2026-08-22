@@ -40,6 +40,21 @@ class ApplicationController < ActionController::Base
   end
   helper_method :modal_turbo_frame?
 
+  # モーダル内フォーム送信後の戻り先（タイムテーブルなど元のページ）
+  def modal_return_url
+    referer = request.referer
+    if referer.present?
+      referer_uri = URI.parse(referer)
+      if referer_uri.host.nil? || referer_uri.host == request.host
+        return referer
+      end
+    end
+
+    show_timetable_path(@event.event_key)
+  rescue URI::InvalidURIError
+    show_timetable_path(@event.event_key)
+  end
+
   # 名前変更モーダルを表示するかどうかを判定するヘルパーメソッド
   def show_name_confirmation_modal?
     user_signed_in? && !current_user.name_confirmed?
@@ -47,6 +62,11 @@ class ApplicationController < ActionController::Base
   helper_method :show_name_confirmation_modal?
 
   private
+    # モーダル内の編集フォームから送信されたか（turbo-frame#modal の _top 送信）
+    def modal_form_submission?
+      params[:from_modal].present?
+    end
+
     # 非公開イベントは作成者本人のみ閲覧を許可する
     def authorize_published_event!(event)
       return if event.is_published?

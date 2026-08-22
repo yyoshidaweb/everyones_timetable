@@ -267,25 +267,21 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#modal input[type=submit][value=?]", "更新"
   end
 
-  # モーダルから更新するとモーダルが閉じる
-  test "turbo_stream: stage is updated and modal is closed from modal" do
+  # モーダルから更新すると元のページへリダイレクトする
+  test "modal update redirects back to referer" do
     stage = @event.stages.first
+    timetable_url = show_timetable_url(@event.event_key)
     patch event_stage_url(@event.event_key, stage),
           params: {
+            from_modal: "1",
             stage: {
               description: "モーダルから更新",
               address: "新住所",
               stage_name_tag_attributes: { name: stage.display_name }
             }
           },
-          headers: {
-            "Turbo-Frame" => "modal",
-            "Accept" => "text/vnd.turbo-stream.html"
-          }
-    assert_response :success
-    assert_equal "text/vnd.turbo-stream.html", response.media_type
-    assert_includes response.body, 'turbo-stream action="update" target="modal"'
-    assert_includes response.body, 'turbo-stream action="refresh"'
+          headers: { "HTTP_REFERER" => timetable_url }
+    assert_redirected_to timetable_url
     stage.reload
     assert_equal "モーダルから更新", stage.description
   end

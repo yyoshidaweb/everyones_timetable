@@ -107,9 +107,10 @@ class StagesController < ApplicationController
 
     # Stage本体を更新（ネストされたフィールドを除く）
     if @stage.update(stage_params.except(:stage_name_tag_attributes))
-      respond_to do |format|
-        format.turbo_stream if modal_turbo_frame?
-        format.html { redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。" }
+      if modal_form_submission?
+        redirect_to modal_return_url, notice: "ステージを更新しました。", status: :see_other
+      else
+        redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。"
       end
     else
       render :edit, status: :unprocessable_entity
@@ -119,9 +120,10 @@ class StagesController < ApplicationController
   # ステージ削除処理
   def destroy
     @stage.destroy!
-    respond_to do |format|
-      format.turbo_stream if modal_turbo_frame?
-      format.html { redirect_to event_stages_path(@event.event_key), notice: "ステージを削除しました。", status: :see_other }
+    if modal_form_submission?
+      redirect_to modal_return_url, notice: "ステージを削除しました。", status: :see_other
+    else
+      redirect_to event_stages_path(@event.event_key), notice: "ステージを削除しました。", status: :see_other
     end
   end
 

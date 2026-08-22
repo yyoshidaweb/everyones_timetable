@@ -64,9 +64,10 @@ class PerformancesController < ApplicationController
 
   def update
     if @performance.update(performance_params_for_update)
-      respond_to do |format|
-        format.turbo_stream if modal_turbo_frame?
-        format.html { redirect_to event_performer_url(@event.event_key, @performance.performer), notice: "出演情報を更新しました。" }
+      if modal_form_submission?
+        redirect_to modal_return_url, notice: "出演情報を更新しました。", status: :see_other
+      else
+        redirect_to event_performer_url(@event.event_key, @performance.performer), notice: "出演情報を更新しました。"
       end
     else
       # エラー時に出演者をセットする
@@ -79,9 +80,10 @@ class PerformancesController < ApplicationController
   def destroy
     @performer = @performance.performer
     @performance.destroy!
-    respond_to do |format|
-      format.turbo_stream if modal_turbo_frame?
-      format.html { redirect_to event_performer_url(@event.event_key, @performer), notice: "出演情報を削除しました。", status: :see_other }
+    if modal_form_submission?
+      redirect_to modal_return_url, notice: "出演情報を削除しました。", status: :see_other
+    else
+      redirect_to event_performer_url(@event.event_key, @performer), notice: "出演情報を削除しました。", status: :see_other
     end
   end
 

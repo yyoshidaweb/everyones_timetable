@@ -114,9 +114,10 @@ class PerformersController < ApplicationController
 
     # Performer本体を更新（ネストされたフィールドを除く）
     if @performer.update(performer_params.except(:performer_name_tag_attributes))
-      respond_to do |format|
-        format.turbo_stream if modal_turbo_frame?
-        format.html { redirect_to event_performer_path(@event.event_key, @performer), notice: "出演者を更新しました。" }
+      if modal_form_submission?
+        redirect_to modal_return_url, notice: "出演者を更新しました。", status: :see_other
+      else
+        redirect_to event_performer_path(@event.event_key, @performer), notice: "出演者を更新しました。"
       end
     else
       render :edit, status: :unprocessable_entity
@@ -125,9 +126,10 @@ class PerformersController < ApplicationController
 
   def destroy
     @performer.destroy!
-    respond_to do |format|
-      format.turbo_stream if modal_turbo_frame?
-      format.html { redirect_to event_performers_path(@event.event_key), notice: "出演者を削除しました。", status: :see_other }
+    if modal_form_submission?
+      redirect_to modal_return_url, notice: "出演者を削除しました。", status: :see_other
+    else
+      redirect_to event_performers_path(@event.event_key), notice: "出演者を削除しました。", status: :see_other
     end
   end
 

@@ -306,25 +306,21 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#modal input[type=submit][value=?]", "更新"
   end
 
-  # モーダルから更新するとモーダルが閉じる
-  test "turbo_stream: performer is updated and modal is closed from modal" do
+  # モーダルから更新すると元のページへリダイレクトする
+  test "modal update redirects back to referer" do
     performer = @event.performers.first
+    timetable_url = show_timetable_url(@event.event_key)
     patch event_performer_url(@event.event_key, performer),
           params: {
+            from_modal: "1",
             performer: {
               description: "モーダルから更新",
               website_url: "https://example.com",
               performer_name_tag_attributes: { name: performer.display_name }
             }
           },
-          headers: {
-            "Turbo-Frame" => "modal",
-            "Accept" => "text/vnd.turbo-stream.html"
-          }
-    assert_response :success
-    assert_equal "text/vnd.turbo-stream.html", response.media_type
-    assert_includes response.body, 'turbo-stream action="update" target="modal"'
-    assert_includes response.body, 'turbo-stream action="refresh"'
+          headers: { "HTTP_REFERER" => timetable_url }
+    assert_redirected_to timetable_url
     performer.reload
     assert_equal "モーダルから更新", performer.description
   end

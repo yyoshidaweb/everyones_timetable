@@ -2,14 +2,18 @@
 <div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
             data-controller="tag-suggestion"
             data-tag-suggestion-url-value="<%= search_stage_name_tags_path %>">
+  <% form_data = modal_turbo_frame? ? { turbo_frame: "_top" } : { turbo: turbo_frame_request? } %>
   <%# 送信時の Turbo 有無で通常のフォームとモーダルを分岐する %>
   <%= form_with model: stage,
-                data: { turbo: turbo_frame_request? },
+                data: form_data,
                 url: editing ? event_stage_path(@event.event_key, stage) : event_stages_path(@event.event_key),
                 method: editing ? :patch : :post,
                 class: "space-y-6" do |f| %>
     <%# エラーメッセージ %>
     <%= render "devise/shared/error_messages", resource: stage %>
+    <% if modal_turbo_frame? %>
+      <%= hidden_field_tag :from_modal, "1" %>
+    <% end %>
     <%# ─ ステージ名（タグ入力＋候補表示） ─ %>
     <div>
       <%= f.label :stage_name_tag, "ステージ名", class: "block text-sm font-semibold text-gray-800 mb-1" %>
@@ -58,9 +62,10 @@
     <%= button_to "削除",
                 event_stage_path(@event.event_key, stage),
                 method: :delete,
+                params: modal_turbo_frame? ? { from_modal: "1" } : {},
                 data: {
                   turbo_confirm: "⚠️ 削除しますか？ 一度削除すると元に戻せません",
-                  turbo_frame: modal_turbo_frame? ? "_self" : nil
+                  turbo_frame: modal_turbo_frame? ? "_top" : nil
                 }.compact,
                 class: "flex justify-center w-full mt-24 py-2 rounded-md bg-gray-800 text-red-500 hover:bg-red-700 hover:text-red-200 transition cursor-pointer" %>
   <% end %>

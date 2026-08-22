@@ -140,10 +140,12 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # モーダルから更新するとモーダルが閉じる
-  test "turbo_stream: performance is updated and modal is closed from modal" do
+  # モーダルから更新すると元のページへリダイレクトする
+  test "modal update redirects back to referer" do
+    timetable_url = show_timetable_url(@event.event_key)
     patch event_performance_path(@event.event_key, @performance),
           params: {
+            from_modal: "1",
             performance: {
               day_id: @performance.day_id,
               stage_id: @performance.stage_id,
@@ -152,14 +154,8 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
               duration: 45
             }
           },
-          headers: {
-            "Turbo-Frame" => "modal",
-            "Accept" => "text/vnd.turbo-stream.html"
-          }
-    assert_response :success
-    assert_equal "text/vnd.turbo-stream.html", response.media_type
-    assert_includes response.body, 'turbo-stream action="update" target="modal"'
-    assert_includes response.body, 'turbo-stream action="refresh"'
+          headers: { "HTTP_REFERER" => timetable_url }
+    assert_redirected_to timetable_url
     @performance.reload
     assert_equal 45, @performance.duration
   end
