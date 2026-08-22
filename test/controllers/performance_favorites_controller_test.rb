@@ -61,6 +61,7 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :success
     assert_select "turbo-stream[action='replace'][target=my_timetable]" do
+      assert_select "div#my_timetable.h-full"
       assert_select "a#my_timetable_performance_#{performance.id}"
     end
   end
@@ -104,6 +105,7 @@ class PerformanceFavoritesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :success
     assert_select "turbo-stream[action='replace'][target=my_timetable]" do
+      assert_select "div#my_timetable.h-full"
       assert_select "a#my_timetable_performance_#{performance.id}", count: 0
     end
   end

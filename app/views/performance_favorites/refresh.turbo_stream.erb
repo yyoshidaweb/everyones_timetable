@@ -9,7 +9,7 @@
       } %>
 <% if @refresh_my_timetable %>
   <%= turbo_stream.replace "my_timetable" do %>
-    <div id="my_timetable">
+    <div id="my_timetable" class="h-full">
       <%= render "my_timetables/content" %>
     </div>
   <% end %>
