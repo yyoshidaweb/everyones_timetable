@@ -85,7 +85,7 @@ class StagesController < ApplicationController
       @stage.stage_name_tag.errors.add(:name, :blank)
       # 親にエラーを伝える
       @stage.errors.add(:base, @stage.stage_name_tag.errors.full_messages.first)
-      return render :edit, status: :unprocessable_entity
+      return render_edit_unprocessable("stages/modal_edit")
     end
 
     # 既存タグを探す or 新規作成
@@ -97,7 +97,7 @@ class StagesController < ApplicationController
       @stage.stage_name_tag = stage_name_tag
       @stage.stage_name_tag.errors.copy!(stage_name_tag.errors)
       @stage.errors.add(:base, stage_name_tag.errors.full_messages.first)
-      return render :edit, status: :unprocessable_entity
+      return render_edit_unprocessable("stages/modal_edit")
     end
 
     stage_name_tag.save if stage_name_tag.new_record?
@@ -113,7 +113,7 @@ class StagesController < ApplicationController
         redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。"
       end
     else
-      render :edit, status: :unprocessable_entity
+      render_edit_unprocessable("stages/modal_edit")
     end
   end
 

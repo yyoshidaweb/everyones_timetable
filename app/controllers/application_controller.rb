@@ -40,19 +40,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :modal_turbo_frame?
 
+  # モーダル内の編集表示・送信か（turbo-frame#modal または from_modal 付き送信）
+  def modal_edit_context?
+    modal_turbo_frame? || modal_form_submission?
+  end
+  helper_method :modal_edit_context?
+
   # モーダル内フォーム送信後の戻り先（タイムテーブルなど元のページ）
   def modal_return_url
-    referer = request.referer
-    if referer.present?
-      referer_uri = URI.parse(referer)
-      if referer_uri.host.nil? || referer_uri.host == request.host
-        return referer
-      end
-    end
-
-    show_timetable_path(@event.event_key)
-  rescue URI::InvalidURIError
-    show_timetable_path(@event.event_key)
+    url_from(request.referer) || show_timetable_path(@event.event_key)
   end
 
   # 名前変更モーダルを表示するかどうかを判定するヘルパーメソッド
@@ -65,6 +61,21 @@ class ApplicationController < ActionController::Base
     # モーダル内の編集フォームから送信されたか（turbo-frame#modal の _top 送信）
     def modal_form_submission?
       params[:from_modal].present?
+    end
+
+    # モーダル内フォームのバリデーションエラー時に #modal を差し替える
+    def render_modal_edit_unprocessable(modal_partial)
+      render turbo_stream: turbo_stream.replace("modal", partial: modal_partial),
+             status: :unprocessable_entity
+    end
+
+    # モーダル編集の失敗時はモーダル差し替え、通常編集は edit を返す
+    def render_edit_unprocessable(modal_partial)
+      if modal_form_submission?
+        render_modal_edit_unprocessable(modal_partial)
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     # 非公開イベントは作成者本人のみ閲覧を許可する

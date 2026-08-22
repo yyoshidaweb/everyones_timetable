@@ -1,6 +1,6 @@
-<% form_wrapper_class = modal_turbo_frame? ? "p-6 pt-10" : "max-w-md mx-auto p-4 bg-white shadow-md rounded-lg" %>
+<% form_wrapper_class = modal_edit_context? ? "p-6 pt-10" : "max-w-md mx-auto p-4 bg-white shadow-md rounded-lg" %>
 <div class="<%= form_wrapper_class %>">
-  <% form_data = modal_turbo_frame? ? { turbo_frame: "_top" } : { turbo: turbo_frame_request? } %>
+  <% form_data = modal_edit_context? ? { turbo_frame: "_top" } : { turbo: turbo_frame_request? } %>
   <%= form_with model: performance,
                 data: form_data,
                 url: event_performance_path(@event.event_key, performance),
@@ -8,7 +8,7 @@
                 class: "space-y-4" do |f| %>
     <%# エラーメッセージ %>
     <%= render "devise/shared/error_messages", resource: performance %>
-    <% if modal_turbo_frame? %>
+    <% if modal_edit_context? %>
       <%= hidden_field_tag :from_modal, "1" %>
     <% end %>
     <h3 class="text-xl font-bold text-gray-900">
@@ -89,7 +89,7 @@
         class: "w-full py-2 rounded-md bg-gray-800 text-white hover:bg-gray-900 transition cursor-pointer" %>
     </div>
   <% end %>
-  <% if modal_turbo_frame? %>
+  <% if modal_edit_context? %>
     <div class="mt-4 flex justify-end">
       <%= link_to "キャンセル",
                   event_performer_path(@event.event_key, @performer),
@@ -100,10 +100,10 @@
   <%= button_to "出演情報を削除する",
               event_performance_path(@event.event_key, performance),
               method: :delete,
-              params: modal_turbo_frame? ? { from_modal: "1" } : {},
+              params: modal_edit_context? ? { from_modal: "1" } : {},
               data: {
                 turbo_confirm: "⚠️ 削除しますか？ 一度削除すると元に戻せません",
-                turbo_frame: modal_turbo_frame? ? "_top" : nil
+                turbo_frame: modal_edit_context? ? "_top" : nil
               }.compact,
               class: "w-full mt-24 py-2 rounded-md bg-gray-800 text-red-500 hover:bg-red-700 hover:text-red-200 transition cursor-pointer" %>
 </div>

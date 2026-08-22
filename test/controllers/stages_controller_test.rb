@@ -286,6 +286,28 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "モーダルから更新", stage.description
   end
 
+  # モーダルからの更新失敗時はモーダル内にエラーを表示する
+  test "modal update with blank tag name replaces modal with errors" do
+    stage = @event.stages.first
+    timetable_url = show_timetable_url(@event.event_key)
+    patch event_stage_url(@event.event_key, stage),
+          params: {
+            from_modal: "1",
+            stage: {
+              stage_name_tag_attributes: { name: "" }
+            }
+          },
+          headers: {
+            "HTTP_REFERER" => timetable_url,
+            "Accept" => "text/vnd.turbo-stream.html, text/html"
+          }
+    assert_response :unprocessable_entity
+    assert_includes response.media_type, "text/vnd.turbo-stream.html"
+    assert_match(/turbo-stream action="replace" target="modal"/, response.body)
+    assert_match(/ステージ名を入力してください/, response.body)
+    assert_select "turbo-stream", count: 1
+  end
+
   # 他者のステージ編集ページはアクセスできない
   test "should not get edit of other user's event" do
     stage = @event.stages.first

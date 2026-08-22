@@ -160,6 +160,30 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 45, @performance.duration
   end
 
+  # モーダルからの更新失敗時はモーダル内にエラーを表示する
+  test "modal update with invalid time replaces modal with errors" do
+    timetable_url = show_timetable_url(@event.event_key)
+    patch event_performance_path(@event.event_key, @performance),
+          params: {
+            from_modal: "1",
+            performance: {
+              day_id: @performance.day_id,
+              stage_id: @performance.stage_id,
+              start_time_hour: "10",
+              start_time_minute: "",
+              duration: 30
+            }
+          },
+          headers: {
+            "HTTP_REFERER" => timetable_url,
+            "Accept" => "text/vnd.turbo-stream.html, text/html"
+          }
+    assert_response :unprocessable_entity
+    assert_includes response.media_type, "text/vnd.turbo-stream.html"
+    assert_match(/turbo-stream action="replace" target="modal"/, response.body)
+    assert_select "turbo-stream", count: 1
+  end
+
   # 0時過ぎの出演は編集フォームで24時台が選択される
   test "should select display hour 25 when editing overnight performance" do
     performance = Performance.create!(

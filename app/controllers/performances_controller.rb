@@ -73,7 +73,7 @@ class PerformancesController < ApplicationController
       # エラー時に出演者をセットする
       @performer = @performance.performer
       restore_time_virtual_attributes
-      render :edit, status: :unprocessable_entity
+      render_edit_unprocessable("performances/modal_edit")
     end
   end
 

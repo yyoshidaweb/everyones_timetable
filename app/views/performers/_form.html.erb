@@ -1,6 +1,6 @@
 <% editing = local_assigns.fetch(:editing, false) %>
-<% form_data = modal_turbo_frame? ? { turbo_frame: "_top" } : { turbo: turbo_frame_request? } %>
-<% form_wrapper_class = modal_turbo_frame? ? "p-6 pt-10" : "max-w-md mx-auto p-6 bg-white shadow-md rounded-lg" %>
+<% form_data = modal_edit_context? ? { turbo_frame: "_top" } : { turbo: turbo_frame_request? } %>
+<% form_wrapper_class = modal_edit_context? ? "p-6 pt-10" : "max-w-md mx-auto p-6 bg-white shadow-md rounded-lg" %>
 <div class="<%= form_wrapper_class %>"
      data-controller="tag-suggestion"
      data-tag-suggestion-url-value="<%= search_performer_name_tags_path %>">
@@ -11,7 +11,7 @@
                 class: "space-y-6" do |f| %>
     <%# エラーメッセージ %>
     <%= render "devise/shared/error_messages", resource: performer %>
-    <% if modal_turbo_frame? %>
+    <% if modal_edit_context? %>
       <%= hidden_field_tag :from_modal, "1" %>
     <% end %>
     <%# ─ 出演者名（タグ入力＋候補表示） ─ %>
@@ -51,7 +51,7 @@
     </div>
   <% end %>
   <% if editing %>
-    <% if modal_turbo_frame? %>
+    <% if modal_edit_context? %>
       <div class="mt-4 flex justify-end">
         <%= link_to "キャンセル",
                     event_performer_path(@event.event_key, performer),
@@ -62,10 +62,10 @@
     <%= button_to "削除",
                 event_performer_path(@event.event_key, performer),
                 method: :delete,
-                params: modal_turbo_frame? ? { from_modal: "1" } : {},
+                params: modal_edit_context? ? { from_modal: "1" } : {},
                 data: {
                   turbo_confirm: "⚠️ この出演者に紐づく出演情報もすべて削除されます。 本当に削除しますか？",
-                  turbo_frame: modal_turbo_frame? ? "_top" : nil
+                  turbo_frame: modal_edit_context? ? "_top" : nil
                 }.compact,
                 class: "flex justify-center w-full mt-24 py-2 rounded-md bg-gray-800 text-red-500 hover:bg-red-700 hover:text-red-200 transition cursor-pointer" %>
   <% end %>

@@ -92,7 +92,7 @@ class PerformersController < ApplicationController
       @performer.performer_name_tag.errors.add(:name, :blank)
       # 親にエラーを伝える
       @performer.errors.add(:base, @performer.performer_name_tag.errors.full_messages.first)
-      return render :edit, status: :unprocessable_entity
+      return render_edit_unprocessable("performers/modal_edit")
     end
 
     # 既存タグを探す or 新規作成
@@ -104,7 +104,7 @@ class PerformersController < ApplicationController
       @performer.performer_name_tag = performer_name_tag
       @performer.performer_name_tag.errors.copy!(performer_name_tag.errors)
       @performer.errors.add(:base, performer_name_tag.errors.full_messages.first)
-      return render :edit, status: :unprocessable_entity
+      return render_edit_unprocessable("performers/modal_edit")
     end
 
     performer_name_tag.save if performer_name_tag.new_record?
@@ -120,7 +120,7 @@ class PerformersController < ApplicationController
         redirect_to event_performer_path(@event.event_key, @performer), notice: "出演者を更新しました。"
       end
     else
-      render :edit, status: :unprocessable_entity
+      render_edit_unprocessable("performers/modal_edit")
     end
   end
 
