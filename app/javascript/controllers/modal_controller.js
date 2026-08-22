@@ -9,7 +9,17 @@ export default class extends Controller {
     const frame = document.getElementById("modal") // layoutに置くturbo-frame
     if (frame) frame.src = url // Turboで内容を読み込む
   }
-  
+
+  // モーダル内のリンク遷移（詳細→編集など）
+  navigate(event) {
+    event.preventDefault()
+    const url = event.currentTarget.href
+    if (!url) return
+
+    const frame = this.element.closest("turbo-frame")
+    if (frame) frame.src = url
+  }
+
   // モーダルをクローズする
   close() {
     // モーダル全体を取得

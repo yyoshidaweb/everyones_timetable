@@ -128,6 +128,62 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # Turbo Frameでは出演情報編集をモーダルとして返す
+  test "edit renders modal when requested as turbo frame" do
+    get edit_event_performance_url(@event.event_key, @performance),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "turbo-frame#modal" do
+      assert_select "input[type=submit][value=?]", "更新"
+      assert_select "a", text: "開催日を追加", count: 0
+      assert_select "a", text: "ステージを追加", count: 0
+    end
+  end
+
+  # モーダルから更新すると元のページへリダイレクトする
+  test "modal update redirects back to referer" do
+    timetable_url = show_timetable_url(@event.event_key)
+    patch event_performance_path(@event.event_key, @performance),
+          params: {
+            from_modal: "1",
+            performance: {
+              day_id: @performance.day_id,
+              stage_id: @performance.stage_id,
+              start_time_hour: "11",
+              start_time_minute: "00",
+              duration: 45
+            }
+          },
+          headers: { "HTTP_REFERER" => timetable_url }
+    assert_redirected_to timetable_url
+    @performance.reload
+    assert_equal 45, @performance.duration
+  end
+
+  # モーダルからの更新失敗時はモーダル内にエラーを表示する
+  test "modal update with invalid time replaces modal with errors" do
+    timetable_url = show_timetable_url(@event.event_key)
+    patch event_performance_path(@event.event_key, @performance),
+          params: {
+            from_modal: "1",
+            performance: {
+              day_id: @performance.day_id,
+              stage_id: @performance.stage_id,
+              start_time_hour: "10",
+              start_time_minute: "",
+              duration: 30
+            }
+          },
+          headers: {
+            "HTTP_REFERER" => timetable_url,
+            "Accept" => "text/vnd.turbo-stream.html, text/html"
+          }
+    assert_response :unprocessable_entity
+    assert_includes response.media_type, "text/vnd.turbo-stream.html"
+    assert_match(/turbo-stream action="replace" target="modal"/, response.body)
+    assert_select "turbo-stream", count: 1
+  end
+
   # 0時過ぎの出演は編集フォームで24時台が選択される
   test "should select display hour 25 when editing overnight performance" do
     performance = Performance.create!(

@@ -9,7 +9,7 @@ class StagesController < ApplicationController
   before_action :set_page_title, except: %i[ destroy ]
   before_action :show_event_header, except: %i[ destroy ]
   # モーダル表示時はレイアウトの空turbo-frame#modalと重ならないようにする
-  layout -> { (modal_turbo_frame? && action_name == "show") ? false : "application" }
+  layout -> { (modal_turbo_frame? && %w[show edit].include?(action_name)) ? false : "application" }
 
   # ステージ一覧
   def index
@@ -85,7 +85,7 @@ class StagesController < ApplicationController
       @stage.stage_name_tag.errors.add(:name, :blank)
       # 親にエラーを伝える
       @stage.errors.add(:base, @stage.stage_name_tag.errors.full_messages.first)
-      return render :edit, status: :unprocessable_entity
+      return render_edit_unprocessable("stages/modal_edit")
     end
 
     # 既存タグを探す or 新規作成
@@ -97,7 +97,7 @@ class StagesController < ApplicationController
       @stage.stage_name_tag = stage_name_tag
       @stage.stage_name_tag.errors.copy!(stage_name_tag.errors)
       @stage.errors.add(:base, stage_name_tag.errors.full_messages.first)
-      return render :edit, status: :unprocessable_entity
+      return render_edit_unprocessable("stages/modal_edit")
     end
 
     stage_name_tag.save if stage_name_tag.new_record?
@@ -107,16 +107,24 @@ class StagesController < ApplicationController
 
     # Stage本体を更新（ネストされたフィールドを除く）
     if @stage.update(stage_params.except(:stage_name_tag_attributes))
-      redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。"
+      if modal_form_submission?
+        redirect_to modal_return_url, notice: "ステージを更新しました。", status: :see_other
+      else
+        redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。"
+      end
     else
-      render :edit, status: :unprocessable_entity
+      render_edit_unprocessable("stages/modal_edit")
     end
   end
 
   # ステージ削除処理
   def destroy
     @stage.destroy!
-    redirect_to event_stages_path(@event.event_key), notice: "ステージを削除しました。", status: :see_other
+    if modal_form_submission?
+      redirect_to modal_return_url, notice: "ステージを削除しました。", status: :see_other
+    else
+      redirect_to event_stages_path(@event.event_key), notice: "ステージを削除しました。", status: :see_other
+    end
   end
 
   # ステージ並び替えページ

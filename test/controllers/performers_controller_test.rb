@@ -77,8 +77,14 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
       assert_select "div[data-controller='modal'][data-action='click->modal#close']"
       assert_select "button[data-action='click->modal#close']"
       assert_select "h1", text: performer.display_name
-      assert_select "a[href=?]", edit_event_performer_path(@event.event_key, performer), count: 0
-      assert_select "a[href*=?]", "/performances/", count: 0
+      assert_select "a[href=?][data-action=?]",
+                    edit_event_performer_path(@event.event_key, performer),
+                    "click->modal#navigate"
+      performance = performer.performances.first
+      assert_not_nil performance
+      assert_select "a[href=?][data-action=?]",
+                    edit_event_performance_path(@event.event_key, performance),
+                    "click->modal#navigate"
       assert_select "a[href=?][data-turbo-frame=_top]",
                     event_performer_path(@event.event_key, performer),
                     text: "詳細→"
@@ -269,6 +275,110 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     performer = @event.performers.first
     get edit_event_performer_url(@event.event_key, performer)
     assert_response :success
+  end
+
+  # Turbo Frameでは出演者編集をモーダルとして返す（showと同様にlayoutなし）
+  test "edit renders modal when requested as turbo frame" do
+    performer = @event.performers.first
+    get edit_event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_equal 1, response.body.scan(/<turbo-frame[^>]*id="modal"/).size
+    assert_no_match /<main/, response.body
+    assert_select "turbo-frame#modal" do
+      assert_select "input[type=submit][value=?]", "更新"
+      assert_select "a[href=?][data-action=?]",
+                    event_performer_path(@event.event_key, performer),
+                    "click->modal#navigate",
+                    text: "キャンセル"
+    end
+  end
+
+  # 詳細モーダルから編集モーダルへ差し替え可能
+  test "show modal edit link navigates to modal edit form" do
+    performer = @event.performers.first
+    get event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "a[href=?][data-action=?]",
+                  edit_event_performer_path(@event.event_key, performer),
+                  "click->modal#navigate"
+
+    get edit_event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "turbo-frame#modal input[type=submit][value=?]", "更新"
+  end
+
+  # モーダルから更新すると元のページへリダイレクトする
+  test "modal update redirects back to referer" do
+    performer = @event.performers.first
+    timetable_url = show_timetable_url(@event.event_key)
+    patch event_performer_url(@event.event_key, performer),
+          params: {
+            from_modal: "1",
+            performer: {
+              description: "モーダルから更新",
+              website_url: "https://example.com",
+              performer_name_tag_attributes: { name: performer.display_name }
+            }
+          },
+          headers: { "HTTP_REFERER" => timetable_url }
+    assert_redirected_to timetable_url
+    performer.reload
+    assert_equal "モーダルから更新", performer.description
+  end
+
+  # モーダルから更新時、外部Refererは無視してタイムテーブルへ戻る
+  test "modal update ignores external referer" do
+    performer = @event.performers.first
+    patch event_performer_url(@event.event_key, performer),
+          params: {
+            from_modal: "1",
+            performer: {
+              description: "モーダルから更新",
+              performer_name_tag_attributes: { name: performer.display_name }
+            }
+          },
+          headers: { "HTTP_REFERER" => "https://evil.example/phishing" }
+    assert_redirected_to show_timetable_url(@event.event_key)
+  end
+
+  # モーダルから更新時、不正なRefererは無視してタイムテーブルへ戻る
+  test "modal update ignores malformed referer" do
+    performer = @event.performers.first
+    patch event_performer_url(@event.event_key, performer),
+          params: {
+            from_modal: "1",
+            performer: {
+              description: "モーダルから更新",
+              performer_name_tag_attributes: { name: performer.display_name }
+            }
+          },
+          headers: { "HTTP_REFERER" => "evil" }
+    assert_redirected_to show_timetable_url(@event.event_key)
+  end
+
+  # モーダルからの更新失敗時はモーダル内にエラーを表示する
+  test "modal update with blank tag name replaces modal with errors" do
+    performer = @event.performers.first
+    timetable_url = show_timetable_url(@event.event_key)
+    patch event_performer_url(@event.event_key, performer),
+          params: {
+            from_modal: "1",
+            performer: {
+              performer_name_tag_attributes: { name: "" }
+            }
+          },
+          headers: {
+            "HTTP_REFERER" => timetable_url,
+            "Accept" => "text/vnd.turbo-stream.html, text/html"
+          }
+    assert_response :unprocessable_entity
+    assert_includes response.media_type, "text/vnd.turbo-stream.html"
+    assert_match(/turbo-stream action="replace" target="modal"/, response.body)
+    assert_match(/出演者名を入力してください/, response.body)
+    assert_select "turbo-stream", count: 1
   end
 
   # 他者の出演者編集ページはアクセスできない

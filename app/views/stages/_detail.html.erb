@@ -1,10 +1,10 @@
-<% unless local_assigns[:in_modal] %>
-  <%# 編集ボタン（作成者本人のみ表示） %>
-  <% if user_signed_in? && current_user == @event.user %>
-    <%= link_to edit_event_stage_path(@event.event_key, @stage),
-                class: "absolute top-4 right-0 text-xs text-gray-800" do %>
-      <span class="material-symbols-outlined">edit</span>
-    <% end %>
+<%# 編集ボタン（作成者本人のみ表示） %>
+<% if user_signed_in? && current_user == @event.user %>
+  <% edit_link_options = local_assigns[:in_modal] ? { data: { action: "click->modal#navigate" } } : {} %>
+  <%= link_to edit_event_stage_path(@event.event_key, @stage),
+              **edit_link_options,
+              class: "absolute #{local_assigns[:in_modal] ? 'top-10 right-4' : 'top-4 right-0'} text-xs text-gray-800" do %>
+    <span class="material-symbols-outlined">edit</span>
   <% end %>
 <% end %>
 <%# ステージ名 %>

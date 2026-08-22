@@ -35,15 +35,12 @@
         </div>
         <%# お気に入りボタンと編集ボタン %>
         <div class="flex items-center">
-          <% unless local_assigns[:in_modal] %>
-            <% if user_signed_in? %>
-              <%# 編集ボタン（出演者の作成者のみ表示） %>
-              <% if current_user == @event.user %>
-                <%= link_to edit_event_performance_path(@event.event_key, performance),
-                                class: "mx-4 flex items-center text-sm text-gray-800" do %>
-                  <span class="material-symbols-outlined">edit_calendar</span>
-                <% end %>
-              <% end %>
+          <% if user_signed_in? && current_user == @event.user %>
+            <% edit_options = local_assigns[:in_modal] ? { data: { action: "click->modal#navigate" } } : {} %>
+            <%= link_to edit_event_performance_path(@event.event_key, performance),
+                            **edit_options,
+                            class: "mx-4 flex items-center text-sm text-gray-800" do %>
+              <span class="material-symbols-outlined">edit_calendar</span>
             <% end %>
           <% end %>
           <%= render "performances/favorite_button", performance: performance %>
