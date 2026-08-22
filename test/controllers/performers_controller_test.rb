@@ -77,8 +77,10 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
       assert_select "div[data-controller='modal'][data-action='click->modal#close']"
       assert_select "button[data-action='click->modal#close']"
       assert_select "h1", text: performer.display_name
-      assert_select "a[href=?]", edit_event_performer_path(@event.event_key, performer), count: 0
-      assert_select "a[href*=?]", "/performances/", count: 0
+      assert_select "a[href=?][data-action=?]",
+                    edit_event_performer_path(@event.event_key, performer),
+                    "click->modal#navigate"
+      assert_select "a[href*=?]", "/performances/", minimum: 0
       assert_select "a[href=?][data-turbo-frame=_top]",
                     event_performer_path(@event.event_key, performer),
                     text: "詳細→"
@@ -269,6 +271,62 @@ class PerformersControllerTest < ActionDispatch::IntegrationTest
     performer = @event.performers.first
     get edit_event_performer_url(@event.event_key, performer)
     assert_response :success
+  end
+
+  # Turbo Frameでは出演者編集をモーダルとして返す（showと同様にlayoutなし）
+  test "edit renders modal when requested as turbo frame" do
+    performer = @event.performers.first
+    get edit_event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_equal 1, response.body.scan(/<turbo-frame[^>]*id="modal"/).size
+    assert_no_match /<main/, response.body
+    assert_select "turbo-frame#modal" do
+      assert_select "input[type=submit][value=?]", "更新"
+      assert_select "a[href=?][data-action=?]",
+                    event_performer_path(@event.event_key, performer),
+                    "click->modal#navigate",
+                    text: "キャンセル"
+    end
+  end
+
+  # 詳細モーダルから編集モーダルへ差し替え可能
+  test "show modal edit link navigates to modal edit form" do
+    performer = @event.performers.first
+    get event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "a[href=?][data-action=?]",
+                  edit_event_performer_path(@event.event_key, performer),
+                  "click->modal#navigate"
+
+    get edit_event_performer_url(@event.event_key, performer),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "turbo-frame#modal input[type=submit][value=?]", "更新"
+  end
+
+  # モーダルから更新するとモーダルが閉じる
+  test "turbo_stream: performer is updated and modal is closed from modal" do
+    performer = @event.performers.first
+    patch event_performer_url(@event.event_key, performer),
+          params: {
+            performer: {
+              description: "モーダルから更新",
+              website_url: "https://example.com",
+              performer_name_tag_attributes: { name: performer.display_name }
+            }
+          },
+          headers: {
+            "Turbo-Frame" => "modal",
+            "Accept" => "text/vnd.turbo-stream.html"
+          }
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_includes response.body, 'turbo-stream action="update" target="modal"'
+    assert_includes response.body, 'turbo-stream action="refresh"'
+    performer.reload
+    assert_equal "モーダルから更新", performer.description
   end
 
   # 他者の出演者編集ページはアクセスできない

@@ -9,7 +9,7 @@ class StagesController < ApplicationController
   before_action :set_page_title, except: %i[ destroy ]
   before_action :show_event_header, except: %i[ destroy ]
   # モーダル表示時はレイアウトの空turbo-frame#modalと重ならないようにする
-  layout -> { (modal_turbo_frame? && action_name == "show") ? false : "application" }
+  layout -> { (modal_turbo_frame? && %w[show edit].include?(action_name)) ? false : "application" }
 
   # ステージ一覧
   def index
@@ -107,7 +107,10 @@ class StagesController < ApplicationController
 
     # Stage本体を更新（ネストされたフィールドを除く）
     if @stage.update(stage_params.except(:stage_name_tag_attributes))
-      redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。"
+      respond_to do |format|
+        format.turbo_stream if modal_turbo_frame?
+        format.html { redirect_to event_stage_path(@event.event_key, @stage), notice: "ステージを更新しました。" }
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -116,7 +119,10 @@ class StagesController < ApplicationController
   # ステージ削除処理
   def destroy
     @stage.destroy!
-    redirect_to event_stages_path(@event.event_key), notice: "ステージを削除しました。", status: :see_other
+    respond_to do |format|
+      format.turbo_stream if modal_turbo_frame?
+      format.html { redirect_to event_stages_path(@event.event_key), notice: "ステージを削除しました。", status: :see_other }
+    end
   end
 
   # ステージ並び替えページ

@@ -10,7 +10,7 @@ class PerformersController < ApplicationController
   before_action :set_page_title, except: %i[ destroy ]
   before_action :show_event_header, except: %i[ destroy ]
   # モーダル表示時はレイアウトの空turbo-frame#modalと重ならないようにする
-  layout -> { (modal_turbo_frame? && action_name == "show") ? false : "application" }
+  layout -> { (modal_turbo_frame? && %w[show edit].include?(action_name)) ? false : "application" }
 
   def index
     @performers = @event.performers
@@ -114,7 +114,10 @@ class PerformersController < ApplicationController
 
     # Performer本体を更新（ネストされたフィールドを除く）
     if @performer.update(performer_params.except(:performer_name_tag_attributes))
-      redirect_to event_performer_path(@event.event_key, @performer), notice: "出演者を更新しました。"
+      respond_to do |format|
+        format.turbo_stream if modal_turbo_frame?
+        format.html { redirect_to event_performer_path(@event.event_key, @performer), notice: "出演者を更新しました。" }
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -122,7 +125,10 @@ class PerformersController < ApplicationController
 
   def destroy
     @performer.destroy!
-    redirect_to event_performers_path(@event.event_key), notice: "出演者を削除しました。", status: :see_other
+    respond_to do |format|
+      format.turbo_stream if modal_turbo_frame?
+      format.html { redirect_to event_performers_path(@event.event_key), notice: "出演者を削除しました。", status: :see_other }
+    end
   end
 
   private

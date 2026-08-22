@@ -13,6 +13,8 @@ class PerformancesController < ApplicationController
   before_action :set_page_title, except: %i[ destroy ]
   before_action :show_event_header, except: %i[ destroy ]
   before_action :set_form_type, only: %i[ new create edit update ]
+  # モーダル表示時はレイアウトの空turbo-frame#modalと重ならないようにする
+  layout -> { (modal_turbo_frame? && action_name == "edit") ? false : "application" }
 
   def new
     @performance = Performance.new
@@ -62,7 +64,10 @@ class PerformancesController < ApplicationController
 
   def update
     if @performance.update(performance_params_for_update)
-      redirect_to event_performer_url(@event.event_key, @performance.performer), notice: "出演情報を更新しました。"
+      respond_to do |format|
+        format.turbo_stream if modal_turbo_frame?
+        format.html { redirect_to event_performer_url(@event.event_key, @performance.performer), notice: "出演情報を更新しました。" }
+      end
     else
       # エラー時に出演者をセットする
       @performer = @performance.performer
@@ -72,8 +77,12 @@ class PerformancesController < ApplicationController
   end
 
   def destroy
+    @performer = @performance.performer
     @performance.destroy!
-    redirect_to event_performer_url(@event.event_key, @performance.performer), notice: "出演情報を削除しました。", status: :see_other
+    respond_to do |format|
+      format.turbo_stream if modal_turbo_frame?
+      format.html { redirect_to event_performer_url(@event.event_key, @performer), notice: "出演情報を削除しました。", status: :see_other }
+    end
   end
 
   private

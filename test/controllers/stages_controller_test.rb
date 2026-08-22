@@ -77,7 +77,9 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
       assert_select "div[data-controller='modal'][data-action='click->modal#close']"
       assert_select "button[data-action='click->modal#close']"
       assert_select "h1", text: stage.display_name
-      assert_select "a[href=?]", edit_event_stage_path(@event.event_key, stage), count: 0
+      assert_select "a[href=?][data-action=?]",
+                    edit_event_stage_path(@event.event_key, stage),
+                    "click->modal#navigate"
       assert_select "a[href=?][data-turbo-frame=_top]",
                     event_stage_path(@event.event_key, stage),
                     text: "詳細→"
@@ -230,6 +232,62 @@ class StagesControllerTest < ActionDispatch::IntegrationTest
     stage = @event.stages.first
     get edit_event_stage_url(@event.event_key, stage)
     assert_response :success
+  end
+
+  # Turbo Frameではステージ編集をモーダルとして返す（showと同様にlayoutなし）
+  test "edit renders modal when requested as turbo frame" do
+    stage = @event.stages.first
+    get edit_event_stage_url(@event.event_key, stage),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_equal 1, response.body.scan(/<turbo-frame[^>]*id="modal"/).size
+    assert_no_match /<main/, response.body
+    assert_select "turbo-frame#modal" do
+      assert_select "input[type=submit][value=?]", "更新"
+      assert_select "a[href=?][data-action=?]",
+                    event_stage_path(@event.event_key, stage),
+                    "click->modal#navigate",
+                    text: "キャンセル"
+    end
+  end
+
+  # 詳細モーダルから編集モーダルへ差し替え可能
+  test "show modal edit link navigates to modal edit form" do
+    stage = @event.stages.first
+    get event_stage_url(@event.event_key, stage),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "a[href=?][data-action=?]",
+                  edit_event_stage_path(@event.event_key, stage),
+                  "click->modal#navigate"
+
+    get edit_event_stage_url(@event.event_key, stage),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+    assert_select "turbo-frame#modal input[type=submit][value=?]", "更新"
+  end
+
+  # モーダルから更新するとモーダルが閉じる
+  test "turbo_stream: stage is updated and modal is closed from modal" do
+    stage = @event.stages.first
+    patch event_stage_url(@event.event_key, stage),
+          params: {
+            stage: {
+              description: "モーダルから更新",
+              address: "新住所",
+              stage_name_tag_attributes: { name: stage.display_name }
+            }
+          },
+          headers: {
+            "Turbo-Frame" => "modal",
+            "Accept" => "text/vnd.turbo-stream.html"
+          }
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_includes response.body, 'turbo-stream action="update" target="modal"'
+    assert_includes response.body, 'turbo-stream action="refresh"'
+    stage.reload
+    assert_equal "モーダルから更新", stage.description
   end
 
   # 他者のステージ編集ページはアクセスできない

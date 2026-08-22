@@ -1,94 +1,12 @@
 <%# 検索結果などに表示されるタイトルと説明 %>
 <% content_for :title, "#{@page_title} #{@event.display_name} #{@performer.display_name} | みんなのタイムテーブル" %>
 <% content_for :description, "#{@event.display_name}の#{@page_title}「#{@performer.display_name}」。" %>
-<div class="pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
-  <div class="max-w-md mx-auto p-4 bg-white shadow-md rounded-lg">
-    <%= form_with model: @performance,
-                  url: event_performance_path(@event.event_key, @performance),
-                  method: :patch,
-                  class: "space-y-4" do |f| %>
-      <%# エラーメッセージ %>
-      <%= render "devise/shared/error_messages", resource: @performance %>
-      <h3 class="text-xl font-bold text-gray-900">
-        <%= @performer.display_name %>
-      </h3>
-      <%# 開催日（任意） %>
-      <div>
-        <%= f.label :day_id, "出演日",
-                    class: "block text-sm font-semibold text-gray-800 mb-1" %>
-        <%# 作成モーダルに対応するためにパーシャルとして表示する %>
-        <div id="day_select">
-          <%= render "shared/day_select",
-                            days: @days,
-                            selected_day: @performance&.day_id,
-                            form_type: @form_type %>
-        </div>
-        <div class="flex justify-end">
-          <span class="text-xs text-gray-500">または、</span>
-          <%= link_to "開催日を追加",
-                            new_event_day_path(form_type: @form_type),
-                            data: { turbo_frame: "modal" },
-                            class: "text-xs text-blue-800 underline" %>
-        </div>
-      </div>
-      <%# ステージ（任意） %>
-      <div>
-        <%= f.label :stage_id, "ステージ",
-                    class: "block text-sm font-semibold text-gray-800 mb-1" %>
-        <%# ステージ作成モーダルに対応するためにパーシャルとして表示する %>
-        <div id="stage_select">
-          <%= render "performances/stage_select",
-                      stages: @stages,
-                      selected_stage: @performance&.stage_id %>
-        </div>
-        <div class="flex justify-end">
-          <span class="text-xs text-gray-500">または、</span>
-          <%= link_to "ステージを追加",
-                      new_event_stage_path,
-                      data: { turbo_frame: "modal" },
-                      class: "text-xs text-blue-800 underline" %>
-        </div>
-      </div>
-      <%# 開始時刻（任意） %>
-      <div>
-        <%= f.label :start_time, "開始時刻",
-                      class: "block text-sm font-semibold text-gray-800 mb-1" %>
-        <div class="flex justify-center items-center space-x-4 text-gray-800">
-          <%= f.select :start_time_hour,
-                time_select_options[:hours],
-                { include_blank: "未定" },
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 cursor-pointer" %>
-          <span class="text-2xl text-gray-500">:</span>
-          <%= f.select :start_time_minute,
-                time_select_options[:minutes],
-                { include_blank: "未定" },
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 cursor-pointer" %>
-        </div>
-      </div>
-      <%# 出演時間（duration） %>
-      <div>
-        <%= f.label :duration, "出演時間",
-                      class: "block text-sm font-semibold text-gray-800 mb-1" %>
-        <div class="flex items-center space-x-2 text-gray-800">
-          <%= f.select :duration,
-                duration_select_options,
-                { include_blank: "未定" },
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 cursor-pointer" %>
-          <span class="text-sm text-gray-500">分</span>
-        </div>
-      </div>
-      <%# 更新ボタン %>
-      <div>
-        <%= f.submit "更新",
-          class: "w-full py-2 rounded-md bg-gray-800 text-white hover:bg-gray-900 transition cursor-pointer" %>
-      </div>
-    <% end %>
-    <%= button_to "出演情報を削除する",
-                event_performance_path(@event.event_key, @performance),
-                method: :delete,
-                data: { turbo_confirm: "⚠️ 削除しますか？ 一度削除すると元に戻せません" },
-                class: "w-full mt-24 py-2 rounded-md bg-gray-800 text-red-500 hover:bg-red-700 hover:text-red-200 transition cursor-pointer" %>
+<% if modal_turbo_frame? %>
+  <%= render "modal_edit" %>
+<% else %>
+  <div class="pb-[calc(5.25rem+env(safe-area-inset-bottom))]">
+    <%= render "form", performance: @performance %>
   </div>
-</div>
-<%# 下部タブメニュー %>
-<%= render "layouts/bottom_tab" %>
+  <%# 下部タブメニュー %>
+  <%= render "layouts/bottom_tab" %>
+<% end %>
