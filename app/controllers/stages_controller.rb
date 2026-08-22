@@ -72,7 +72,8 @@ class StagesController < ApplicationController
   def edit
   end
 
-  # ステージ編集処理
+  # ステージ更新。
+  # from_modal 送信時は成功後 modal_return_url へ、失敗時は turbo-stream で #modal を差し替える。
   def update
     # フォームのタグ名を取得
     tag_name = params.dig(:stage, :stage_name_tag_attributes, :name)&.strip
@@ -117,7 +118,8 @@ class StagesController < ApplicationController
     end
   end
 
-  # ステージ削除処理
+  # ステージ削除処理。
+  # from_modal 送信時は modal_return_url へ、通常時はステージ一覧へ戻る。
   def destroy
     @stage.destroy!
     if modal_form_submission?

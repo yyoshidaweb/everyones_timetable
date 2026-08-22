@@ -34,19 +34,29 @@ class ApplicationController < ActionController::Base
   # ビューでpreview_environment?メソッドを使用できるようにする
   helper_method :preview_environment?
 
-  # レイアウトのturbo-frame#modal からのリクエストかどうか
+  # レイアウトの turbo-frame#modal からのリクエストかどうか。
+  #
+  # Turbo-Frame ヘッダーが "modal" のとき true。show/edit のモーダル描画や
+  # layout: false の判定に使う。
   def modal_turbo_frame?
     turbo_frame_request_id == "modal"
   end
   helper_method :modal_turbo_frame?
 
-  # モーダル内の編集表示・送信か（turbo-frame#modal または from_modal 付き送信）
+  # モーダル内の編集表示・送信かどうか。
+  #
+  # turbo-frame#modal からの GET、または hidden field from_modal 付きの
+  # PATCH/DELETE を指す。フォームの _top 送信後の再描画でも true になる。
   def modal_edit_context?
     modal_turbo_frame? || modal_form_submission?
   end
   helper_method :modal_edit_context?
 
-  # モーダル内フォーム送信後の戻り先（タイムテーブルなど元のページ）
+  # モーダル内フォーム送信後の戻り先 URL。
+  #
+  # from_modal 付きの更新・削除成功時にタイムテーブル等へ戻るために使う。
+  # Referer は url_from で検証し、外部 URL や不正な値は無視して
+  # タイムテーブルへフォールバックする。
   def modal_return_url
     url_from(request.referer) || show_timetable_path(@event.event_key)
   end
@@ -58,18 +68,26 @@ class ApplicationController < ActionController::Base
   helper_method :show_name_confirmation_modal?
 
   private
-    # モーダル内の編集フォームから送信されたか（turbo-frame#modal の _top 送信）
+    # モーダル内編集フォームからの送信かどうか。
+    #
+    # フォームは turbo-frame="_top" で送るため Turbo-Frame ヘッダーは付かない。
+    # hidden field from_modal でモーダル起点の送信を識別する。
     def modal_form_submission?
       params[:from_modal].present?
     end
 
-    # モーダル内フォームのバリデーションエラー時に #modal を差し替える
+    # モーダル内フォームのバリデーションエラー時に #modal を差し替える。
+    #
+    # _top 送信の 422 では通常 edit が全ページを置き換えてしまうため、
+    # turbo-stream でモーダル枠だけ編集フォーム＋エラーを返す。
     def render_modal_edit_unprocessable(modal_partial)
       render turbo_stream: turbo_stream.replace("modal", partial: modal_partial),
              status: :unprocessable_entity
     end
 
-    # モーダル編集の失敗時はモーダル差し替え、通常編集は edit を返す
+    # 編集失敗時のレスポンスをモーダル送信か通常送信かで切り替える。
+    #
+    # from_modal なら render_modal_edit_unprocessable、それ以外は edit を返す。
     def render_edit_unprocessable(modal_partial)
       if modal_form_submission?
         render_modal_edit_unprocessable(modal_partial)

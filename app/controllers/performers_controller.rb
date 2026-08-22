@@ -80,6 +80,8 @@ class PerformersController < ApplicationController
   def edit
   end
 
+  # 出演者更新。
+  # from_modal 送信時は成功後 modal_return_url へ、失敗時は turbo-stream で #modal を差し替える。
   def update
     # フォームのタグ名を取得
     tag_name = params.dig(:performer, :performer_name_tag_attributes, :name)&.strip
@@ -124,6 +126,8 @@ class PerformersController < ApplicationController
     end
   end
 
+  # 出演者削除。
+  # from_modal 送信時は modal_return_url へ、通常時は出演者一覧へ戻る。
   def destroy
     @performer.destroy!
     if modal_form_submission?
