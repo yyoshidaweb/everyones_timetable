@@ -62,6 +62,8 @@ class PerformancesController < ApplicationController
     @performance.start_time_minute = @performance.start_time&.min
   end
 
+  # 出演情報更新。
+  # from_modal 送信時は成功後 modal_return_url へ、失敗時は turbo-stream で #modal を差し替える。
   def update
     if @performance.update(performance_params_for_update)
       if modal_form_submission?
@@ -77,6 +79,8 @@ class PerformancesController < ApplicationController
     end
   end
 
+  # 出演情報削除。
+  # from_modal 送信時は modal_return_url へ、通常時は出演者詳細へ戻る。
   def destroy
     @performer = @performance.performer
     @performance.destroy!
