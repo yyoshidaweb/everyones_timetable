@@ -1,5 +1,6 @@
 <% editing = local_assigns.fetch(:editing, false) %>
-<div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
+<% form_wrapper_class = modal_turbo_frame? ? "p-6 pt-10" : "max-w-md mx-auto p-6 bg-white shadow-md rounded-lg" %>
+<div class="<%= form_wrapper_class %>"
             data-controller="tag-suggestion"
             data-tag-suggestion-url-value="<%= search_stage_name_tags_path %>">
   <% form_data = modal_turbo_frame? ? { turbo_frame: "_top" } : { turbo: turbo_frame_request? } %>
