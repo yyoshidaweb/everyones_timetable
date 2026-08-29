@@ -60,6 +60,16 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_select "span.material-symbols-outlined", text: "lock"
   end
 
+  # 一覧のタイムテーブル名は単語途中でも省略される（truncate）
+  test "should truncate event name mid-word on index" do
+    long_name = "SuperLongTimetableNameWithoutAnySpacesToForceMidWordTruncationOnTheIndexCard"
+    @event.event_name_tag.update!(name: long_name)
+
+    get events_path(filter: "created")
+    assert_response :success
+    assert_select "p.truncate[title=?]", long_name, text: /#{Regexp.escape(long_name)}/
+  end
+
   # イベント作成ページを表示
   test "should new event" do
     get new_event_url

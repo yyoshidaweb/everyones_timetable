@@ -1,8 +1,8 @@
 <%# タイムテーブルカードパーシャル %>
 <%= link_to show_timetable_path(event.event_key),
                           class: "block bg-white shadow-md rounded-lg p-4 border hover:shadow-xl hover:bg-gray-50 transition" do %>
-  <%# タイトル %>
-  <p class="text-lg font-semibold text-gray-800 line-clamp-1">
+  <%# タイトル（単語途中でも省略し、表示文字数を確保する） %>
+  <p class="text-lg font-semibold text-gray-800 truncate" title="<%= event.display_name %>">
     <%= event_name_with_lock(event) %>
   </p>
   <%# 開催日 %>
