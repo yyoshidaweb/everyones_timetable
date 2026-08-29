@@ -37,6 +37,11 @@
   color: #1f2937 !important;
 }
 
+.ts-wrapper.single .ts-control input::placeholder {
+  color: #6b7280; /* gray-500 */
+  opacity: 1;
+}
+
 .ts-dropdown,
 .ts-dropdown.single {
   border: 1px solid #d1d5db !important;

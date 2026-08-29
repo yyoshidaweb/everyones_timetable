@@ -5,6 +5,10 @@
         :display_name,
         selected_performer
         ),
-        prompt: "選択してください",
-        data: { controller: "searchable-select" },
+        include_blank: true,
+        data: {
+          controller: "searchable-select",
+          searchable_select_allow_empty_value: false,
+          searchable_select_placeholder_value: "選択してください"
+        },
         class: "w-full" %>
