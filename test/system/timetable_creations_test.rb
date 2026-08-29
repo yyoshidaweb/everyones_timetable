@@ -75,7 +75,7 @@ class TimetableCreationsTest < ApplicationSystemTestCase
 
   private
 
-  # Tom Select は元の select を視覚的に隠すため、表示テキストと元 select の選択値の両方を確認する
+  # Tom Selectは元のselectを視覚的に隠すため、表示テキストと元selectの選択値の両方を確認する
   def assert_searchable_select_selected(container_id, selected_text)
     within "##{container_id}" do
       assert_selector ".ts-control", text: selected_text
