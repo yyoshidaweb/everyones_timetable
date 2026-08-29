@@ -1,5 +1,9 @@
-/* 既存のフォームselectに合わせたTom Selectの見た目調整 */
-.ts-wrapper.single .ts-control {
+/* 既存のフォームselectと同じフラットな見た目にする */
+
+.ts-wrapper.single .ts-control,
+.ts-wrapper.single.input-active .ts-control,
+.ts-wrapper.single.focus .ts-control,
+.dropdown-active .ts-control {
   border: 1px solid #d1d5db; /* gray-300 */
   border-radius: 0.375rem; /* rounded-md */
   padding: 0.5rem 0.75rem;
@@ -15,7 +19,6 @@
 
 .ts-wrapper.single.focus .ts-control {
   border-color: #1f2937; /* gray-800 */
-  box-shadow: 0 0 0 1px #1f2937;
 }
 
 .ts-wrapper.single .ts-control input {
@@ -23,13 +26,16 @@
   color: #1f2937;
 }
 
-.ts-dropdown {
+.ts-dropdown,
+.ts-dropdown.single {
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-top: 1px solid #d1d5db;
+  box-shadow: none;
   margin-top: 0.25rem;
   font-size: 1rem;
   color: #1f2937;
+  background: #fff;
 }
 
 .ts-dropdown .option {
