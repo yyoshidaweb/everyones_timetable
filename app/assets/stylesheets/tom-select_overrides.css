@@ -1,5 +1,16 @@
 /* 既存のフォームselectと同じフラットな見た目にする（tom-select.css より後に読み込むこと） */
 
+/* selectのclassがwrapperにコピーされても二重枠にならないようにする */
+.ts-wrapper {
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+}
+
 .ts-wrapper.single .ts-control,
 .ts-wrapper.single.input-active .ts-control,
 .ts-wrapper.single.focus .ts-control,
