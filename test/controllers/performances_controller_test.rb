@@ -23,6 +23,8 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
   test "should get new" do
     get new_event_performance_url(@event.event_key)
     assert_response :success
+    assert_select 'select[name="performance[performer_id]"][data-controller="searchable-select"]'
+    assert_select 'select[name="performance[stage_id]"][data-controller="searchable-select"]'
   end
 
   # 他者の出演情報作成ページはアクセスできない
@@ -126,6 +128,7 @@ class PerformancesControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     get edit_event_performance_url(@event.event_key, @performance)
     assert_response :success
+    assert_select 'select[name="performance[stage_id]"][data-controller="searchable-select"]'
   end
 
   # Turbo Frameでは出演情報編集をモーダルとして返す
