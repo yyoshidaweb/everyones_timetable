@@ -41,7 +41,7 @@ class TimetableCreationsTest < ApplicationSystemTestCase
       fill_in "performer[performer_name_tag_attributes][name]", with: PERFORMER_NAME
       click_on "作成"
     end
-    assert_selector :select, "出演者", selected: PERFORMER_NAME
+    assert_searchable_select_selected "performer_select", PERFORMER_NAME
 
     # 開催日をモーダルから追加すると、追加した開催日が選択される
     click_on "開催日を追加"
@@ -57,7 +57,7 @@ class TimetableCreationsTest < ApplicationSystemTestCase
       fill_in "stage[stage_name_tag_attributes][name]", with: STAGE_NAME
       click_on "作成"
     end
-    assert_selector :select, "ステージ", selected: STAGE_NAME
+    assert_searchable_select_selected "stage_select", STAGE_NAME
 
     # 開始時刻と出演時間を選択して出演情報を作成する
     select "10", from: "performance[start_time_hour]"
@@ -71,5 +71,16 @@ class TimetableCreationsTest < ApplicationSystemTestCase
     assert_text STAGE_NAME
     assert_text PERFORMER_NAME
     assert_text "10:00"
+  end
+
+  private
+
+  # Tom Select は元の select を視覚的に隠すため、表示テキストと元 select の選択値の両方を確認する
+  def assert_searchable_select_selected(container_id, selected_text)
+    within "##{container_id}" do
+      assert_selector ".ts-control", text: selected_text
+      selected_option = find("select", visible: :all).find("option[selected]", visible: :all)
+      assert_equal selected_text, selected_option.text.strip
+    end
   end
 end
