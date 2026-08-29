@@ -5,6 +5,10 @@
         :display_name,
         selected_performer
         ),
-        prompt: "選択してください",
-        class: "w-full border border-gray-300 rounded-md mb-2 px-3 py-2 text-gray-800
-                focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800" %>
+        include_blank: true,
+        data: {
+          controller: "searchable-select",
+          searchable_select_allow_empty_value: false,
+          searchable_select_placeholder_value: "選択してください"
+        },
+        class: "w-full" %>

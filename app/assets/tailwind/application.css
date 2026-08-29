@@ -14,6 +14,10 @@
 /* フォント用CSSを読み込む */
 @import "../stylesheets/fonts.css";
 
+/* 検索可能なセレクト（Tom Select） */
+@import "../stylesheets/tom-select.css";
+@import "../stylesheets/tom-select_overrides.css";
+
 @config '../../../config/tailwind.config.js';
 
 /*
