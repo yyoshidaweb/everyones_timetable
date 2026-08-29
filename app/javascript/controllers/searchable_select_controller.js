@@ -1,15 +1,21 @@
 import { Controller } from "@hotwired/stimulus"
 import TomSelect from "tom-select"
 
-// 出演情報フォームなどの<select>を検索可能なドロップダウンにする
+/**
+ * 出演情報フォームなどのselectを検索可能なドロップダウンにする。
+ * allowEmpty: 空のoptionを選択肢として残すか（ステージの「未定」など）
+ * placeholder: 未選択時に表示するプレースホルダー
+ */
 export default class extends Controller {
-  // allowEmpty: 空の<option>を選択肢として残すか（ステージの「未定」など）
-  // placeholder: 未選択時に表示するプレースホルダー
   static values = {
     allowEmpty: { type: Boolean, default: true },
     placeholder: { type: String, default: "" }
   }
 
+  /**
+   * 要素にTom Selectを初期化する。
+   * 既に初期化済みの場合は何もしない。
+   */
   connect() {
     if (this.element.tomselect) return
 
@@ -25,6 +31,9 @@ export default class extends Controller {
     })
   }
 
+  /**
+   * Tom Selectインスタンスを破棄してDOMを元に戻す。
+   */
   disconnect() {
     if (this.select) {
       this.select.destroy()

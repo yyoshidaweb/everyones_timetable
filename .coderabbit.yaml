@@ -1,0 +1,7 @@
+# https://docs.coderabbit.ai/configuration/reference
+language: "ja-JP"
+reviews:
+  # 第三者ライブラリのvendorはレビュー・Docstring Coverageの対象外にする
+  path_filters:
+    - "!vendor/**"
+    - "!app/assets/stylesheets/tom-select.css"
