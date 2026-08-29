@@ -16,7 +16,7 @@
 
 /* 検索可能なセレクト（Tom Select） */
 @import "../stylesheets/tom-select.css";
-@import "../stylesheets/searchable-select.css";
+@import "../stylesheets/tom-select_overrides.css";
 
 @config '../../../config/tailwind.config.js';
 

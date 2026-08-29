@@ -1,0 +1,59 @@
+/* 既存のフォームselectと同じフラットな見た目にする（tom-select.css より後に読み込むこと） */
+
+.ts-wrapper.single .ts-control,
+.ts-wrapper.single.input-active .ts-control,
+.ts-wrapper.single.focus .ts-control,
+.dropdown-active .ts-control {
+  border: 1px solid #d1d5db !important; /* gray-300 */
+  border-radius: 0.375rem !important; /* rounded-md */
+  padding: 0.5rem 0.75rem !important;
+  background: #fff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  min-height: 2.5rem;
+  font-size: 1rem !important;
+  line-height: 1.5rem !important;
+  color: #1f2937 !important; /* gray-800 */
+  cursor: pointer;
+}
+
+.ts-wrapper.single.focus .ts-control {
+  border-color: #1f2937 !important; /* gray-800 */
+}
+
+.ts-wrapper.single .ts-control input {
+  font-size: 1rem !important;
+  color: #1f2937 !important;
+}
+
+.ts-dropdown,
+.ts-dropdown.single {
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.375rem !important;
+  border-top: 1px solid #d1d5db !important;
+  box-shadow: none !important;
+  margin-top: 0.25rem;
+  font-size: 1rem !important;
+  color: #1f2937 !important;
+  background: #fff !important;
+}
+
+.ts-dropdown .option {
+  padding: 0.5rem 0.75rem;
+}
+
+.ts-dropdown .active {
+  background-color: #f3f4f6 !important; /* gray-100 */
+  color: #1f2937 !important;
+}
+
+.ts-dropdown .no-results {
+  padding: 0.5rem 0.75rem;
+  color: #6b7280; /* gray-500 */
+}
+
+/* 出演者・ステージselectの下余白を維持 */
+#performer_select .ts-wrapper,
+#stage_select .ts-wrapper {
+  margin-bottom: 0.5rem;
+}
