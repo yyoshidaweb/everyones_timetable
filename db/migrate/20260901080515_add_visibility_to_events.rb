@@ -5,7 +5,7 @@ class AddVisibilityToEvents < ActiveRecord::Migration[8.1]
     execute <<~SQL.squish
       UPDATE events
       SET visibility = CASE
-        WHEN is_published = 1 THEN 0
+        WHEN is_published THEN 0
         ELSE 2
       END
     SQL
@@ -19,8 +19,8 @@ class AddVisibilityToEvents < ActiveRecord::Migration[8.1]
     execute <<~SQL.squish
       UPDATE events
       SET is_published = CASE
-        WHEN visibility = 0 THEN 1
-        ELSE 0
+        WHEN visibility = 0 THEN TRUE
+        ELSE FALSE
       END
     SQL
 
