@@ -179,8 +179,7 @@ class EventsController < ApplicationController
   def event_params
     params.require(:event).permit(
       :description,
-      :is_published,
-      :is_private,
+      :visibility,
       event_name_tag_attributes: [ :name ] # event_name_tagに対するエラーの伝播を許可
     )
   end

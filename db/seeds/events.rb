@@ -10,7 +10,7 @@ Event.find_or_create_by!(
   event_name_tag_id: tag_1.id,
   ) do |e|
   e.description = "テスト用の音楽フェス。3日間開催、複数ステージあり。"
-  e.is_published = true
+  e.visibility = :public
 end
 
 # イベント2
@@ -20,5 +20,5 @@ Event.find_or_create_by!(
   event_name_tag_id: tag_2.id,
   ) do |e|
   e.description = "テスト用の音楽フェス。3日間開催、複数ステージあり。"
-  e.is_published = true
+  e.visibility = :public
 end

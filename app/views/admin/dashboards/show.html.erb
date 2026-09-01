@@ -43,7 +43,7 @@
           <tr>
             <th class="px-3 py-2 font-semibold">ID</th>
             <th class="px-3 py-2 font-semibold">名前</th>
-            <th class="px-3 py-2 font-semibold">公開</th>
+            <th class="px-3 py-2 font-semibold">公開範囲</th>
             <th class="px-3 py-2 font-semibold">作成者</th>
             <th class="px-3 py-2 font-semibold">作成日</th>
           </tr>
@@ -56,7 +56,7 @@
                 <%= link_to event.display_name, show_timetable_path(event.event_key),
                             class: "text-blue-600 hover:underline" %>
               </td>
-              <td class="px-3 py-2"><%= event.is_published? ? "公開" : "非公開" %></td>
+              <td class="px-3 py-2"><%= t("activerecord.enums.event.visibility.#{event.visibility}") %></td>
               <td class="px-3 py-2"><%= event.user.name %>（<%= event.user.email %>）</td>
               <td class="px-3 py-2"><%= l(event.created_at.to_date, format: :default) %></td>
             </tr>

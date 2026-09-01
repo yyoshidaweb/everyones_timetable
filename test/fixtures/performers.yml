@@ -22,3 +22,8 @@ five:
   event: four
   performer_name_tag: one
   description: "出演者1の説明"
+
+unlisted_performer:
+  event: unlisted
+  performer_name_tag: one
+  description: "限定公開イベントの出演者"

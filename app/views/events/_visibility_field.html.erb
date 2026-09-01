@@ -1,0 +1,33 @@
+<%# 公開範囲の3段階選択 %>
+<fieldset>
+  <legend class="block text-sm font-semibold text-gray-800 mb-2">公開範囲</legend>
+  <div class="space-y-3">
+    <label class="flex items-start gap-3 cursor-pointer">
+      <%= form.radio_button :visibility, "public",
+        class: "mt-1 w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800 cursor-pointer" %>
+      <%= material_icon("public", extra_class: "mt-0.5") %>
+      <span>
+        <span class="block text-sm text-gray-800">公開</span>
+        <span class="block text-xs text-gray-500">誰でも閲覧可能。トップページにも掲載されます。</span>
+      </span>
+    </label>
+    <label class="flex items-start gap-3 cursor-pointer">
+      <%= form.radio_button :visibility, "unlisted",
+        class: "mt-1 w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800 cursor-pointer" %>
+      <%= material_icon("link", extra_class: "mt-0.5") %>
+      <span>
+        <span class="block text-sm text-gray-800">限定公開</span>
+        <span class="block text-xs text-gray-500">URLを知っている人のみ閲覧可能。トップページには掲載されません。</span>
+      </span>
+    </label>
+    <label class="flex items-start gap-3 cursor-pointer">
+      <%= form.radio_button :visibility, "private",
+        class: "mt-1 w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800 cursor-pointer" %>
+      <%= material_icon("lock", extra_class: "mt-0.5") %>
+      <span>
+        <span class="block text-sm text-gray-800">非公開</span>
+        <span class="block text-xs text-gray-500">作成者本人のみ閲覧・編集できます。</span>
+      </span>
+    </label>
+  </div>
+</fieldset>

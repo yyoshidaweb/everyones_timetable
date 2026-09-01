@@ -45,7 +45,7 @@ class SitemapBuilder
 
   # 公開イベントの lastmod と、出演情報があるイベントIDの集合を返す
   def self.published_events_with_lastmod
-    events = Event.where(is_published: true).order(:id).to_a
+    events = Event.visibility_public.order(:id).to_a
     # 出演情報を追加してもイベント自体の updated_at は変わらないため、別途取得する
     performances_updated_at = Performance
       .joins(:performer)

@@ -21,3 +21,6 @@ no_ai_usage_event:
 
 unpublished:
   name: "非公開イベント"
+
+unlisted:
+  name: "限定公開イベント"

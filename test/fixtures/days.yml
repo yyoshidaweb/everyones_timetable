@@ -17,3 +17,7 @@ no_performance_event_day:
 no_ai_usage_event_day:
   event: no_ai_usage_event
   date: <%= Date.current %>
+
+unlisted_event_day:
+  event: unlisted
+  date: <%= Date.current + 3.days %>

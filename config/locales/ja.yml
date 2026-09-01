@@ -25,7 +25,7 @@ ja:
         event_key: "タイムテーブルキー"
         event_name_tag_id: "タイムテーブル名タグ"
         event_name_tag: "タイムテーブル名"
-        is_published: "公開設定"
+        visibility: "公開範囲"
         user_id: "作成者"
 
       event_name_tag:
@@ -71,3 +71,10 @@ ja:
       performer_favorite:
         user_id: "ユーザー"
         performer_id: "出演者"
+
+    enums:
+      event:
+        visibility:
+          public: "公開"
+          unlisted: "限定公開"
+          private: "非公開"

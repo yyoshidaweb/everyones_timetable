@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_31_084711) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_080515) do
   create_table "days", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "date", null: false
@@ -42,9 +42,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_084711) do
     t.text "description"
     t.string "event_key", limit: 50, null: false
     t.integer "event_name_tag_id", null: false
-    t.boolean "is_published", default: true, null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.integer "visibility", default: 0, null: false
     t.index ["event_key"], name: "index_events_on_event_key", unique: true
     t.index ["event_name_tag_id"], name: "index_events_on_event_name_tag_id"
     t.index ["user_id", "event_name_tag_id"], name: "index_events_on_user_id_and_event_name_tag_id", unique: true

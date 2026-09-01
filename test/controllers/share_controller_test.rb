@@ -15,6 +15,12 @@ class ShareControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "should show unlisted event share with logout" do
+    get share_path(type: "event", event_key: events(:unlisted).event_key),
+        headers: { "Turbo-Frame" => "modal" }
+    assert_response :success
+  end
+
   test "should return 404 for unpublished event share by other user" do
     sign_in @user_two
     get share_path(type: "event", event_key: @unpublished_event.event_key)

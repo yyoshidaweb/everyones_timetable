@@ -8,9 +8,9 @@
       <%= render "events/favorite_button", event: @event %>
     </div>
     <% header_title = event_header_title %>
-    <%# 非公開の場合はタイトル全体の先頭に鍵アイコンを付ける %>
+    <%# 限定公開・非公開の場合はタイトル全体の先頭にアイコンを付ける %>
     <h1 class="text-sm text-white flex-1 min-w-0 flex items-center justify-center gap-1 leading-none">
-      <%= lock_icon_for(@event) %>
+      <%= visibility_icon_for(@event) %>
       <%# 省略された場合でも全文を確認できるようにtitle属性を付ける %>
       <span class="truncate" title="<%= header_title %>"><%= header_title %></span>
     </h1>

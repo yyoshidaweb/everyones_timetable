@@ -41,6 +41,12 @@ class TimetablesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "ページが見つかりません"
   end
 
+  test "should get unlisted timetable with logout" do
+    sign_out @user
+    get show_timetable_path(events(:unlisted).event_key)
+    assert_response :success
+  end
+
   test "should not get unpublished timetable by other user" do
     sign_out @user
     sign_in @user_two

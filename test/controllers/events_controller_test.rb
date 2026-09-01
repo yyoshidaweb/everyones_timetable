@@ -28,6 +28,20 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "should show unlisted event with logout" do
+    sign_out @user
+    get event_url(events(:unlisted).event_key)
+    assert_response :success
+  end
+
+  test "should show link icon on unlisted event detail" do
+    sign_out @user
+    get event_url(events(:unlisted).event_key)
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "link"
+    assert_select "span.material-symbols-outlined", text: "lock", count: 0
+  end
+
   test "should not show unpublished event by other user" do
     sign_out @user
     sign_in users(:two)
@@ -58,6 +72,12 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     get events_path(filter: "created")
     assert_response :success
     assert_select "span.material-symbols-outlined", text: "lock"
+  end
+
+  test "should show link icon for unlisted event in created list" do
+    get events_path(filter: "created")
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "link"
   end
 
   # 一覧のタイムテーブル名は単語途中でも省略される（truncate）
@@ -102,20 +122,36 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to show_timetable_path(created_event.event_key)
   end
 
-  test "should create unpublished event" do
+  test "should create private event" do
     event_name = "非公開イベント作成テスト"
     assert_difference("Event.count", 1) do
       post events_url, params: {
         event: {
           event_name_tag_attributes: { name: event_name },
           description: "説明",
-          is_published: false
+          visibility: "private"
         }
       }
     end
 
     created_event = Event.last
-    assert_not created_event.is_published?
+    assert created_event.visibility_private?
+  end
+
+  test "should create unlisted event" do
+    event_name = "限定公開イベント作成テスト"
+    assert_difference("Event.count", 1) do
+      post events_url, params: {
+        event: {
+          event_name_tag_attributes: { name: event_name },
+          description: "説明",
+          visibility: "unlisted"
+        }
+      }
+    end
+
+    created_event = Event.last
+    assert created_event.visibility_unlisted?
   end
 
   # 1ユーザー内のイベント名が重複する場合は作成できない
@@ -164,17 +200,17 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should check private checkbox when event is unpublished" do
+  test "should select private visibility when event is private" do
     unpublished_event = events(:unpublished)
     get edit_event_url(unpublished_event.event_key)
     assert_response :success
-    assert_select "input[name='event[is_private]'][type=checkbox][checked]"
+    assert_select "input[name='event[visibility]'][type=radio][value=private][checked]"
   end
 
-  test "should not check private checkbox when event is published" do
+  test "should select public visibility when event is public" do
     get edit_event_url(@event.event_key)
     assert_response :success
-    assert_select "input[name='event[is_private]'][type=checkbox][checked]", count: 0
+    assert_select "input[name='event[visibility]'][type=radio][value=public][checked]"
   end
 
   # 他者が作成した編集フォームは表示できない
@@ -205,18 +241,18 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "説明更新", @event.description
   end
 
-  test "should update event publication status" do
+  test "should update event visibility" do
     patch event_url(@event.event_key), params: {
       event: {
         description: @event.description,
-        is_published: false,
+        visibility: "private",
         event_name_tag_attributes: { name: @event.event_name_tag.name }
       }
     }
 
     assert_redirected_to event_path(@event.event_key)
     @event.reload
-    assert_not @event.is_published?
+    assert @event.visibility_private?
   end
 
   # イベント名が空文字の場合は編集できない
