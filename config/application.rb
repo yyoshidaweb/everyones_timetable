@@ -23,6 +23,9 @@ module Minnanotimetable
     # monitoring は initializer から明示 require するため autoload 対象外にする
     config.autoload_lib(ignore: %w[assets tasks monitoring])
 
+    require Rails.root.join("lib/monitoring/malformed_request_middleware")
+    config.middleware.insert_before 0, Monitoring::MalformedRequestMiddleware
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
