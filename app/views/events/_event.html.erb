@@ -3,7 +3,7 @@
                           class: "block bg-white shadow-md rounded-lg p-4 border hover:shadow-xl hover:bg-gray-50 transition" do %>
   <%# タイトル（単語途中でも省略し、表示文字数を確保する） %>
   <p class="text-lg font-semibold text-gray-800 truncate" title="<%= event.display_name %>">
-    <%= event_name_with_lock(event) %>
+    <%= event_name_with_visibility_icon(event) %>
   </p>
   <%# 開催日 %>
   <p class="text-sm text-gray-500">

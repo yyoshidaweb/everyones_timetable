@@ -60,3 +60,12 @@ five:
   start_time: "15:00:00"
   end_time: "15:45:00"
   duration: 45
+
+# 限定公開イベントの出演情報
+unlisted_one:
+  day: unlisted_event_day
+  performer: unlisted_performer
+  stage: unlisted_stage
+  start_time: "12:00:00"
+  end_time: "13:00:00"
+  duration: 60

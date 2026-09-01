@@ -34,10 +34,11 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should not show lock icon on unlisted event detail" do
+  test "should show link icon on unlisted event detail" do
     sign_out @user
     get event_url(events(:unlisted).event_key)
     assert_response :success
+    assert_select "span.material-symbols-outlined", text: "link"
     assert_select "span.material-symbols-outlined", text: "lock", count: 0
   end
 
@@ -71,6 +72,12 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     get events_path(filter: "created")
     assert_response :success
     assert_select "span.material-symbols-outlined", text: "lock"
+  end
+
+  test "should show link icon for unlisted event in created list" do
+    get events_path(filter: "created")
+    assert_response :success
+    assert_select "span.material-symbols-outlined", text: "link"
   end
 
   # 一覧のタイムテーブル名は単語途中でも省略される（truncate）

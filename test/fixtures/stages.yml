@@ -34,3 +34,10 @@ sort_two:
   event: one
   stage_name_tag: sort_two_tag
   position: "2"
+
+unlisted_stage:
+  event: unlisted
+  stage_name_tag: one
+  address: "テスト県テスト市テスト町2-2-2"
+  description: "限定公開イベントのステージ"
+  position: "0"
