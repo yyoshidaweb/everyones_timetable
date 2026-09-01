@@ -3,46 +3,53 @@ one:
   event_name_tag: one
   event_key: "one"
   description: "テスト用フェスイベント"
-  is_published: true
+  visibility: public
 
 two:
   user: one
   event_name_tag: two
   event_key: "two"
   description: "テスト用フェスイベント"
-  is_published: true
+  visibility: public
 
 three:
   user: one
   event_name_tag: three
   event_key: "three"
   description: "テスト用フェスイベント"
-  is_published: true
+  visibility: public
 
 four:
   user: two
   event_name_tag: four
   event_key: "four"
   description: "テスト用フェスイベント"
-  is_published: true
+  visibility: public
 
 no_performance_event:
   user: two
   event_name_tag: one
   event_key: "no_performance_event"
   description: "出演情報がないテスト用フェスイベント"
-  is_published: true
+  visibility: public
 
 no_ai_usage_event:
   user: no_ai_usage
   event_name_tag: no_ai_usage_event
   event_key: "no_ai_usage_event"
   description: "AI利用回数0のユーザーのテスト用フェスイベント"
-  is_published: true
+  visibility: public
 
 unpublished:
   user: one
   event_name_tag: unpublished
   event_key: "unpublished"
   description: "非公開のテスト用フェスイベント"
-  is_published: false
+  visibility: private
+
+unlisted:
+  user: one
+  event_name_tag: unlisted
+  event_key: "unlisted"
+  description: "限定公開のテスト用フェスイベント"
+  visibility: unlisted

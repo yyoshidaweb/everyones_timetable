@@ -3,7 +3,7 @@ module EventsHelper
   # align-middleはインライン文脈（一覧カード・概要ページ）用、
   # shrink-0はflex文脈（event-header）でアイコンが潰れないようにするためのもの
   def lock_icon_for(event)
-    return if event.is_published?
+    return unless event.visibility_private?
 
     content_tag(
       :span,

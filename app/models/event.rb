@@ -18,6 +18,12 @@ class Event < ApplicationRecord
   # nested attributes を許可（フォームで fields_for を使うため）
   accepts_nested_attributes_for :event_name_tag, update_only: false
 
+  enum :visibility, {
+    public: 0,
+    unlisted: 1,
+    private: 2
+  }, prefix: true
+
   # ===== バリデーション =====
   validates :event_key, presence: true, uniqueness: true
   validates :event_name_tag, presence: true
@@ -29,7 +35,7 @@ class Event < ApplicationRecord
   # みんなが作ったタイムテーブルのうち、未来イベントを取得
   scope :future_all, -> {
     now = Time.current.to_date
-    where(is_published: true)
+    visibility_public
       .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
@@ -48,7 +54,7 @@ class Event < ApplicationRecord
   # みんなが作ったタイムテーブルのうち、過去イベントを取得
   scope :past_all, -> {
     now = Time.current.to_date
-    where(is_published: true)
+    visibility_public
       .left_joins(:event_favorites)
       .left_joins(performers: :performances)
       .left_joins(:days)
@@ -86,7 +92,7 @@ class Event < ApplicationRecord
   scope :recent_favorite_by, ->(user) {
     joins(:event_favorites)
       .where(event_favorites: { user_id: user.id })
-      .where("events.is_published = ? OR events.user_id = ?", true, user.id)
+      .where("events.visibility != ? OR events.user_id = ?", visibilities[:private], user.id)
       .includes(:user, :days, :event_name_tag, :event_favorites)
       .order("event_favorites.created_at DESC")
   }
@@ -101,13 +107,13 @@ class Event < ApplicationRecord
     event_name_tag.name
   end
 
-  # フォーム用: 非公開チェックボックス（オン=非公開）
-  # boolean列 is_published を反転した値として扱う
-  def is_private
-    !is_published?
+  # URLを知っていれば閲覧可能かどうか
+  def viewable_by_url?
+    !visibility_private?
   end
 
-  def is_private=(value)
-    self.is_published = !ActiveModel::Type::Boolean.new.cast(value)
+  # 検索エンジンへのインデックス対象かどうか
+  def search_indexable?
+    visibility_public?
   end
 end

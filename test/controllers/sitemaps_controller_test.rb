@@ -36,12 +36,13 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "<loc>http://www.example.com/t/#{event.event_key}</loc>"
   end
 
-  # 非公開イベントはサイトマップに含まれない
-  test "sitemap excludes unpublished events" do
+  # 非公開・限定公開イベントはサイトマップに含まれない
+  test "sitemap excludes non-public events" do
     get sitemap_path
-    event = events(:unpublished)
-    assert_not_includes response.body, "<loc>http://www.example.com/events/#{event.event_key}</loc>"
-    assert_not_includes response.body, "<loc>http://www.example.com/t/#{event.event_key}</loc>"
+    [ events(:unpublished), events(:unlisted) ].each do |event|
+      assert_not_includes response.body, "<loc>http://www.example.com/events/#{event.event_key}</loc>"
+      assert_not_includes response.body, "<loc>http://www.example.com/t/#{event.event_key}</loc>"
+    end
   end
 
   # マイタイムテーブルは重複コンテンツになるためサイトマップに含めない

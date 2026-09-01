@@ -71,7 +71,7 @@ module ApplicationHelper
   def robots_noindex?
     return true if Rails.env.staging?
     return true if defined?(@my_timetable_view) && @my_timetable_view
-    return true if defined?(@event) && @event.present? && !@event.is_published?
+    return true if defined?(@event) && @event.present? && !@event.search_indexable?
 
     case current_page
     when "home#index", "static_pages#terms", "static_pages#privacy"
@@ -137,6 +137,6 @@ module ApplicationHelper
 
     # 検索の入り口になる公開タイムテーブルがあるか
     def indexable_timetable_event?
-      defined?(@event) && @event.present? && @event.is_published? && @event.performances.exists?
+      defined?(@event) && @event.present? && @event.search_indexable? && @event.performances.exists?
     end
 end

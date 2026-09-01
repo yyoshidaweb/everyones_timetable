@@ -9,3 +9,7 @@ user_two_to_unpublished:
 user_one_to_unpublished:
   user: one
   event: unpublished
+
+user_two_to_unlisted:
+  user: two
+  event: unlisted

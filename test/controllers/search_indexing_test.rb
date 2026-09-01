@@ -78,6 +78,11 @@ class SearchIndexingTest < ActionDispatch::IntegrationTest
     assert_not_canonicalized_to_timetable(@empty_event)
   end
 
+  test "unlisted event includes noindex" do
+    get event_path(events(:unlisted).event_key)
+    assert_noindex
+  end
+
   test "performers index without performances includes noindex" do
     get event_performers_path(@empty_event.event_key)
     assert_noindex

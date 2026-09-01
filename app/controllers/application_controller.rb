@@ -98,7 +98,7 @@ class ApplicationController < ActionController::Base
 
     # 非公開イベントは作成者本人のみ閲覧を許可する
     def authorize_published_event!(event)
-      return if event.is_published?
+      return if event.viewable_by_url?
       return if user_signed_in? && event.user_id == current_user.id
 
       # raise だと開発環境で Exception 画面になるため、公開用404を返す
