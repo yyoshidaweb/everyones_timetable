@@ -9,4 +9,10 @@ Sentry.init do |config|
   config.send_default_pii = false
   # 無料枠内に収めるため、パフォーマンス計測は低サンプル率にする
   config.traces_sample_rate = Monitoring::SentryConfig::TRACES_SAMPLE_RATE
+
+  # 不正なmultipartリクエスト（ボットスキャン等）はクライアント起因のため除外する
+  config.excluded_exceptions += %w[
+    Rack::Multipart::BoundaryTooLongError
+    Rack::Multipart::EmptyContentError
+  ]
 end
